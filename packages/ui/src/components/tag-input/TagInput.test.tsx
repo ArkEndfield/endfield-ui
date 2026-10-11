@@ -515,6 +515,28 @@ describe("TagInput", () => {
     expect(input()).not.toHaveAttribute("placeholder");
   });
 
+  it("高对比模式：小块有一圈线；禁用时线和字都写明灰字色", () => {
+    const { rerender } = render(<Example defaultValue={["北岭"]} />);
+    const chip = () => document.querySelector("[data-tag]");
+    expect(chip()).toHaveClass(
+      "forced-colors:border",
+      "forced-colors:border-[ButtonText]",
+    );
+    expect(chip()!.className).not.toContain("GrayText");
+
+    rerender(<Example disabled defaultValue={["北岭"]} />);
+    expect(chip()).toHaveClass(
+      "forced-colors:border",
+      "forced-colors:border-[GrayText]",
+      "forced-colors:text-[GrayText]",
+    );
+    expect(chip()).not.toHaveClass("forced-colors:border-[ButtonText]");
+
+    // 只读不是禁用：照旧是普通的那一圈线
+    rerender(<Example readOnly defaultValue={["北岭"]} />);
+    expect(chip()).toHaveClass("forced-colors:border-[ButtonText]");
+  });
+
   it("禁用和只读：小块上没有叉，加不了也删不了", async () => {
     const user = userEvent.setup();
     const onValueChange = vi.fn();

@@ -12,12 +12,13 @@ export const valueChipSize: Record<ControlSize, string> = {
   lg: "h-8 text-base",
 };
 
+// 高对比模式下底色被系统换掉，小块就成了一串连着的字：补一圈线，一块还是一块
 export const valueChip =
-  "flex max-w-full min-w-0 cursor-default items-center bg-surface-muted pl-2 text-ink";
+  "flex max-w-full min-w-0 cursor-default items-center bg-surface-muted pl-2 text-ink forced-colors:border forced-colors:border-[ButtonText]";
 
 /** 小块右端的删除叉：一个和小块等高的方钮 */
 export const valueChipRemove =
-  "flex aspect-square h-full shrink-0 items-center justify-center text-ink-secondary hover:bg-line hover:text-ink";
+  "flex aspect-square h-full shrink-0 items-center justify-center text-ink-secondary hover:bg-line hover:text-ink forced-colors:in-data-disabled:text-[GrayText]";
 
 /** 和小块排在一起的那个输入框：和小块一样高，这一行才不会比小块高出一截 */
 export const valueInputHeight: Record<ControlSize, string> = {

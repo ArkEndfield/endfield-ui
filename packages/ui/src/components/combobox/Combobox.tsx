@@ -314,6 +314,8 @@ export function Combobox(props: ComboboxProps) {
                         valueChip,
                         "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus",
                         "data-disabled:text-ink-disabled",
+                        // 高对比模式：系统不知道这一块禁用了，字和那一圈线都写明灰字色
+                        "forced-colors:data-disabled:border-[GrayText] forced-colors:data-disabled:text-[GrayText]",
                         valueChipSize[size],
                       )}
                     >

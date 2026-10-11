@@ -158,7 +158,8 @@ async function differs(
 }
 
 // stroke 是 SVG 的：上面写的颜色系统不换，要自己写成系统色
-type ColorProperty = "backgroundColor" | "color" | "outlineColor" | "stroke";
+type ColorProperty =
+  "backgroundColor" | "color" | "outlineColor" | "borderTopColor" | "stroke";
 
 /**
  * 等这个元素（或它的伪元素）上声明的颜色是这个系统色关键字。作者写的普通颜色在计算样式里
@@ -1116,4 +1117,65 @@ test("禁用项的文字：复选、单选、开关的标签和分段选择里�
     false,
     "没禁用也没选中的那一段，文字不该是灰字色",
   );
+});
+
+test("值块：组合框多选和标签输入里的每个值有一圈线；禁用的是灰字色", async () => {
+  const { page } = storybook;
+  await open(page, "控件-combobox-组合框--multiple");
+  const chip = `${ROOT} [role=toolbar] > div[aria-label]`;
+  // 取左边那条线的正中：值块横向的位置是定死的，纵向跟着上面那行字的高度走，每台机器不一样
+  const edge = (selector: string, nth = 0) =>
+    at(page, selector, 0, "center", nth);
+  // 往里 4px：在线和字之间的留白里
+  const inside = (selector: string) => at(page, selector, 4, 4);
+
+  for (const nth of [0, 1]) {
+    await shows(
+      page,
+      await edge(chip, nth),
+      "ButtonText",
+      `第 ${nth + 1} 个值块的左缘应该有一条线`,
+    );
+  }
+  await differs(
+    page,
+    await inside(chip),
+    "ButtonText",
+    "值块里面应该是空的，不是实心的",
+  );
+  await declares(page, chip, "borderTopColor", "ButtonText");
+
+  // 四个框：空的、错误、禁用、只读
+  await open(page, "控件-taginput-标签输入--states");
+  const disabledTag = `${ROOT} [data-disabled] [data-tag]`;
+  const readOnlyTag = `${ROOT} div[data-variant]:nth-child(4) [data-tag]`;
+  await shows(
+    page,
+    await edge(disabledTag),
+    "GrayText",
+    "禁用的标签输入：值块的线应该是灰字色",
+  );
+  await declares(page, disabledTag, "color", "GrayText");
+  await shows(
+    page,
+    await edge(readOnlyTag),
+    "ButtonText",
+    "只读的标签输入：值块照旧是普通的那一圈线",
+  );
+  assert.equal(
+    await declared(page, readOnlyTag, "color", "GrayText"),
+    false,
+    "只读不是禁用：值块的字不该是灰字色",
+  );
+
+  // 第三个字段是禁用的多选
+  await open(page, "控件-combobox-组合框--states");
+  await shows(
+    page,
+    await edge(chip),
+    "GrayText",
+    "禁用的组合框：值块的线应该是灰字色",
+  );
+  await declares(page, chip, "color", "GrayText");
+  await declares(page, `${chip} button`, "color", "GrayText");
 });

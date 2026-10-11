@@ -409,7 +409,9 @@ export function TagInput({
                 "data-flash:bg-surface-inverse data-flash:text-ink-inverse",
                 flipLeaving,
                 added.has(tag) && fadeInFast,
-                disabled && "text-ink-disabled",
+                // 高对比模式：这是个 <span>，系统不知道它禁用了，字和那一圈线都写明灰字色
+                disabled &&
+                  "text-ink-disabled forced-colors:border-[GrayText] forced-colors:text-[GrayText]",
                 !editable && "pr-2",
               )}
             >

@@ -343,6 +343,29 @@ describe("Combobox", () => {
       ).toHaveAttribute("aria-selected", "true");
     });
 
+    it("高对比模式：小块有一圈线；禁用时线、字和叉都写明灰字色", () => {
+      render(
+        <Combobox
+          multiple
+          items={stations}
+          aria-label="站点"
+          defaultValue={["n07"]}
+        />,
+      );
+      const remove = screen.getByRole("button", { name: "移除北区七号站" });
+      // 底色被系统换掉之后，小块靠这一圈线才还是一块
+      expect(remove.parentElement).toHaveClass(
+        "forced-colors:border",
+        "forced-colors:border-[ButtonText]",
+        // 小块不是真的控件，系统不知道它禁用了
+        "forced-colors:data-disabled:border-[GrayText]",
+        "forced-colors:data-disabled:text-[GrayText]",
+      );
+      expect(remove).toHaveClass(
+        "forced-colors:in-data-disabled:text-[GrayText]",
+      );
+    });
+
     it("点小块上的叉移除这一项；输入框空着时退格删掉最后一项", async () => {
       const user = userEvent.setup();
       const onValueChange = vi.fn();
