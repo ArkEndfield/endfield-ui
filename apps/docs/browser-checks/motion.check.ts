@@ -2603,3 +2603,108 @@ test("页签的胶囊：选中的墨底滑到新的那一个（200ms），宽度
   await page.settled(LIST);
   assert.equal((await at()).on, 2);
 });
+
+test("页内目录：点一项，这一次跳转滚得平滑——点的那一刻容器和页面上写着 scroll-behavior，停下就撤掉；减少动态效果下不写", async () => {
+  const { page } = storybook;
+  const SCROLLER = "#storybook-root [role=region]";
+  const LINKS = "#storybook-root nav a";
+
+  /**
+   * 点第几项。无头浏览器不做平滑滚动的动画，所以核对的是它"要了什么"：
+   * 点击事件冒泡到 document 的那一刻（控件已经处理完，浏览器还没开始跳）把两处的样式读一遍
+   */
+  const pick = (index: number) =>
+    page.evaluate(
+      ({ scroller: css, links, at }) => {
+        const scroller = document.querySelector<HTMLElement>(css)!;
+        const root = document.documentElement;
+        let during: string[] = [];
+        document.addEventListener(
+          "click",
+          () => {
+            during = [
+              scroller.style.scrollBehavior,
+              getComputedStyle(scroller).scrollBehavior,
+              root.style.scrollBehavior,
+              getComputedStyle(root).scrollBehavior,
+            ];
+          },
+          { once: true },
+        );
+        const link = document.querySelectorAll<HTMLElement>(links)[at]!;
+        link.click();
+        return {
+          during,
+          followed: location.hash === link.getAttribute("href"),
+        };
+      },
+      { scroller: SCROLLER, links: LINKS, at: index },
+    );
+  const state = () =>
+    page.evaluate(
+      ({ scroller: css, links }) => {
+        const scroller = document.querySelector<HTMLElement>(css)!;
+        return {
+          inline: [
+            scroller.style.scrollBehavior,
+            document.documentElement.style.scrollBehavior,
+          ],
+          attributes: [
+            scroller.getAttribute("style"),
+            document.documentElement.getAttribute("style"),
+          ],
+          scrolled: Math.round(scroller.scrollTop),
+          current:
+            [...document.querySelectorAll(links)].find((link) =>
+              link.hasAttribute("aria-current"),
+            )?.textContent ?? null,
+        };
+      },
+      { scroller: SCROLLER, links: LINKS },
+    );
+  const stopped = async (message: string) => {
+    await page.waitFor(async () => (await state()).scrolled > 0, message);
+    // 滚动停下 150ms 之后才撤：等它撤掉
+    return page.waitFor(async () => {
+      const found = await state();
+      return found.inline.join("") === "" ? found : null;
+    }, "滚动停下之后，临时写上去的 scroll-behavior 应该撤掉");
+  };
+
+  let smooth = { scrolled: 0, current: null as string | null };
+  await withMotion(page, async () => {
+    await page.story("控件-toc-页内目录--playground");
+    const before = await state();
+    assert.deepEqual(before.inline, ["", ""]);
+
+    const picked = await pick(3);
+    assert.deepEqual(
+      picked.during,
+      ["smooth", "smooth", "smooth", "smooth"],
+      "点的那一刻，正文的滚动容器和页面都应该是平滑滚动",
+    );
+    assert.equal(picked.followed, true, "仍然是锚点跳转：地址里是这一节");
+
+    const after = await stopped("正文应该滚过去了");
+    assert.deepEqual(
+      after.attributes,
+      before.attributes,
+      "撤掉之后不该多留一个 style 属性",
+    );
+    assert.equal(after.current, "本月排期", "点的那一项是当前项");
+    smooth = after;
+  });
+
+  // 减少动态效果：不写，直接跳；到的是同一个地方
+  await page.story("控件-toc-页内目录--playground");
+  const picked = await pick(3);
+  assert.deepEqual(
+    picked.during,
+    ["", "auto", "", "auto"],
+    "减少动态效果下不该要平滑滚动",
+  );
+  assert.equal(picked.followed, true);
+  const reduced = await stopped("减少动态效果下也应该跳过去");
+  assert.equal(reduced.scrolled, smooth.scrolled, "两种到的应该是同一个位置");
+  assert.equal(reduced.current, "本月排期");
+});

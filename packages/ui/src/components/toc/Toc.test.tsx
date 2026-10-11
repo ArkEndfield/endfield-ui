@@ -284,6 +284,95 @@ describe("Toc", () => {
     expect(current()).toEqual([]);
   });
 
+  /* 系统的"减少动态效果"：jsdom 里没有 matchMedia，开着的时候桩一个 */
+  const reduceMotion = () => {
+    const original = window.matchMedia;
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: query.includes("prefers-reduced-motion"),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }));
+    return () => {
+      window.matchMedia = original;
+    };
+  };
+  const behavior = (element: HTMLElement = document.documentElement) =>
+    element.style.getPropertyValue("scroll-behavior");
+
+  it("点一项：这一次跳转滚得平滑——页面上临时写着 scroll-behavior，滚动停下就撤掉", () => {
+    vi.useFakeTimers();
+    render(<Page />);
+    expect(behavior()).toBe("");
+
+    fireEvent.click(screen.getByRole("link", { name: "站点档案" }));
+    expect(behavior()).toBe("smooth");
+
+    // 还在滚：每来一次滚动事件就再等一会儿
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+    scrollTo(900);
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+    expect(behavior()).toBe("smooth");
+
+    // 停下了：撤掉，不留一个空的 style 属性
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
+    expect(behavior()).toBe("");
+    expect(document.documentElement).not.toHaveAttribute("style");
+  });
+
+  it("平滑只借这一次：页面原来写着的内联值，停下之后、卸载之后都还在", () => {
+    vi.useFakeTimers();
+    const root = document.documentElement;
+    root.style.setProperty("scroll-behavior", "auto");
+    const { unmount } = render(<Page />);
+
+    fireEvent.click(screen.getByRole("link", { name: "日常作业" }));
+    expect(behavior()).toBe("smooth");
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
+    expect(behavior()).toBe("auto");
+
+    // 还没停下就卸载了：也还原
+    fireEvent.click(screen.getByRole("link", { name: "队员" }));
+    expect(behavior()).toBe("smooth");
+    unmount();
+    expect(behavior()).toBe("auto");
+    root.removeAttribute("style");
+  });
+
+  it("不平滑的几种：系统开了「减少动态效果」、页面上没有这一节、点击被拦下", () => {
+    const { unmount } = render(<Page />);
+    fireEvent.click(screen.getByRole("link", { name: "页面上没有的一节" }));
+    expect(behavior()).toBe("");
+
+    const restore = reduceMotion();
+    fireEvent.click(screen.getByRole("link", { name: "站点档案" }));
+    // 照旧是当前项，只是直接跳
+    expect(current()).toEqual(["站点档案"]);
+    expect(behavior()).toBe("");
+    restore();
+    unmount();
+
+    render(
+      <>
+        <Toc>
+          <TocItem href="#bulletin" onClick={(event) => event.preventDefault()}>
+            最新情报
+          </TocItem>
+        </Toc>
+        <h2 id="bulletin">最新情报</h2>
+      </>,
+    );
+    fireEvent.click(screen.getByRole("link", { name: "最新情报" }));
+    expect(behavior()).toBe("");
+  });
+
   it("onActiveChange：当前的小节变了才报，一节都没到时是 null", () => {
     const onActiveChange = vi.fn();
     render(<Page onActiveChange={onActiveChange} />);
@@ -359,6 +448,45 @@ describe("Toc", () => {
       scroller.dispatchEvent(new Event("scroll"));
     });
     expect(current()).toEqual(["日常作业"]);
+  });
+
+  it("target：点一项时容器和页面一起平滑——小节在容器里，页面也可能跟着滚", () => {
+    vi.useFakeTimers();
+    function InContainer() {
+      const ref = useRef<HTMLDivElement>(null);
+      return (
+        <>
+          <Toc target={ref}>
+            <TocItem href="#bulletin">最新情报</TocItem>
+          </Toc>
+          <div ref={ref} data-testid="scroller">
+            <h2 id="bulletin">最新情报</h2>
+          </div>
+        </>
+      );
+    }
+    render(<InContainer />);
+    const scroller = screen.getByTestId("scroller");
+    const read = (element: HTMLElement) =>
+      element.style.getPropertyValue("scroll-behavior");
+
+    fireEvent.click(screen.getByRole("link", { name: "最新情报" }));
+    expect(read(scroller)).toBe("smooth");
+    expect(read(document.documentElement)).toBe("smooth");
+
+    // 容器还在滚：两处都留着
+    act(() => {
+      vi.advanceTimersByTime(100);
+      scroller.dispatchEvent(new Event("scroll"));
+      vi.advanceTimersByTime(100);
+    });
+    expect(read(scroller)).toBe("smooth");
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
+    expect(read(scroller)).toBe("");
+    expect(read(document.documentElement)).toBe("");
+    expect(scroller).not.toHaveAttribute("style");
   });
 
   it("className 和 ref 给 nav，其余属性也是", () => {

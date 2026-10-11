@@ -54,10 +54,50 @@ export type TocProps = TocOwnProps &
 const SETTLE_MS = 150;
 
 /**
+ * 让接下来的这一次滚动是平滑的：给这几个滚动容器写上内联的 `scroll-behavior`，
+ * 滚动停下（`SETTLE_MS` 里没有再滚）就还原成原来的内联值。返回的函数提前还原。
+ *
+ * 滚动本身不归它管——跳过去的仍然是浏览器（锚点跳转）。
+ */
+function smoothOnce(scrollers: readonly HTMLElement[]) {
+  const before = scrollers.map((scroller) =>
+    scroller.style.getPropertyValue("scroll-behavior"),
+  );
+  for (const scroller of scrollers) {
+    scroller.style.setProperty("scroll-behavior", "smooth");
+  }
+
+  // 页面的滚动事件发在 window 上，容器的发在它自己身上
+  const sources = scrollers.map((scroller) =>
+    scroller === document.documentElement ? window : scroller,
+  );
+  let timer: ReturnType<typeof setTimeout>;
+  const restore = () => {
+    clearTimeout(timer);
+    for (const source of sources) source.removeEventListener("scroll", wait);
+    scrollers.forEach((scroller, index) => {
+      scroller.style.setProperty("scroll-behavior", before[index]!);
+      // 原来没有内联样式的，不留一个空的 style 属性在上面
+      if (scroller.style.length === 0) scroller.removeAttribute("style");
+    });
+  };
+  function wait() {
+    clearTimeout(timer);
+    timer = setTimeout(restore, SETTLE_MS);
+  }
+  for (const source of sources) {
+    source.addEventListener("scroll", wait, { passive: true });
+  }
+  wait();
+  return restore;
+}
+
+/**
  * 页内目录：这一页有哪几节、现在看到了哪一节。里面放 `TocItem`。
  *
- * 位置由使用方给，通常是 `className="sticky top-6"`。点一项就是点一个锚点链接：
- * 滚不滚、平不平滑是浏览器和页面 CSS 的事，它不接管滚动。
+ * 位置由使用方给，通常是 `className="sticky top-6"`。点一项仍然是点一个锚点链接——
+ * 地址、后退、`scroll-mt` 都是浏览器原生的那一套；它只让这一次跳转滚得平滑
+ * （系统开了"减少动态效果"时照旧直接跳）。
  */
 export function Toc({
   title,
@@ -137,6 +177,32 @@ export function Toc({
 
   const active = pinned ?? spied;
 
+  // 点了一项之后的那一次跳转滚得平滑。这是脚本里要的平滑滚动，"减少动态效果"得自己看
+  const restoreScroll = useRef<(() => void) | null>(null);
+  useEffect(() => () => restoreScroll.current?.(), []);
+  const pick = useCallback(
+    (section: string) => {
+      setPinned(section);
+      restoreScroll.current?.();
+      restoreScroll.current = null;
+      if (!document.getElementById(section)) return;
+      if (
+        typeof window.matchMedia === "function" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+        return;
+      }
+      // 小节在容器里时，页面也可能跟着滚（把它带到眼前）：两处一起
+      const container = target?.current;
+      restoreScroll.current = smoothOnce(
+        container
+          ? [container, document.documentElement]
+          : [document.documentElement],
+      );
+    },
+    [target],
+  );
+
   const report = useRef(onActiveChange);
   report.current = onActiveChange;
   const reported = useRef<string | null>(null);
@@ -162,7 +228,7 @@ export function Toc({
     }
   }, [active]);
 
-  const context = useMemo(() => ({ active, pick: setPinned }), [active]);
+  const context = useMemo(() => ({ active, pick }), [active, pick]);
   const hasTitle = title !== undefined && title !== null && title !== false;
 
   return (
