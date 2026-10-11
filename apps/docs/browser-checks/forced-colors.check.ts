@@ -5,6 +5,7 @@
 // 只比"是同一个颜色 / 不是同一个颜色"，不比色值：系统色是使用者自己定的，每台机器不一样
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { inflateSync } from "node:zlib";
 import { useStorybook, type Page } from "./lib/harness.ts";
 
 const storybook = useStorybook();
@@ -128,7 +129,38 @@ async function painted(page: Page, keyword: SystemColor): Promise<string> {
   return color;
 }
 
-/** 等这一点画成这个系统色。状态刚变的头一两帧还是旧的，所以是等，不是量一次 */
+/** 1×1 的截图是什么颜色。只在没过的时候报给人看，不拿来比 */
+function rgb(png: string): string {
+  const bytes = Buffer.from(png, "base64");
+  // 第 25 个字节是颜色类型：2、6 才是按 R、G、B 排的
+  if (bytes[25] !== 2 && bytes[25] !== 6) return png;
+  // 文件头 8 个字节，之后一块接一块：长度、名字、内容、校验。像素在 IDAT 里，会分成几块
+  const idat: Buffer[] = [];
+  for (let at = 8; at < bytes.length; at += 12 + bytes.readUInt32BE(at)) {
+    if (bytes.toString("latin1", at + 4, at + 8) === "IDAT") {
+      idat.push(bytes.subarray(at + 8, at + 8 + bytes.readUInt32BE(at)));
+    }
+  }
+  // 解开是"滤波类型 + 一个像素"。只有一个像素，没有左边和上边可减，值就是原样
+  const [, r, g, b] = inflateSync(Buffer.concat(idat));
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+/** 这个系统色关键字在这个浏览器里算出来的值。也只在没过的时候报给人看 */
+const computed = (page: Page, keyword: SystemColor) =>
+  page.evaluate((color) => {
+    const probe = document.createElement("i");
+    probe.style.color = color;
+    document.body.append(probe);
+    const value = getComputedStyle(probe).color;
+    probe.remove();
+    return value;
+  }, keyword);
+
+/**
+ * 等这一点画成这个系统色。状态刚变的头一两帧还是旧的，所以是等，不是量一次。
+ * 没等到就把两边的颜色报出来：CI 上的浏览器本机没有，只有这一行日志可看
+ */
 async function shows(
   page: Page,
   point: Point,
@@ -136,10 +168,19 @@ async function shows(
   message: string,
 ) {
   const expected = await painted(page, keyword);
-  await page.waitFor(
-    async () => (await pixel(page, point)) === expected,
-    message,
-  );
+  let last = expected;
+  try {
+    await page.waitFor(
+      async () => (last = await pixel(page, point)) === expected,
+      message,
+    );
+  } catch (error) {
+    if (!(error instanceof assert.AssertionError)) throw error;
+    assert.fail(
+      `${error.message}。取到的是 ${rgb(last)}；${keyword} 画在页面上是 ${rgb(expected)}，` +
+        `算出来的值是 ${await computed(page, keyword)}`,
+    );
+  }
 }
 
 /** 等这一点不是这个系统色。先等动效走完；刚换走的那一个，头一两帧可能还是旧的 */
