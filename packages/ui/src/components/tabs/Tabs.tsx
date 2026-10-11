@@ -261,10 +261,13 @@ export function Tab({
           focusRingInset,
           wedgeSize[size],
           selected
-            ? // 高对比模式下黄底被系统换掉：楔形改用系统的"选中"色，字用配它的字色；
+            ? // 焦点环画在里面、压在黄楔上：普通的焦点色在暗色主题下也是黄的，看不见，
+              // 换成压得住黄底的颜色。再往里收 2px：这个颜色贴着边的话，在暗色页面上
+              // 和页面分不开，看上去只是黄楔小了一圈。
+              // 高对比模式下黄底被系统换掉：楔形改用系统的"选中"色，字用配它的字色；
               // 这一个的颜色不让系统再改，不然它会在字后面垫一块页面色。
               // 画在里面的焦点环也用那个字色，再往里收 2px：贴着边的话它和页面一个颜色
-              "text-on-action before:bg-action forced-colors:forced-color-adjust-none forced-colors:text-[HighlightText] forced-colors:before:bg-[Highlight] forced-colors:focus-visible:-outline-offset-4 forced-colors:focus-visible:outline-[HighlightText]"
+              "text-on-action before:bg-action focus-visible:-outline-offset-4 focus-visible:outline-on-action forced-colors:forced-color-adjust-none forced-colors:text-[HighlightText] forced-colors:before:bg-[Highlight] forced-colors:focus-visible:-outline-offset-4 forced-colors:focus-visible:outline-[HighlightText]"
             : disabled
               ? "cursor-not-allowed text-ink-disabled"
               : "text-ink hover:before:bg-ink/5",

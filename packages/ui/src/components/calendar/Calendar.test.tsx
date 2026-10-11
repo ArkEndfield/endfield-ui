@@ -94,6 +94,23 @@ describe("Calendar", () => {
     expect(day("2026-10-16").className).not.toContain("forced-colors:");
   });
 
+  it("选中格的焦点环换成反转块上的强调色：普通的焦点色和那块实心的底撞色", () => {
+    render(<October defaultValue="2026-10-15" />);
+    expect(day("2026-10-15")).toHaveClass(
+      "focus-visible:outline-accent-ink-inverse",
+      // 粗细和位置照旧：还是画在里面的那一圈
+      "focus-visible:outline-2",
+      "focus-visible:-outline-offset-2",
+    );
+    // 两个颜色不能都留着：谁赢要看它们在生成的 CSS 里的先后
+    expect(day("2026-10-15")).not.toHaveClass("focus-visible:outline-focus");
+    // 没选中的格子压在页面上，照旧是普通的焦点色
+    expect(day("2026-10-16")).toHaveClass("focus-visible:outline-focus");
+    expect(day("2026-10-16")).not.toHaveClass(
+      "focus-visible:outline-accent-ink-inverse",
+    );
+  });
+
   it("整个网格只占一个 Tab 停靠点：选中的那一天，没选时是今天", () => {
     const { rerender } = render(<October />);
     expect(tabStops()).toEqual([day("2026-10-09")]);
@@ -711,5 +728,26 @@ describe("Calendar · 选一段", () => {
   it("今天压在两端的块上时，短线换成反转的强调色", () => {
     render(<OctoberRange defaultValue={["2026-10-09", "2026-10-12"]} />);
     expect(day("2026-10-09")).toHaveClass("after:bg-accent-ink-inverse");
+  });
+
+  it("两端的焦点环也换成反转块上的强调色；中间的浅带上照旧", () => {
+    render(<OctoberRange defaultValue={["2026-10-09", "2026-10-12"]} />);
+    for (const end of ["2026-10-09", "2026-10-12"]) {
+      expect(day(end)).toHaveClass("focus-visible:outline-accent-ink-inverse");
+      expect(day(end)).not.toHaveClass("focus-visible:outline-focus");
+    }
+    for (const between of ["2026-10-10", "2026-10-11"]) {
+      expect(day(between)).toHaveClass("focus-visible:outline-focus");
+    }
+  });
+
+  it("起始日定了、结束日还没定：那块实心的起始日上也是", async () => {
+    const user = userEvent.setup();
+    render(<OctoberRange />);
+    await user.click(day("2026-10-13"));
+    expect(day("2026-10-13")).toHaveClass(
+      "focus-visible:outline-accent-ink-inverse",
+    );
+    expect(day("2026-10-13")).not.toHaveClass("focus-visible:outline-focus");
   });
 });

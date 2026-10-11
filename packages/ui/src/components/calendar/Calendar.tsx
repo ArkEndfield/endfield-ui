@@ -434,11 +434,13 @@ export function Calendar({
                         "transition-colors duration-(--duration-fast) ease-standard",
                         focusRingInset,
                         endpoint
-                          ? // 高对比模式下底色被系统换掉：实心块改用系统的"选中"色。
+                          ? // 焦点环画在实心块里面：普通的焦点色在亮色下就是这块墨的颜色，
+                            // 暗色下是黄压在近白上，都看不见——换成反转块上的强调色。
+                            // 高对比模式下底色被系统换掉：实心块改用系统的"选中"色。
                             // 这一格的颜色不让系统再改，不然它会在数字后面垫一块页面色。
                             // 画在里面的焦点环换成它上面的字色，再往里收 2px——贴着边的话，
                             // 环和页面一个颜色，看上去只是块小了一圈
-                            "bg-surface-inverse font-bold text-ink-inverse forced-colors:forced-color-adjust-none forced-colors:bg-[Highlight] forced-colors:text-[HighlightText] forced-colors:focus-visible:-outline-offset-4 forced-colors:focus-visible:outline-[HighlightText]"
+                            "bg-surface-inverse font-bold text-ink-inverse focus-visible:outline-accent-ink-inverse forced-colors:forced-color-adjust-none forced-colors:bg-[Highlight] forced-colors:text-[HighlightText] forced-colors:focus-visible:-outline-offset-4 forced-colors:focus-visible:outline-[HighlightText]"
                           : [
                               // 一段的中间是连着的浅带；还没定结束日时是更浅的预览。
                               // 高对比模式下浅带没了，换成上下两条系统"选中"色的线——格子之间没有间距，连起来还是一条带子

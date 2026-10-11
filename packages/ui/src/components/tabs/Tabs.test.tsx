@@ -344,11 +344,35 @@ describe("Tabs", () => {
     expect(gear).not.toHaveClass("before:bg-action");
     expect(screen.getByRole("tab", { name: "封存" })).toBeDisabled();
 
+    // 暗色主题下普通的焦点色也是黄的：压在黄楔上的环换成压得住黄底的颜色，
+    // 并且再往里收——贴着边的话它在暗色页面上和页面分不开。
+    // 同一样东西的两个类不能都留着：谁赢要看它们在生成的 CSS 里的先后
+    expect(depot).toHaveClass(
+      "focus-visible:outline-2",
+      "focus-visible:-outline-offset-4",
+      "focus-visible:outline-on-action",
+    );
+    expect(depot).not.toHaveClass(
+      "focus-visible:outline-focus",
+      "focus-visible:-outline-offset-2",
+    );
+    expect(gear).toHaveClass(
+      "focus-visible:-outline-offset-2",
+      "focus-visible:outline-focus",
+    );
+    expect(gear).not.toHaveClass(
+      "focus-visible:outline-on-action",
+      "focus-visible:-outline-offset-4",
+    );
+
     depot.focus();
     await userEvent.keyboard("{ArrowRight}");
     expect(gear).toHaveFocus();
     expect(gear).toHaveAttribute("aria-selected", "true");
     expect(screen.getByRole("tabpanel")).toHaveTextContent("装备内容");
+    // 选中换了人，环的颜色跟着换
+    expect(gear).toHaveClass("focus-visible:outline-on-action");
+    expect(depot).toHaveClass("focus-visible:outline-focus");
 
     // 禁用的页签被方向键跳过
     await userEvent.keyboard("{ArrowRight}");

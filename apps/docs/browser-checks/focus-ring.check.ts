@@ -1,4 +1,5 @@
-// 键盘聚焦时看得见焦点环，颜色跟着主题走（亮色是墨色，暗色是黄色）
+// 键盘聚焦时看得见焦点环，颜色跟着主题走（亮色是墨色，暗色是黄色）；
+// 环画在一块实心的"选中"底里面时，换成和那块底分得开的颜色
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { useStorybook, type Page } from "./lib/harness.ts";
@@ -53,7 +54,129 @@ async function waitRing(page: Page, where: string, levelsUp = 0) {
   }
 }
 
+/** 当前焦点上的焦点环和它压着的那块底，以及这个位置上两个令牌各自的取值（都是 rgb()） */
+function ringOnFill(
+  page: Page,
+  tokens: { ring: string; fill: string },
+  pseudo: string | null,
+) {
+  return page.evaluate(
+    (ringToken, fillToken, where) => {
+      const element = document.activeElement as HTMLElement;
+      const style = getComputedStyle(element);
+      // 探针每个令牌新建一个：在同一个元素上连着改颜色，读到的是上一个值
+      const resolve = (name: string) => {
+        const probe = document.createElement("span");
+        probe.style.color = style.getPropertyValue(name);
+        element.append(probe);
+        const color = getComputedStyle(probe).color;
+        probe.remove();
+        return color;
+      };
+      return {
+        style: style.outlineStyle,
+        width: style.outlineWidth,
+        offset: style.outlineOffset,
+        ring: style.outlineColor,
+        fill: getComputedStyle(element, where).backgroundColor,
+        ringToken: resolve(ringToken),
+        fillToken: resolve(fillToken),
+      };
+    },
+    tokens.ring,
+    tokens.fill,
+    pseudo,
+  );
+}
+
+/**
+ * 焦点环画在一块实心的底里面：等环和底都到位（各是哪个令牌），再看这两个颜色分不分得开。
+ * 普通的焦点色在亮色下是墨色、暗色下是黄色，正好分别和反转块、行动色的底是同一个颜色。
+ * 底也要等：暗色主题是载入之后过渡过去的，头几帧量到的还是亮色那一档。
+ * `pseudo` 是底画在哪个伪元素上（楔形画在 `::before`），不传就是元素自己。
+ * `offset` 是环离边多远（声明的值）：贴边是 -2px；颜色和页面分不开的那一种要再往里收
+ */
+async function waitRingOnFill(
+  page: Page,
+  where: string,
+  tokens: { ring: string; fill: string },
+  {
+    pseudo = null,
+    offset = "-2px",
+  }: { pseudo?: string | null; offset?: string } = {},
+) {
+  // 先等过渡走完：环的颜色是从文字色过渡过来的，而黄楔上的字正好就是 `on-action`——
+  // 刚聚焦就读，一个没换颜色的环也会在头一帧碰巧"对上"
+  await page.settled();
+  let found: Awaited<ReturnType<typeof ringOnFill>> | undefined;
+  try {
+    await page.waitFor(
+      async () => {
+        found = await ringOnFill(page, tokens, pseudo);
+        return (
+          found.style === "solid" &&
+          found.width === "2px" &&
+          found.offset === offset &&
+          found.ring === found.ringToken &&
+          found.fill === found.fillToken
+        );
+      },
+      "",
+      2000,
+    );
+  } catch {
+    assert.fail(
+      `${where}的焦点环不对（要 2px 实线、离边 ${offset}、${tokens.ring} 的颜色，压在 ${tokens.fill} 的底上）：${JSON.stringify(found)}`,
+    );
+  }
+  assert.notEqual(
+    found!.ring,
+    found!.fill,
+    `${where}的焦点环和它压着的底是同一个颜色，看不见`,
+  );
+}
+
 for (const theme of ["light", "dark"] as const) {
+  test(`${theme}：月历选中格的焦点环画在实心块里面，颜色和那块底分得开`, async () => {
+    const { page } = storybook;
+    await page.story("控件-calendar-月历--pick-range", theme);
+    // 两个翻月的钮，然后是网格里唯一的停靠点：这一段的起始日
+    await page.key("Tab");
+    await page.key("Tab");
+    await page.key("Tab");
+    await page.waitFocused(/^button:.*起始日$/);
+    await waitRingOnFill(page, "月历的起始日", {
+      ring: "--ef-accent-ink-inverse",
+      fill: "--ef-surface-inverse",
+    });
+
+    // 往前一天不在这一段里：它压在页面上，照旧是普通的焦点色
+    await page.key("ArrowLeft");
+    await page.waitFor(
+      () =>
+        page.evaluate(
+          () =>
+            document.activeElement?.getAttribute("data-date") === "2026-10-06",
+        ),
+      "焦点没有走到前一天",
+    );
+    await waitRing(page, "没选中的日期格");
+  });
+
+  test(`${theme}：楔形页签选中项的焦点环画在黄楔里面，颜色和黄底分得开`, async () => {
+    const { page } = storybook;
+    await page.story("控件-tabs-页签--wedge", theme);
+    await page.key("Tab");
+    await page.waitFocused("tab:物资");
+    // 墨色的环贴着边时，在暗色页面上和页面分不开：它再往里收 2px，两边都是黄
+    await waitRingOnFill(
+      page,
+      "选中的楔形页签",
+      { ring: "--ef-on-action", fill: "--ef-action" },
+      { pseudo: "::before", offset: "-4px" },
+    );
+  });
+
   test(`${theme}：菜单项有焦点环`, async () => {
     const { page } = storybook;
     await page.story("控件-dropdownmenu-下拉菜单--playground", theme);
