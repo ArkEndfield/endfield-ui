@@ -199,7 +199,8 @@ export function OtpInput({
             <span
               aria-hidden="true"
               data-separator=""
-              className="h-0.5 w-2 shrink-0 bg-line-strong"
+              // 高对比模式下底色被系统换掉，短横就没了，只剩一段比别处宽的空：换成页面的字色
+              className="h-0.5 w-2 shrink-0 bg-line-strong forced-colors:bg-[CanvasText]"
             />
           )}
           <BaseOtpField.Input

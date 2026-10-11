@@ -197,6 +197,13 @@ describe("OtpInput", () => {
     expect(separators[0]!.nextElementSibling).toBe(slots()[3]);
   });
 
+  it("高对比模式：短横是底色画的，写明页面的字色", () => {
+    const { container } = render(<Code length={6} groupSize={3} />);
+    expect(container.querySelector("[data-separator]")).toHaveClass(
+      "forced-colors:bg-[CanvasText]",
+    );
+  });
+
   it("groupSize 分成三组时有两道短横", () => {
     const { container } = render(<Code length={6} groupSize={2} />);
     expect(container.querySelectorAll("[data-separator]")).toHaveLength(2);

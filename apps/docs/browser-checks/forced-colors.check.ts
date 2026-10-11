@@ -1574,3 +1574,19 @@ test("标签输入：打了重复的词，已有的那个小块闪的时候外�
   await page.waitGone(`${chip}[data-flash]`, "放开之后那一闪应该收场");
   await differs(page, await ring(0), "Highlight", "闪完环应该没了");
 });
+
+test("验证码输入：分组之间的短横看得见", async () => {
+  const { page } = storybook;
+  // 两排：六位三位一组、八位四位一组，各一道短横。短横 8 × 2，取正中
+  await open(page, "控件-otpinput-验证码输入--grouped");
+  const separator = `${ROOT} [data-separator]`;
+  for (const nth of [0, 1]) {
+    await shows(
+      page,
+      await at(page, separator, "center", "center", nth),
+      "CanvasText",
+      `第 ${nth + 1} 排的短横应该看得见`,
+    );
+    await declares(page, separator, "backgroundColor", "CanvasText", { nth });
+  }
+});

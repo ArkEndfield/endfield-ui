@@ -107,7 +107,7 @@
 | 格子 | 见方，32 / 40 / 56px 三档；`surface-sunken` 底 + 2px 底边线，直角 |
 | 字 | 居中，`font-tech`、等宽数字、`font-medium`；三档是 `text-base` / `text-lg` / `text-2xl` |
 | 间距 | 格子之间 8px（`sm` 是 6px） |
-| 分组 | 可选：每几格之间多一道 8px 宽、2px 高的短横（`line-strong`）。六位的码分成三位一组好念、好对 |
+| 分组 | 可选：每几格之间多一道 8px 宽、2px 高的短横（`line-strong`）。六位的码分成三位一组好念、好对。短横是底色画的，高对比模式下换成 `CanvasText`，不然只剩一段比别处宽的空（推断，见 [色彩](../foundations/color.md#高对比模式)） |
 | 状态 | 和输入框一样只看底边线：默认 `line-strong` → 悬停 `ink-secondary` → 聚焦 `ink` → 错误 `danger`。聚焦的那一格另有焦点环 |
 | 禁用 / 只读 | 同输入框：禁用是 `line` 的底边线和 `ink-disabled` 的字；只读没有底边线、底变透明（高对比模式下那条占位的透明边线同样写成 `Canvas`） |
 | `outline` | 同输入框的 `outline`：四边 1px、`surface` 底，放在凹陷底色的区域里用 |
