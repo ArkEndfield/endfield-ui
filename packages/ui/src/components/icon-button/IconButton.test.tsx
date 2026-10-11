@@ -47,11 +47,62 @@ describe("IconButton", () => {
           <Close />
         </IconButton>,
       );
-      expect(screen.getByRole("button").className).not.toContain(
-        "forced-colors:",
+      const released = screen.getByRole("button");
+      expect(released).not.toHaveClass("forced-colors:bg-[Highlight]");
+      expect(released).not.toHaveClass("forced-colors:text-[HighlightText]");
+      unmount();
+    }
+  });
+
+  it("高对比模式：没激活的补一圈线，禁用的是灰字色的线，激活的线跟着块走", () => {
+    for (const variant of ["plain", "floating", "accent", "inverse"] as const) {
+      const { rerender, unmount } = render(
+        <IconButton aria-label="静音" variant={variant}>
+          <Close />
+        </IconButton>,
+      );
+      expect(screen.getByRole("button")).toHaveClass(
+        "forced-colors:border",
+        "forced-colors:border-[ButtonText]",
+      );
+
+      rerender(
+        <IconButton aria-label="静音" variant={variant} disabled>
+          <Close />
+        </IconButton>,
+      );
+      expect(screen.getByRole("button")).toHaveClass(
+        "forced-colors:border",
+        "forced-colors:border-[GrayText]",
+      );
+      expect(screen.getByRole("button")).not.toHaveClass(
+        "forced-colors:border-[ButtonText]",
+      );
+
+      // 线三种状态都在：换状态时里面的图标不挪
+      rerender(
+        <IconButton aria-label="静音" variant={variant} pressed>
+          <Close />
+        </IconButton>,
+      );
+      expect(screen.getByRole("button")).toHaveClass(
+        "forced-colors:border",
+        "forced-colors:border-[Highlight]",
       );
       unmount();
     }
+  });
+
+  it("高对比模式：32px 那一档的点击区多补 1px，抵掉那一圈线", () => {
+    render(
+      <IconButton aria-label="关闭" size="sm">
+        <Close />
+      </IconButton>,
+    );
+    expect(screen.getByRole("button")).toHaveClass(
+      "after:-inset-1",
+      "forced-colors:after:-inset-[5px]",
+    );
   });
 
   it("不是开关时不输出 aria-pressed", () => {

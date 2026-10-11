@@ -1840,3 +1840,63 @@ test("按钮：带底色的变体各有一圈线，竖条和分隔线看得见�
   await declares(page, off, "borderTopColor", "GrayText");
   await declares(page, off, "color", "GrayText");
 });
+
+test("图标按钮：没激活的有一圈线，禁用的是灰字色的线；取消激活之后剩一圈线；32px 那一档的点击区还是 40px", async () => {
+  const { page } = storybook;
+  // 四种变体：plain、accent、inverse，最后一个是圆的 floating
+  await open(page, "控件-iconbutton-图标按钮--variants");
+  const button = `${ROOT} button`;
+  // 图标在正中：上沿正中是线，往里 4px 是留白
+  const edge = (nth: number) => at(page, button, "center", 0, nth);
+  const inside = (nth: number) => at(page, button, "center", 4, nth);
+  for (const nth of [0, 1, 2]) {
+    await shows(
+      page,
+      await edge(nth),
+      "ButtonText",
+      `第 ${nth + 1} 个图标按钮应该有一圈线`,
+    );
+    await differs(
+      page,
+      await inside(nth),
+      "ButtonText",
+      `第 ${nth + 1} 个图标按钮应该是空心的`,
+    );
+    await declares(page, button, "borderTopColor", "ButtonText", { nth });
+  }
+  // 圆的那一圈是弧线，取不准一个像素：核对声明
+  await declares(page, button, "borderTopColor", "ButtonText", { nth: 3 });
+
+  await open(page, "控件-iconbutton-图标按钮--disabled");
+  await shows(
+    page,
+    await edge(0),
+    "GrayText",
+    "禁用的图标按钮应该是灰字色的线",
+  );
+  await declares(page, button, "borderTopColor", "GrayText");
+
+  // 三个都是激活的：线跟着块走；点一下取消，剩下一圈线
+  await open(page, "控件-iconbutton-图标按钮--pressed");
+  await shows(
+    page,
+    await edge(0),
+    "Highlight",
+    "激活的图标按钮连边线都是「选中」色",
+  );
+  await declares(page, button, "borderTopColor", "Highlight");
+  await page.click(button);
+  await shows(page, await edge(0), "ButtonText", "取消激活之后应该剩一圈线");
+
+  // 点击区是伪元素往外补的，从线的里沿起算：多了一圈线，要多补 1px 才还是 40px
+  await open(page, "控件-iconbutton-图标按钮--sizes");
+  await page.waitEqual(
+    () =>
+      page.evaluate((css) => {
+        const after = getComputedStyle(document.querySelector(css)!, "::after");
+        return [after.width, after.height];
+      }, `${button}[data-size=sm]`),
+    ["40px", "40px"],
+    "32px 那一档的点击区应该还是 40 × 40px",
+  );
+});

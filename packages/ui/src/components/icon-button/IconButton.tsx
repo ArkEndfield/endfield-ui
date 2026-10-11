@@ -21,8 +21,9 @@ export type IconButtonProps = Omit<ComponentProps<"button">, "aria-label"> & {
 };
 
 const sizeClass: Record<IconButtonSize, string> = {
-  // 32px 小于触屏的最小点击区，用伪元素向外补到 40px
-  sm: "size-8 after:absolute after:-inset-1 after:content-[''] [&_svg]:size-4",
+  // 32px 小于触屏的最小点击区，用伪元素向外补到 40px。
+  // 高对比模式下多了一圈 1px 的线，伪元素是从线的里沿起算的，多补 1px 才还是 40px
+  sm: "size-8 after:absolute after:-inset-1 after:content-[''] forced-colors:after:-inset-[5px] [&_svg]:size-4",
   md: "size-10 [&_svg]:size-5",
   lg: "size-12 [&_svg]:size-6",
 };
@@ -50,9 +51,16 @@ const pressedClass: Record<IconButtonVariant, string> = {
   inverse: "bg-surface-inverse text-accent-ink-inverse",
 };
 
-/* 高对比模式下底色都被系统换掉，激活的和没激活的就成了一个样子：激活的改用系统的"选中"色 */
+/*
+ * 高对比模式下底色都被系统换掉：没激活的只剩一个图标，看不出是按钮；激活的和没激活的也成了
+ * 一个样子。所以都补一圈线（圆的那种是圆圈）——没激活的是按钮的字色，禁用的是灰字色，
+ * 激活的整块改用系统的"选中"色。线三种状态都有，换状态时图标不会挪
+ */
+const outlineForced = "forced-colors:border";
+const enabledForced = "forced-colors:border-[ButtonText]";
 const pressedForced =
-  "forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]";
+  "forced-colors:border-[Highlight] forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]";
+const disabledForced = "forced-colors:border-[GrayText]";
 
 const disabledClass: Record<IconButtonVariant, string> = {
   plain: "cursor-not-allowed bg-surface-sunken text-ink-disabled",
@@ -85,11 +93,12 @@ export function IconButton({
         "transition-colors duration-(--duration-fast) ease-standard",
         focusRing,
         sizeClass[size],
+        outlineForced,
         disabled
-          ? disabledClass[variant]
+          ? [disabledClass[variant], disabledForced]
           : pressed
             ? [pressedClass[variant], pressedForced]
-            : enabledClass[variant],
+            : [enabledClass[variant], enabledForced],
         className,
       )}
     >
