@@ -3334,3 +3334,149 @@ test("文件列表：移除一行，它按高度收起并淡出（200ms），连
   const reduced = await unmounted("减少动态效果下移除的那一行也应该卸载");
   assert.deepEqual([reduced.rows, reduced.list], [1, true]);
 });
+
+test("主题切换：useTheme 切亮暗时整页交叉淡化一次（视图过渡，200ms），走完撤掉标记；局部主题那一块不变；减少动态效果下直接切", async () => {
+  const { page } = storybook;
+
+  /**
+   * 点开关里的哪一段。同一步里数视图过渡被要了几次，等它起来把根上那几层的时长读出来，
+   * 再等它走完——中途不回到这边来读：200ms 一晃就过了
+   */
+  const switchTo = (label: string) =>
+    page.evaluate(async (name) => {
+      const html = document.documentElement;
+      const local = document.querySelector<HTMLElement>(
+        "#storybook-root [data-local]",
+      )!;
+      const paint = (node: Element) => {
+        const style = getComputedStyle(node);
+        return [style.backgroundColor, style.color];
+      };
+      const before = { local: paint(local), page: paint(document.body) };
+
+      const native = document.startViewTransition?.bind(document);
+      const started: ViewTransition[] = [];
+      if (native) {
+        document.startViewTransition = ((update?: () => void) => {
+          const transition = native(update);
+          started.push(transition);
+          return transition;
+        }) as typeof document.startViewTransition;
+      }
+      [...document.querySelectorAll<HTMLElement>("#storybook-root label")]
+        .find((item) => item.textContent === name)!
+        .click();
+      await Promise.resolve();
+      const found = {
+        supported: native !== undefined,
+        asked: started.length,
+        marked: html.hasAttribute("data-theme-switching"),
+        layers: {} as Record<string, number>,
+        after: "",
+        stillMarked: false,
+        local: [before.local, before.local],
+        repainted: false,
+      };
+      const transition = started[0];
+      if (transition) {
+        await transition.ready.catch(() => {});
+        for (const animation of document.getAnimations()) {
+          const effect = animation.effect as KeyframeEffect | null;
+          const layer = effect?.pseudoElement;
+          if (!layer?.startsWith("::view-transition")) continue;
+          found.layers[layer] = Number(effect!.getComputedTiming().duration);
+        }
+        await transition.finished;
+      }
+      if (native) document.startViewTransition = native;
+      found.after = html.dataset.theme ?? "";
+      found.stillMarked = html.hasAttribute("data-theme-switching");
+      found.local = [before.local, paint(local)];
+      found.repainted = paint(document.body).join() !== before.page.join();
+      return found;
+    }, label);
+
+  await withMotion(page, async () => {
+    await page.story("示例-主题切换--switch");
+    const dark = await switchTo("暗色");
+    if (dark.supported) {
+      assert.deepEqual(
+        [dark.asked, dark.marked],
+        [1, true],
+        "亮暗变了，应该要一次视图过渡，期间 <html> 上标着 data-theme-switching",
+      );
+      assert.deepEqual(
+        dark.layers,
+        {
+          "::view-transition-group(root)": 200,
+          "::view-transition-old(root)": 200,
+          "::view-transition-new(root)": 200,
+        },
+        "根的三层都应该是 200ms（只改新旧两层的话，组那一层还是浏览器默认的 250ms）",
+      );
+    }
+    assert.deepEqual(
+      [dark.after, dark.stillMarked],
+      ["dark", false],
+      "走完之后 <html> 是暗色，标记撤掉",
+    );
+    assert.deepEqual(
+      dark.local[1],
+      dark.local[0],
+      "写死主题的那一块不该跟着变",
+    );
+
+    // 换回来：同样淡一次
+    await page.settled();
+    const light = await switchTo("亮色");
+    if (light.supported) assert.equal(light.asked, 1);
+    assert.deepEqual([light.after, light.stillMarked], ["light", false]);
+
+    // 跟随系统：跑实测的这台机器系统是亮是暗说不准，量出来再说。亮暗变了才淡
+    await page.settled();
+    const followed = await page.evaluate(() =>
+      matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
+    );
+    const system = await switchTo("跟随系统");
+    if (system.supported) {
+      assert.equal(
+        system.asked,
+        followed === "dark" ? 1 : 0,
+        `系统是 ${followed}：亮暗${followed === "dark" ? "变了，应该淡一次" : "没变，不该淡"}`,
+      );
+    }
+    assert.deepEqual([system.after, system.stillMarked], [followed, false]);
+
+    // 从"跟随系统"换成同一个亮暗：没变，不淡
+    await page.settled();
+    const same = await switchTo(followed === "dark" ? "暗色" : "亮色");
+    assert.deepEqual(
+      [same.asked, same.marked, same.after],
+      [0, false, followed],
+      "亮暗没变的时候不该走视图过渡",
+    );
+  });
+
+  // 减少动态效果：不走视图过渡，直接切
+  await page.story("示例-主题切换--switch");
+  const reduced = await switchTo("暗色");
+  assert.deepEqual(
+    [reduced.asked, reduced.marked, reduced.after, reduced.stillMarked],
+    [0, false, "dark", false],
+    "减少动态效果下应该直接切",
+  );
+  // 字和底的颜色还带着各自的换色过渡：等它们到位再看
+  await page.settled();
+  const settled = await page.evaluate(() => {
+    const local = document.querySelector("#storybook-root [data-local]")!;
+    return {
+      page: getComputedStyle(document.body).backgroundColor,
+      local: getComputedStyle(local).backgroundColor,
+    };
+  });
+  assert.equal(
+    settled.page,
+    settled.local,
+    "页面换成暗色之后和写死暗色的那一块同色",
+  );
+});

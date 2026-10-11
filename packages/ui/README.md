@@ -763,7 +763,7 @@ function ThemeToggle() {
 }
 ```
 
-`useTheme` 读写 `<html data-theme>`，支持 `"light"`、`"dark"`、`"system"`，选择记在 `localStorage` 的 `ef-theme` 里。要避免首屏闪一下亮色，在 `<head>` 里用一小段内联脚本提前把 `data-theme` 写好。
+`useTheme` 读写 `<html data-theme>`，支持 `"light"`、`"dark"`、`"system"`，选择记在 `localStorage` 的 `ef-theme` 里。亮暗变了的时候整页交叉淡化一次（200ms；浏览器要支持视图过渡，系统开了"减少动态效果"时直接切）——这时候 `<html>` 上的属性和钩子返回的值是晚一帧才变的。要避免首屏闪一下亮色，在 `<head>` 里用一小段内联脚本提前把 `data-theme` 写好。
 
 把强调色换成自己的主题色，见 [色彩](https://github.com/icaruszezen/endfield-ui/blob/main/docs/design/foundations/color.md) 的"主题色接管"。
 

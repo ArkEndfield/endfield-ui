@@ -611,6 +611,24 @@
 }
 
 /* ------------------------------------------------------------------ */
+/* 主题切换                                                             */
+/* ------------------------------------------------------------------ */
+
+/*
+ * useTheme 切亮暗时整页交叉淡化一次（浏览器支持视图过渡时）。切的那一下它在 <html> 上标
+ * data-theme-switching，这里把根的那几层换成"颜色、透明度"那一档的时长。
+ * 只在这个标记下生效：使用方自己的视图过渡不受影响。三层要一起给——只改新旧两层的话，
+ * 组那一层还是浏览器默认的 250ms，整个过渡要到那时候才算完。
+ * "减少动态效果"不在这里管：开了的时候 useTheme 根本不走视图过渡
+ */
+:root[data-theme-switching]::view-transition-group(root),
+:root[data-theme-switching]::view-transition-old(root),
+:root[data-theme-switching]::view-transition-new(root) {
+  animation-duration: var(--duration-fast);
+  animation-timing-function: var(--ease-standard);
+}
+
+/* ------------------------------------------------------------------ */
 /* 减少动态效果                                                         */
 /* ------------------------------------------------------------------ */
 
