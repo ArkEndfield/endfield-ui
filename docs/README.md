@@ -12,7 +12,7 @@
 | 做一张长图或活动页 | [宣传物料](design/surfaces/promotional.md) → [纹理](design/foundations/texture.md) |
 | 用现成的组件 | [packages/ui](../packages/ui/README.md) |
 | 接着写组件 | [组件规范](design/components/README.md) → [组件约定](../packages/ui/src/components/README.md) → [theme.css](../packages/ui/src/styles/theme.css) |
-| 接着补动效 | [动效补全计划](motion-plan.md)——逐步的清单，做完一步勾一步 |
+| 给控件加动效，或者想知道某处为什么这么动 | [动效](design/foundations/motion.md) → [动效补全计划](motion-plan.md)——35 步都做完了，留着的是每一步怎么定的 |
 | 核对某个数值的依据 | [官网实测数据](design/references/measurements.md) |
 
 ## 全部文档

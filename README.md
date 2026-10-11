@@ -4,7 +4,7 @@
 
 > 非官方的爱好者项目，与鹰角网络（Hypergryph）无关。本仓库不包含任何官方素材。详见 [NOTICE](NOTICE.md)。
 
-[在线预览](https://icaruszezen.github.io/endfield-ui/) · [设计文档](docs/README.md) · [组件库用法](packages/ui/README.md) · [路线](ROADMAP.md)
+[在线预览](https://icaruszezen.github.io/endfield-ui/) · [设计文档](docs/README.md) · [组件库用法](packages/ui/README.md) · [npm](https://www.npmjs.com/package/@endfield-ui/react) · [更新记录](CHANGELOG.md) · [路线](ROADMAP.md)
 
 [![示例页"仓库"的暗色截图：镂空巨字、楔形页签、物品格、带取景角与刻度圆环的详情面板](docs/screenshots/depot-dark.png)](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-仓库页--page&globals=theme:dark)
 
@@ -48,7 +48,7 @@
 | [![设置页的亮色截图](docs/screenshots/settings-light.png)](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-设置页--page&globals=theme:light) | [![列表页的暗色截图](docs/screenshots/list-dark.png)](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-列表页--page&globals=theme:dark) |
 | 表单与反馈：页头、步骤条、字段与校验、下拉选择与组合框、标签输入、文件上传、验证码输入、分段选择、滑块、折叠面板，带一次完整的"提交 → 报错 → 改正 → 保存" | 页头，检索、排序、筛选，网格与列表两种视图，分页；侧栏里是胶囊导航器、进度环、步进器和一条限高、在滚动区里滚的时间线 |
 
-演示内容都是原创的占位图和虚构文案。
+"示例"组里还有两个小的：[主题色接管](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-主题色接管--takeover)（下面有图）和[主题切换](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-主题切换--switch)（切亮暗时整页交叉淡化一次）。演示内容都是原创的占位图和虚构文案。
 
 ### 控件一览
 
@@ -65,7 +65,9 @@
 - **亮、暗与局部主题。** 默认亮色，`data-theme="dark"` 写在 `<html>` 或任意容器上就是暗色。标题带这类"和页面相反"的区域是 `data-theme="inverse"`，放进去的按钮、复选框、焦点环按这条带子的底色取值，见 [色彩](docs/design/foundations/color.md#反转块里的局部主题)。
 - **强调色可以换。** 信号黄能整体换成自己的主题色（下图的下半是换成青色的样子），见 [主题色接管](docs/design/foundations/color.md#主题色接管)。
 - **母题同时是工具类。** 切角、斜楔、角括号、镂空字、斜纹、底纹除了组件，还是 Tailwind 工具类（`cut-tr`、`wedge-r`、`corner-brackets`、`dot-grid`…），见 [styles/README.md](packages/ui/src/styles/README.md#母题工具类)。
-- **行为交给 Base UI。** 浮层和组合框的焦点、键盘、定位建立在 [Base UI](https://base-ui.com) 上，其余控件用的是原生元素。
+- **动得短，动得硬。** 状态变了有过渡：记号淡入、选中的墨块滑过去、明细按高度展开、删掉的一项淡出、其余的补位，浮层从触发它的那一侧来；都在 0.2 – 0.3 秒里做完，没有回弹。系统开了"减少动态效果"时全部停在终态，见 [动效](docs/design/foundations/motion.md)。
+- **键盘、读屏和高对比模式。** 每个控件都能用键盘操作、有焦点环，状态不只靠颜色说；系统的高对比模式（`forced-colors`）下，靠底色成形的地方另有一份画法，见 [色彩](docs/design/foundations/color.md#高对比模式)。
+- **行为交给 Base UI。** 浮层和几个行为复杂的控件（组合框、滑块、工具栏、验证码输入…）的焦点、键盘、定位建立在 [Base UI](https://base-ui.com) 上，其余控件用的是原生元素。
 - **链接接得上路由。** 能当链接用的控件除了 `href` 还收一个 `render`，用来接路由库的链接组件。
 
 [![同一组控件在亮暗两个主题下的截图，上半是默认的信号黄，下半把强调色换成了青色](docs/screenshots/takeover.png)](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-主题色接管--takeover)
@@ -97,6 +99,7 @@ endfield-ui/
 │   │   ├── components/        组件：按钮、导航、卡片、表单、反馈、浮层、数据展示
 │   │   ├── references/        依据：官网实测数据、官方来源、开源项目调研
 │   │   └── assets/            原创 SVG 图解
+│   ├── motion-plan.md         动效是怎么一步步补上的（已做完，留作记录）
 │   └── screenshots/           这一页用的示例页截图
 ├── packages/
 │   └── ui/                    组件库 @endfield-ui/react
@@ -111,6 +114,7 @@ endfield-ui/
 │       ├── stories/           每个组件一个文件，外加几个示例页
 │       └── browser-checks/    在真的浏览器里做的检查（键盘、焦点、布局）
 ├── pnpm-workspace.yaml
+├── CHANGELOG.md               更新记录
 ├── ROADMAP.md                 路线
 ├── NOTICE.md                  版权与商标声明
 └── LICENSE
@@ -145,15 +149,15 @@ import { Button, Field, Input, Tag } from "@endfield-ui/react";
 </Field>
 ```
 
-默认亮色；在 `<html>` 或任意容器上加 `data-theme="dark"` 切到暗色。不用 Tailwind 的项目、主题切换的 hook 等见 [packages/ui/README.md](packages/ui/README.md)。
+需要 React 19；这个入口还需要 Tailwind CSS v4，不用 Tailwind 的项目改引预编译的 `@endfield-ui/react/styles.css`。默认亮色，在 `<html>` 或任意容器上加 `data-theme="dark"` 切到暗色。各类控件的用法、主题切换的 hook、路由的接法见 [packages/ui/README.md](packages/ui/README.md)。
 
 ### 只使用设计令牌
 
-令牌文件可以独立于组件使用。在一个已经装好 Tailwind CSS v4 的项目里：
+令牌文件可以独立于组件使用。在一个已经装好 Tailwind CSS v4 的项目里，装上这个包之后只引它的令牌（也可以直接把 [theme.css](packages/ui/src/styles/theme.css) 复制走）：
 
 ```css
 @import "tailwindcss";
-@import "./theme.css"; /* 从 packages/ui/src/styles/ 复制 */
+@import "@endfield-ui/react/theme.css";
 ```
 
 ```html

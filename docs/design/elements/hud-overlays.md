@@ -62,7 +62,7 @@
 
 游戏内的图鉴用准星占位符表示"未获得"的条目（社区）。
 
-已实现为 `<Viewfinder size crosshair readouts>`，被框住的画面作为子元素传入：
+已实现为 `<Viewfinder size crosshair readouts animate>`，被框住的画面作为子元素传入：
 
 - 取景角画在画面内侧 12px 处，线宽 1.5px，臂长两档：`sm` 16px、`md` 24px；
 - `crosshair` 在正中放一个 12px 的准星，用 `accent-ink`；

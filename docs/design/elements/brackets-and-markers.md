@@ -84,7 +84,7 @@
 
 每张图都加取景角会显得刻意。一屏一处，或者只在"正在查看 / 正在瞄准"的语境里用。
 
-已实现为 `<Viewfinder size crosshair readouts>`，见 [测绘叠层](hud-overlays.md)。
+已实现为 `<Viewfinder size crosshair readouts animate>`，见 [测绘叠层](hud-overlays.md)。
 
 ## 标记词汇
 

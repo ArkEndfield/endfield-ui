@@ -14,7 +14,7 @@
 | 导航 | SideRail（含二级）、TopBar、NavMenu、NavAction、PageHeader、Breadcrumb、Pagination、Navigator、AvatarSwitcher、DashIndicator、Steps、Toc、BackToTop |
 | 母题 | CornerBrackets、Viewfinder、GhostText、Hatch、Texture、RegistrationStrip、TickRing、HazardStripe |
 
-每个控件的变体与状态见[在线预览](https://icaruszezen.github.io/endfield-ui/)。
+每个控件的变体与状态见[在线预览](https://icaruszezen.github.io/endfield-ui/)；各版本改了什么见[更新记录](https://github.com/icaruszezen/endfield-ui/blob/main/CHANGELOG.md)。
 
 ## 安装
 
@@ -22,7 +22,10 @@
 pnpm add @endfield-ui/react
 ```
 
-需要 React 19。走 `tailwind.css` 入口的项目还要有 Tailwind CSS v4，用预编译的 `styles.css` 则不需要。包只出 ESM。
+需要 React 19。走 `tailwind.css` 入口的项目还要有 Tailwind CSS v4，用预编译的 `styles.css` 则不需要。包只出 ESM，带类型声明。
+
+- 浏览器的底线和 Tailwind CSS v4 相同（Chrome 111、Safari 16.4、Firefox 128 起）。更新的特性只用在过渡上：不支持视图过渡、`@starting-style` 的浏览器少的是那一下过渡，功能照常。
+- 1.0.0 起版本号按语义化版本走。
 
 ## 技术栈
 
@@ -31,7 +34,7 @@ pnpm add @endfield-ui/react
 | 框架 | React 19 + TypeScript |
 | 样式 | Tailwind CSS v4（CSS-first，`@theme` 令牌，不使用 `tailwind.config.js`） |
 | 变体 | 手写的 `Record<Variant, string>` + `cn()`（`clsx` + `tailwind-merge`） |
-| 无障碍基元 | [Base UI](https://base-ui.com)（`@base-ui/react`），用在浮层和几个行为复杂的控件上：文字提示、气泡卡片、弹窗、抽屉、全屏菜单、轻提示、下拉选择、组合框、下拉菜单、右键菜单、展开条、折叠面板、滑块、头像。其余控件建立在原生元素上（月历是手写的：Base UI 还没有公开的日历基元） |
+| 无障碍基元 | [Base UI](https://base-ui.com)（`@base-ui/react`），用在浮层和几个行为复杂的控件上：文字提示、气泡卡片、悬浮卡、弹窗、抽屉、全屏菜单、图片查看的大图层、轻提示、下拉选择、组合框、日期选择的面板、下拉菜单、右键菜单、展开条、折叠面板、侧轨的二级、工具栏、滑块、验证码输入、滚动区、头像。其余控件建立在原生元素上（月历是手写的：Base UI 还没有公开的日历基元） |
 | 构建 | tsdown（ESM + 类型声明）+ `@tailwindcss/cli`（预编译 CSS） |
 | 测试 | Vitest + Testing Library（jsdom） |
 
@@ -267,6 +270,43 @@ import {
 - 只有图标的钮必须有 `aria-label`。`ToolbarButton` 可以交给 `DropdownMenu` / `Popover` 的 `trigger`，也可以用 `Tooltip` 包住。
 - 不在工具栏里放输入框：左右方向键在输入框里是移光标。
 
+### 反馈
+
+```tsx
+import {
+  Alert,
+  Button,
+  EmptyState,
+  Progress,
+  ProgressRing,
+  Skeleton,
+} from "@endfield-ui/react";
+
+<Alert tone="danger" title="有两项没有填对" open={invalid} onClose={() => setInvalid(false)}>
+  改正标红的字段之后再保存。
+</Alert>
+
+<Progress value={62} showValue aria-label="同步进度" />
+<Progress segments={6} value={3} showValue aria-label="建站步骤" />
+<ProgressRing value={75} showValue aria-label="载重" />
+
+<Button loading loadingText="保存中">保存</Button>
+
+<Skeleton variant="text" lines={3} />
+
+<EmptyState
+  title="暂无记录"
+  description="完成一次任务后，这里会出现记录。"
+  action={<Button>新建任务</Button>}
+/>
+```
+
+- `Alert` 是常驻在页面里的提示条，色调只点在左缘的色条和图标上。传了 `onClose` 才有关闭图标；显示与否由你决定——把 `open` 置为 `false`，它先收起、淡出再卸载（之后触发 `onExited`），直接不渲染它就是立刻消失。
+- `Progress`、`ProgressRing` 不传 `value` 就是"不确定进度"。步骤数明确时用 `segments` 把轨道切成小段。
+- 等的时间短、位置小的用 `Spinner`；按钮的 `loading` 里就是它，按钮的尺寸不变、不响应点击。
+- `Skeleton` 自己对读屏隐藏，"正在加载"由外层区域的 `aria-busy="true"` 说。
+- 一闪而过、不需要处理的消息用轻提示（见下面的[浮层](#浮层)）；盖住整页的等待用加载页。
+
 ### 加载页
 
 `Loader` 默认铺满视口，并在加载期间锁住页面滚动和焦点。内容就绪后把 `open` 置为 `false`，遮罩滑出、随后自己卸载：
@@ -292,6 +332,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   IconButton,
+  Lock,
   Tooltip,
 } from "@endfield-ui/react";
 
@@ -646,6 +687,18 @@ import { Toc, TocItem } from "@endfield-ui/react";
 - 页面有吸顶的页头时 `offset` 传它的高度，并给各节的标题加同样大小的 `scroll-mt-*`。内容在某个滚动容器里时传 `target`。
 - 位置自己给（`sticky`）；窄屏放不下时由页面收起来。
 
+要被一眼看到的数字用统计块：
+
+```tsx
+import { RollingNumber, Stat } from "@endfield-ui/react";
+
+<Stat label="在线站点" value={<RollingNumber value={1280} />} unit="座" delta="+6%" />
+<Stat label="待处理批次" value="07" delta="−2" trend="down" />
+```
+
+- `label` 前面的 `//` 由组件加；`delta` 连同正负号一起传，`trend="down"` 时是危险色。
+- `RollingNumber` 进入视口时从 0 滚到终值，一次；值后来变了直接换。读屏读到的、打印和服务端渲染出来的都是终值。默认带千分位，换写法用 `format`。
+
 ### 游戏风格的控件
 
 物品格的宽度跟着所在的网格走。格子里只有图标，`name` 是给读屏的名称；选中是四角的角括号，画在格子之外 4px。一组格子放进 `ItemGrid`：它自带留好空隙的网格，并且整个矩阵只占一个 Tab 停靠点，进去之后用方向键在格子之间走。
@@ -769,6 +822,48 @@ function ThemeToggle() {
 
 还有第三个取值 `data-theme="inverse"`：和所在的主题相反。面板的标题带、表格的表头带、完成横幅用的就是它，所以放进去的按钮、复选框、焦点环不用另外处理。自己做一块"和页面相反"、里面还要放控件的区域时，写 `data-theme="inverse"` 加 `bg-surface text-ink`——取到的就是 `surface-inverse` / `ink-inverse`。反转块里不要再嵌反转块。
 
+### 动效
+
+动效是控件自带的，不用配置：状态变了有过渡（勾和圆点淡入、选中的墨块滑过去、明细按高度展开、删掉的一项淡出、其余的补位），浮层从触发它的那一侧来。都在 0.2 – 0.3 秒里做完，没有回弹，悬停不放大。
+
+- **只播一次的入场**带一个 `animate` 属性，默认开，传 `animate={false}` 关掉：`SectionTitle`、`BracketTitle`、`PageHeader`、`CompletionBanner`、`EmptyState`、`Sparkline`、`RollingNumber`。反过来默认关着的有两个：`Progress`（入场时充填一次）和 `Viewfinder`（取景角落位）。
+- **系统开了"减少动态效果"时全部停在终态。** CSS 的动画和过渡由样式入口末尾的一条全局规则统一降级；脚本驱动的几处（滚动数字、平滑滚动、主题的交叉淡化）各自看系统设置。你自己写脚本驱动的动效时用 `useReducedMotion()`。
+- 时长、缓动、位移量都是令牌（`--duration-fast`、`--ease-exit`、`--motion-shift`…），各自的用途见 [动效规范](https://github.com/icaruszezen/endfield-ui/blob/main/docs/design/foundations/motion.md)。
+
+### 无障碍
+
+- **键盘。** 每个能点的控件都能用键盘操作，有 `:focus-visible` 的焦点环。成组的控件（页签、分段选择、头像切换、工具栏、物品格矩阵、验证码输入）整组只占一个 Tab 停靠点，进去之后用方向键走。弹窗、抽屉、菜单这类浮层打开时焦点移入，关上时还给触发元素。
+- **读屏。** 能用原生元素的都用原生元素；纯图标的控件必须给 `aria-label`（`IconButton` 在类型上就是必填的）；装饰（竖条、括号、纹理、巨字）对读屏隐藏。状态不只靠颜色说：错误同时有图标和文字，四种提示的图标外形各不相同。
+- **高对比模式**（Windows 的对比度主题，CSS 的 `forced-colors`）。系统会把底色统一换成页面色，所以凡是靠底色成形的地方——"选中"的墨块、进度条、滑块、按钮的外形——都另写了一份用系统色的画法。是在 Chromium 的模拟下逐个核对的，对应关系见 [色彩](https://github.com/icaruszezen/endfield-ui/blob/main/docs/design/foundations/color.md#高对比模式)。
+- **触屏。** 悬停的样式只在有指针的设备上生效；靠悬停才出现的东西（表格的行内操作）在触屏上常显。
+- 对比度按各主题里最不利的常用表面验算过，见 [色彩](https://github.com/icaruszezen/endfield-ui/blob/main/docs/design/foundations/color.md#对比度)。
+
+### 图标与工具
+
+控件自己用到的二十个图标一并导出（`Close`、`Check`、`Plus`、`Minus`、`ChevronDown`、`ArrowRight`、`Lock`、`Menu`、`CalendarIcon`、`Upload`…），全是原创的；清单见 [icons/README.md](src/icons/README.md)。它们接受 `size` 与 `className`，颜色跟着文字走，默认对读屏隐藏。业务上要的图标用 `createIcon` 照同一套画法做（24 网格、2px 描边、平头端点、尖角拐角）：
+
+```tsx
+import { createIcon, IconButton } from "@endfield-ui/react";
+
+const Route = createIcon("Route", <path d="M5 19V9l7-4 7 4v10" />);
+
+<IconButton aria-label="路线">
+  <Route size={20} />
+</IconButton>
+```
+
+另外导出的几样：
+
+| 导出 | 作用 |
+| --- | --- |
+| `cn()` | 合并类名（`clsx` + `tailwind-merge`），认得本库自定义的令牌名。给控件传 `className` 覆盖内置类时，库里用的就是它 |
+| `useTheme()` | 读写主题，见上面的[主题](#主题) |
+| `useReducedMotion()` | 系统开了"减少动态效果"时返回 `true` |
+| `useInView()` | 返回 `[ref, inView]`：元素第一次进入视口后是 `true`，之后不再变回去——自己做"只播一次"的入场时用 |
+| `useControllableState()` | 受控 / 非受控合并，自己写带状态的控件时用 |
+| `usePortalScope()` | 自己用 Base UI 拼浮层时，把触发处的局部主题带到挂在 `<body>` 下的浮层上 |
+| `useFieldControl()`、`useFieldContext()` | 把自定义控件接进 `Field`：拿到该落在控件上的 `id`、`disabled`、`required`、`invalid` 和 `aria-describedby` |
+
 ## 目录
 
 ```
@@ -804,8 +899,8 @@ TypeScript 用的是 7.0。tsdown 在这个版本下生成类型声明时会提�
 
 ### 发布
 
-1. 改本目录 `package.json` 里的 `version`，提交并推到 `main`，等 CI 跑完。
-2. 打一个和版本号对应的标签推上去：`git tag v0.2.0`，`git push origin v0.2.0`。
+1. 改本目录 `package.json` 里的 `version`，在根目录的 [CHANGELOG.md](https://github.com/icaruszezen/endfield-ui/blob/main/CHANGELOG.md) 里写上这一版改了什么，提交并推到 `main`，等 CI 跑完。
+2. 打一个和版本号对应的标签推上去：`git tag v1.0.0`，`git push origin v1.0.0`。
 3. [publish.yml](https://github.com/icaruszezen/endfield-ui/blob/main/.github/workflows/publish.yml) 核对标签与版本号，跑类型检查、测试与构建（`prepublishOnly`），然后发布到 npm。
 
 认证用的是 npm 的 Trusted Publishing，仓库里不存 token：npm 上这个包的设置里登记了本仓库和 `publish.yml` 这个文件名，两边任何一个改名都要同步。

@@ -1,9 +1,9 @@
 /*
- * endfield-ui 设计令牌（草案）
+ * endfield-ui 设计令牌
  *
  * 用法：
  *   @import "tailwindcss";
- *   @import "./theme.css";
+ *   @import "@endfield-ui/react/theme.css";
  *
  * 结构：
  *   1. 语义变量      随主题变化；亮色在 :root 与 [data-theme="light"]，
