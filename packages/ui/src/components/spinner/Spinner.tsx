@@ -19,8 +19,12 @@ const sizeClass: Record<SpinnerSize, string> = {
 };
 
 // 系统开启"减少动态效果"时停成一个 45° 的菱形，和列表里的菱形记号是同一个样子
-const square =
-  "animate-spin bg-current motion-reduce:rotate-45 motion-reduce:animate-none";
+const square = [
+  "animate-spin bg-current motion-reduce:rotate-45 motion-reduce:animate-none",
+  // 高对比模式下底色被系统换成页面色，方块就没了：换成页面的字色。
+  // 写的是系统色，不是 currentColor——使用方用 className 给它另上了颜色时，这里照样看得见
+  "forced-colors:bg-[CanvasText]",
+].join(" ");
 
 /**
  * 行内加载指示：一个匀速旋转的小方块，颜色继承文字。

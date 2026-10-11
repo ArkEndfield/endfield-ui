@@ -29,6 +29,27 @@ describe("Skeleton", () => {
     expect(container.firstElementChild!.children[0]).toHaveClass("w-full");
   });
 
+  it("高对比模式：每个色块剩一圈灰字色的轮廓", () => {
+    const outline = [
+      "forced-colors:outline",
+      "forced-colors:-outline-offset-1",
+      "forced-colors:outline-[GrayText]",
+    ];
+    const { container, rerender } = render(<Skeleton />);
+    expect(container.firstElementChild).toHaveClass(...outline);
+
+    rerender(<Skeleton variant="circle" />);
+    expect(container.firstElementChild).toHaveClass(...outline);
+
+    // 几行文字：轮廓画在每一行上，不画在包着它们的那一层上
+    rerender(<Skeleton variant="text" lines={2} />);
+    const wrapper = container.firstElementChild!;
+    expect(wrapper.className).not.toContain("forced-colors:");
+    for (const line of wrapper.children) {
+      expect(line).toHaveClass(...outline);
+    }
+  });
+
   it("className 可以覆盖默认尺寸", () => {
     const { container } = render(<Skeleton className="h-40" />);
     expect(container.firstElementChild).toHaveClass("h-40");

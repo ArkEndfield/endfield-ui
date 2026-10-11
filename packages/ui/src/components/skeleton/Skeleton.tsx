@@ -16,7 +16,10 @@ export type SkeletonProps = Omit<ComponentProps<"span">, "children"> & {
   pulse?: boolean;
 };
 
-const fill = "block bg-surface-muted";
+// 高对比模式下底色被系统换掉，色块就没了：剩一圈 1px 的灰字色轮廓——
+// 和输入框的占位字一个颜色，说的是"这里的内容还没到"
+const fill =
+  "block bg-surface-muted forced-colors:outline forced-colors:-outline-offset-1 forced-colors:outline-[GrayText]";
 
 /**
  * 骨架：只画大块，不画细节。

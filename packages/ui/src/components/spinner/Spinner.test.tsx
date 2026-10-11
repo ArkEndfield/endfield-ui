@@ -27,6 +27,22 @@ describe("Spinner", () => {
     expect(container.firstElementChild).toHaveClass("animate-spin");
   });
 
+  it("高对比模式：方块用页面的字色；使用方另上了颜色也照样", () => {
+    const { container, rerender } = render(<Spinner />);
+    expect(screen.getByRole("status").firstElementChild).toHaveClass(
+      "bg-current",
+      "forced-colors:bg-[CanvasText]",
+    );
+
+    // 按钮里的记号就是这样用的：底色换成了别的，高对比模式下那一份还在
+    rerender(<Spinner label={null} className="bg-action" />);
+    expect(container.firstElementChild).toHaveClass(
+      "bg-action",
+      "forced-colors:bg-[CanvasText]",
+    );
+    expect(container.firstElementChild).not.toHaveClass("bg-current");
+  });
+
   it("两档尺寸，className 可以覆盖", () => {
     const { container, rerender } = render(<Spinner label={null} size="sm" />);
     expect(container.firstElementChild).toHaveClass("size-3");

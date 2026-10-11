@@ -1179,3 +1179,52 @@ test("值块：组合框多选和标签输入里的每个值有一圈线；禁�
   await declares(page, chip, "color", "GrayText");
   await declares(page, `${chip} button`, "color", "GrayText");
 });
+
+test("行内加载指示看得见；骨架的每个色块有一圈灰字色的轮廓", async () => {
+  const { page } = storybook;
+  // 两个：12px 和 16px。减少动态效果下停成一个菱形，正中是实心的
+  await open(page, "控件-spinner-行内加载指示--sizes");
+  const square = `${ROOT} [role=status] > span[aria-hidden]`;
+  for (const nth of [0, 1]) {
+    await shows(
+      page,
+      await at(page, square, "center", "center", nth),
+      "CanvasText",
+      `第 ${nth + 1} 个加载指示应该看得见`,
+    );
+  }
+  await declares(page, square, "backgroundColor", "CanvasText");
+
+  // 一块、三行、一个圆
+  await open(page, "控件-skeleton-骨架--variants");
+  const block = `${ROOT} [data-variant=block]`;
+  const line = `${ROOT} [data-variant=text] > span`;
+  // 取左边那条线的正中；里面是空的
+  await shows(
+    page,
+    await at(page, block, 0, "center"),
+    "GrayText",
+    "骨架的色块左缘应该有一条灰字色的线",
+  );
+  await differs(
+    page,
+    await at(page, block, "center", "center"),
+    "GrayText",
+    "骨架的色块应该是空心的",
+  );
+  for (const nth of [0, 1, 2]) {
+    await shows(
+      page,
+      await at(page, line, 0, "center", nth),
+      "GrayText",
+      `骨架的第 ${nth + 1} 行左缘应该有一条灰字色的线`,
+    );
+  }
+  // 圆的那一圈是弧线，取不准一个像素：核对声明
+  await declares(
+    page,
+    `${ROOT} [data-variant=circle]`,
+    "outlineColor",
+    "GrayText",
+  );
+});
