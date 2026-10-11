@@ -1228,3 +1228,66 @@ test("行内加载指示看得见；骨架的每个色块有一圈灰字色的�
     "GrayText",
   );
 });
+
+test("步进器：两端的按钮和中间连成三格；到头而禁用的那个按钮是灰字色的线", async () => {
+  const { page } = storybook;
+  // 三个：已在下限（减少禁用）、中间、已在上限（增加禁用）
+  await open(page, "控件-stepper-步进器--limits");
+  const stepper = (nth: number) => `${ROOT} [data-size]:nth-child(${nth})`;
+  const minus = (nth: number) => `${stepper(nth)} button:first-child`;
+  const plus = (nth: number) => `${stepper(nth)} button:last-child`;
+  // 按钮 40 × 40，记号在正中：取左边那条线靠上的一点，和往里 4px 的留白
+  const edge = (selector: string) => at(page, selector, 0, 4);
+  const inside = (selector: string) => at(page, selector, 4, 4);
+
+  for (const button of [minus(2), plus(2)]) {
+    await shows(
+      page,
+      await edge(button),
+      "ButtonText",
+      `${button} 应该有一圈线`,
+    );
+    await differs(
+      page,
+      await inside(button),
+      "ButtonText",
+      `${button} 应该是空心的`,
+    );
+    await declares(page, button, "borderTopColor", "ButtonText");
+  }
+  // 中间那一格：上下各一条，和两端连起来
+  const field = `${stepper(2)} [role=spinbutton]`;
+  await shows(
+    page,
+    await at(page, field, "center", 0),
+    "ButtonText",
+    "中间那一格上沿应该有一条线",
+  );
+  await shows(
+    page,
+    await at(page, field, "center", -1),
+    "ButtonText",
+    "中间那一格下沿应该有一条线",
+  );
+  await declares(page, field, "borderTopColor", "ButtonText");
+
+  await shows(
+    page,
+    await edge(minus(1)),
+    "GrayText",
+    "已在下限：减少的按钮应该是灰字色的线",
+  );
+  await shows(
+    page,
+    await edge(plus(1)),
+    "ButtonText",
+    "已在下限：增加的按钮照旧",
+  );
+  // 最右边那条线：从右往里 1px
+  await shows(
+    page,
+    await at(page, plus(3), -1, 4),
+    "GrayText",
+    "已在上限：增加的按钮应该是灰字色的线",
+  );
+});

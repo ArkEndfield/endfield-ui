@@ -238,6 +238,8 @@ export function Stepper({
     cn(
       "flex shrink-0 items-center justify-center select-none",
       "transition-colors duration-(--duration-fast) ease-standard",
+      // 高对比模式下底色都被系统换掉，加减钮只剩一个记号：补一圈线，和中间那一格连成三格
+      "forced-colors:border forced-colors:border-[ButtonText] forced-colors:disabled:border-[GrayText]",
       buttonSize[size],
       inactive
         ? "cursor-not-allowed bg-disabled text-on-disabled"
@@ -292,6 +294,8 @@ export function Stepper({
         className={cn(
           "min-w-0 flex-1 border-y-2 border-transparent bg-surface-sunken text-center font-tech font-bold tabular-nums outline-none",
           "disabled:cursor-not-allowed",
+          // 高对比模式：上下各一条 1px 的线，和两端按钮的那一圈连成三格
+          "forced-colors:border-y forced-colors:border-[ButtonText] forced-colors:disabled:border-[GrayText]",
           fieldSize[size],
           disabled ? "text-ink-disabled" : "text-ink",
           invalid && !disabled && "border-b-danger",

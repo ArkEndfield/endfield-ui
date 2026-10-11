@@ -235,6 +235,23 @@ describe("Stepper", () => {
     expect(spin()).toHaveValue("3");
   });
 
+  it("高对比模式：两端的按钮各一圈线，中间上下各一条，连成三格；禁用的线写明灰字色", () => {
+    render(<Stepper aria-label="数量" defaultValue={2} />);
+    for (const button of [minus(), plus()]) {
+      expect(button).toHaveClass(
+        "forced-colors:border",
+        "forced-colors:border-[ButtonText]",
+        "forced-colors:disabled:border-[GrayText]",
+      );
+    }
+    // 中间那一格平时留着 2px 透明的上下边（给错误态的红线占位），这里收成 1px，和两端对齐
+    expect(spin()).toHaveClass(
+      "forced-colors:border-y",
+      "forced-colors:border-[ButtonText]",
+      "forced-colors:disabled:border-[GrayText]",
+    );
+  });
+
   it("放进 Field：标签、错误说明与错误态都关联上", () => {
     render(
       <Field label="数量" error="数量不能超过库存 64 件。">
