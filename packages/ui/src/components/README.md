@@ -124,7 +124,7 @@ components/
 - 压在反转块（`surface-inverse`）上的强调记号用 `accent-ink-inverse`，压在页面表面上的用 `accent-ink`，都不直接用 `action`：它在浅色底上看不见。
 - 悬停底用 `hover:bg-ink/5`，不用 `surface-sunken`——后者在暗色主题下是纯黑。
 - **只靠底色或阴影说"选中 / 当前"的地方，要另写一份高对比模式（`forced-colors:`）下的画法。** 系统会把作者写的底色都换成页面色、阴影不画：填充反转的块改成 `forced-colors:bg-[Highlight]` 加 `forced-colors:text-[HighlightText]`，底色画的记号改成 `forced-colors:bg-[Highlight]`。系统色关键字只写在 `forced-colors:` 变体里，是"只用令牌"的例外。字压在 `Highlight` 上的那个元素还要加 `forced-colors:forced-color-adjust-none`（不然浏览器会在字后面垫一块页面色），并把它的边线、焦点环一起写成系统色。对应关系和理由见 [色彩](../../../../docs/design/foundations/color.md#高对比模式)。
-- **全靠底色成形的部件，高对比模式下同样要另写**——不只是"选中"。整个是底色画的（滑块、进度条、加载指示、骨架）会直接不见；靠底色围出来的一块（框里的值块、步进器的格子、排期的条目）只剩里面的字。轨道和填上的那一段写成"空心对实心"（轨道 `forced-colors:outline forced-colors:-outline-offset-1`，填充 `forced-colors:bg-[Highlight]`），不靠两种系统色分；围出来的一块补一圈线（`forced-colors:border`）。控件自己的部件用 `ButtonText`，页面上的用 `CanvasText`。还有三件容易漏的：**禁用的字色**写在 `<label>`、`<span>`、`<output>` 上时系统会当普通字换掉，要写明 `GrayText`；**SVG 里写的颜色**（`fill-*`、`stroke-*`）系统不换，要自己写成系统色；**说着事的线别用 [`decor`](../lib/decor.ts)**，它在高对比模式下整个去掉（排期里"今天"的竖线）。
+- **全靠底色成形的部件，高对比模式下同样要另写**——不只是"选中"。整个是底色画的（滑块、进度条、加载指示、骨架）会直接不见；靠底色围出来的一块（框里的值块、步进器的格子、排期的条目）只剩里面的字。轨道和填上的那一段写成"空心对实心"（轨道 `forced-colors:outline forced-colors:-outline-offset-1`，填充 `forced-colors:bg-[Highlight]`），不靠两种系统色分；围出来的一块补一圈线（`forced-colors:border`）。控件自己的部件用 `ButtonText`，页面上的用 `CanvasText`。还有几件容易漏的：**禁用的字色**写在 `<label>`、`<span>`、`<output>` 上时系统会当普通字换掉，要写明 `GrayText`——禁用的 `<input>` 也要在它自己身上写（`forced-colors:disabled:text-[GrayText]`，[`controlElement`](input/control-box.ts) 里有），浏览器只认写了 `type` 的；**SVG 里写的颜色**（`fill-*`、`stroke-*`）系统不换，要自己写成系统色，直接写在图标 `<svg>` 上的 `text-*` 也一样（图标跟着走的只是继承来的字色）；**占位用的透明边线**（只读的输入框）会被系统显形，写成 `forced-colors:border-[Canvas]`；**说着事的线别用 [`decor`](../lib/decor.ts)**，它在高对比模式下整个去掉（排期里"今天"的竖线）。
 - 组件 API 用语义命名（`variant="action"`、`tone="danger"`），不把颜色名写进属性（不要 `yellow`）。
 - **能当链接用的控件，`href` 之外同时收 `render`**（路由库的链接组件）。链接形态里的那个 `<a>` 换成 [`LinkElement`](link-element/LinkElement.tsx)，判断写成 `href !== undefined || render !== undefined`；转给 Base UI 部件的（菜单项）用 [`defined()`](../lib/defined.ts) 去掉没有值的属性，免得把那个元素自己的地址盖掉。
 - 变体写成 `Record<Variant, string>`，用 [`cn()`](../lib/cn.ts) 合并，使用方传入的 `className` 排在最后、可以覆盖内置类。
@@ -158,7 +158,7 @@ components/
 - **一块固定深色的区域里还要放别的控件时，把它做成局部主题**（`data-theme="dark"`），里面照常用语义令牌；不要逐个写 `neutral-*`。弹窗的标题带、行带都是这样。
 - **一块跟着主题翻、但总和页面相反的区域（反转块）里要放别的控件时，用 `data-theme="inverse"`**，里面照常用 `bg-surface text-ink`——取到的就是原来的 `surface-inverse` / `ink-inverse`，颜色不变。面板的标题带、表格的表头带、完成横幅都是这样。反转块里不要再嵌反转块。
 - 进出场用基元给的 `data-starting-style` / `data-ending-style` 写 CSS 过渡（`data-starting-style:opacity-0`），不写关键帧。基元等过渡结束才卸载浮层。
-- 没有边线、全靠底色和页面分开的浮层（文字提示）加一圈透明的边线：高对比模式下底色被系统覆盖，边线会自己显形。
+- 没有边线、全靠底色和页面分开的浮层（文字提示）加一圈透明的边线：高对比模式下底色被系统覆盖，边线会自己显形。反过来，只为占位留着的透明边线不想让它显形，就写成 `Canvas`（见上面"全靠底色成形的部件"那一条）。
 - **要画焦点环的元素不要写 `outline-none`。** Tailwind v4 里它把轮廓的线型定成 `none`，后面的 `focus-visible:outline-2` 也跟着画不出来（菜单的选项踩过）。`outline-none` 只留给"焦点环画在别处"的元素：输入框里的 `<input>`、下拉的触发按钮（环在外框上）、弹窗的面。
 - 局部主题里的焦点环如果会画到局部主题之外（外扩 2px），颜色就压在了页面的底色上。轻提示是深色的一块，环是黄的，画到亮色页面上看不见——所以它用画在里面的 `focusRingInset`。
 - 测试里查浮层用角色（`findByRole("dialog")`）。文字提示的内容同时存在于隐藏的描述里，按文字查时要排除 `[hidden]`。
