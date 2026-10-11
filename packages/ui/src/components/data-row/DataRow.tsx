@@ -167,7 +167,8 @@ const toneClass: Record<DataRowTone, string> = {
 };
 
 const favoriteDot = "block size-4 rounded-full";
-const favoriteOn = "bg-action";
+/* 高对比模式下底色被系统换掉，实心的圆就没了：改用系统的"选中"色 */
+const favoriteOn = "bg-action forced-colors:bg-[Highlight]";
 /* 未收藏是一个空心的圆环：形状也不同，不只靠颜色 */
 const favoriteOff = "border-2 border-ink-tertiary";
 

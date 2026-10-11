@@ -122,6 +122,18 @@ function Switcher(
 
 const radio = (name: string) => screen.getByRole("radio", { name });
 
+describe("Avatar · 高对比模式", () => {
+  it("选中环是阴影画的，高对比模式下不显示：换成一圈系统「选中」色的边线", () => {
+    const { rerender } = render(<Avatar name="林澈" selected />);
+    expect(screen.getByRole("img")).toHaveClass(
+      "forced-colors:border-[3px]",
+      "forced-colors:border-[Highlight]",
+    );
+    rerender(<Avatar name="林澈" />);
+    expect(screen.getByRole("img").className).not.toContain("forced-colors:");
+  });
+});
+
 describe("AvatarSwitcher", () => {
   it("是一个有名称的单选组，每个头像是一个以名字命名的单选按钮", () => {
     render(<Switcher defaultValue="lin" />);

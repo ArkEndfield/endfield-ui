@@ -31,10 +31,13 @@ const sizeClass: Record<AvatarSize, string> = {
 
 /*
  * 选中环：2px 的间隔 + 3px 的行动色 + 1px 的墨线。
- * 墨线是给亮色页面的——黄色在白底上看不出来
+ * 墨线是给亮色页面的——黄色在白底上看不出来。
+ *
+ * 高对比模式下阴影不画：换成一圈系统"选中"色的边线，画在头像里面
+ * （外面那一圈轮廓留给头像切换的焦点环）
  */
 export const avatarSelectedRing =
-  "shadow-[0_0_0_2px_var(--ef-surface),0_0_0_5px_var(--ef-action),0_0_0_6px_var(--ef-ink)]";
+  "shadow-[0_0_0_2px_var(--ef-surface),0_0_0_5px_var(--ef-action),0_0_0_6px_var(--ef-ink)] forced-colors:border-[3px] forced-colors:border-[Highlight]";
 
 /** 中文名取第一个字；拉丁字母的名字取前两个词的首字母 */
 export function initialsOf(name: string): string {

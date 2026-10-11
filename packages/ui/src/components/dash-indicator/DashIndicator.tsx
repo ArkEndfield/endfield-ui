@@ -34,8 +34,11 @@ export function DashIndicator({
           data-current={position === current ? "" : undefined}
           className={cn(
             "h-0.5 transition-[width,background-color] duration-(--duration-base) ease-standard",
-            // 当前一根除了换色还加长一倍，不只靠颜色
-            position === current ? "w-8 bg-accent-ink" : "w-4 bg-line-strong",
+            // 当前一根除了换色还加长一倍，不只靠颜色。
+            // 高对比模式下底色被系统换掉，整排都没了：当前一根用系统的"选中"色，其余用页面的字色
+            position === current
+              ? "w-8 bg-accent-ink forced-colors:bg-[Highlight]"
+              : "w-4 bg-line-strong forced-colors:bg-[CanvasText]",
           )}
         />
       ))}

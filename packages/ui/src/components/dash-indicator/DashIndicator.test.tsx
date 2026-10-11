@@ -11,6 +11,16 @@ describe("DashIndicator", () => {
     expect(indicator.children[1]).toHaveAttribute("data-current");
   });
 
+  it("高对比模式：当前一根用系统的「选中」色，其余用页面的字色", () => {
+    render(<DashIndicator count={3} index={1} />);
+    const [first, current, last] = screen.getByRole("img").children;
+    expect(current).toHaveClass("forced-colors:bg-[Highlight]");
+    for (const other of [first, last]) {
+      expect(other).toHaveClass("forced-colors:bg-[CanvasText]");
+      expect(other).not.toHaveClass("forced-colors:bg-[Highlight]");
+    }
+  });
+
   it("默认名称说出第几项、共几项", () => {
     render(<DashIndicator count={5} index={1} />);
     expect(

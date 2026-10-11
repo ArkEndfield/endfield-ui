@@ -121,6 +121,16 @@ describe("DataRow", () => {
     expect(within(filter!).getByRole("rowheader")).toHaveTextContent(/^滤芯$/);
   });
 
+  it("高对比模式：收藏的实心圆改用系统的「选中」色，没收藏的圆环不用动", () => {
+    render(<Ledger />);
+    const [, steel, filter] = screen.getAllByRole("row");
+    const dot = (row: HTMLElement) =>
+      within(row).getByRole("rowheader").querySelector("[aria-hidden=true]")!;
+    expect(dot(steel!)).toHaveClass("forced-colors:bg-[Highlight]");
+    expect(dot(filter!)).toHaveClass("border-2");
+    expect(dot(filter!).className).not.toContain("forced-colors:");
+  });
+
   it("传了 onFavoriteChange：一个切换按钮，报出收没收藏", async () => {
     const user = userEvent.setup();
     const onFavoriteChange = vi.fn();

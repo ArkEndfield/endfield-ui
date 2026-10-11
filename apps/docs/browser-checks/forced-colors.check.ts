@@ -745,3 +745,61 @@ test("下拉选择：已选项左缘有一条「选中」色的竖条；组合�
     "没移到的项不该有环",
   );
 });
+
+test("头像的选中环、数据行的收藏圆、进度短横：都看得见", async () => {
+  const { page } = storybook;
+  await open(page, "控件-avatar-头像与头像切换--switcher");
+  // 选中环是阴影画的，高对比模式下不画：换成头像里面的一圈边线
+  await shows(
+    page,
+    await at(page, `${ROOT} label[data-current] [data-size]`, "center", 1),
+    "Highlight",
+    "选中的头像应该有一圈「选中」色的边线",
+  );
+  await differs(
+    page,
+    await at(
+      page,
+      `${ROOT} label:not([data-current]) [data-size]`,
+      "center",
+      1,
+    ),
+    "Highlight",
+    "没选的头像不该有那一圈",
+  );
+
+  await open(page, "控件-datarow-数据行带--playground");
+  const dot = (favorite: boolean) =>
+    `${ROOT} [role=row]${favorite ? "[data-favorite]" : ":not([data-favorite])"} [role=rowheader] button > span`;
+  await shows(
+    page,
+    await at(page, dot(true), "center", "center"),
+    "Highlight",
+    "已收藏的圆应该是「选中」色的实心圆",
+  );
+  await differs(
+    page,
+    await at(page, dot(false), "center", "center"),
+    "Highlight",
+    "没收藏的圆应该是空心的",
+  );
+
+  await open(page, "控件-dashindicator-进度短横--playground");
+  await shows(
+    page,
+    await at(page, `${ROOT} [role=img] [data-current]`, "center", "center"),
+    "Highlight",
+    "当前的那一根短横应该是「选中」色",
+  );
+  await shows(
+    page,
+    await at(
+      page,
+      `${ROOT} [role=img] span:not([data-current])`,
+      "center",
+      "center",
+    ),
+    "CanvasText",
+    "其余的短横应该看得见",
+  );
+});
