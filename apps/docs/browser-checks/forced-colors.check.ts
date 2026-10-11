@@ -1590,3 +1590,84 @@ test("验证码输入：分组之间的短横看得见", async () => {
     await declares(page, separator, "backgroundColor", "CanvasText", { nth });
   }
 });
+
+test("步骤条：已完成是实心块，当前是「选中」色的块，未到和有误的是空心框；连接线走过的粗、没到的细", async () => {
+  const { page } = storybook;
+  const step = (nth: number) => `${ROOT} ol > li:nth-child(${nth})`;
+  const node = (nth: number) => `${step(nth)} > span > span:first-child`;
+  const line = (nth: number) => `${step(nth)} > span > span:last-child`;
+  // 节点 24 × 24，勾和序号在正中：往里 3px 是留白（空心框的那一圈线只有 1px）
+  const corner = (nth: number) => at(page, node(nth), 3, 3);
+
+  // 四步，走到第二步：已完成、当前、未到、未到
+  await open(page, "控件-steps-步骤条--playground");
+  await shows(
+    page,
+    await corner(1),
+    "CanvasText",
+    "已完成的节点应该是实心块，不是一个勾浮着",
+  );
+  await declares(page, node(1), "backgroundColor", "CanvasText");
+  await declares(page, node(1), "color", "Canvas");
+  await shows(
+    page,
+    await corner(2),
+    "Highlight",
+    "当前的节点应该是系统的「选中」色",
+  );
+  await declares(page, node(2), "backgroundColor", "Highlight");
+  await declares(page, node(2), "borderTopColor", "Highlight");
+  await declares(page, node(2), "color", "HighlightText");
+  await unadjusted(page, node(2));
+  await shows(page, await corner(3), "Canvas", "未到的节点应该是空心的");
+
+  // 横排：线 2px 高，纵向的位置是整数。走过的两行都有；没到的只剩下面那一行
+  const row = (nth: number, dy: number) => at(page, line(nth), 8, dy);
+  for (const dy of [0, 1]) {
+    await shows(
+      page,
+      await row(1, dy),
+      "CanvasText",
+      "走过的那一段线应该是 2px 的实线",
+    );
+  }
+  await shows(page, await row(2, 1), "CanvasText", "没到的那一段线应该看得见");
+  await shows(
+    page,
+    await row(2, 0),
+    "Canvas",
+    "没到的那一段线应该只有 1px，比走过的细",
+  );
+  await declares(page, line(2), "borderBottomColor", "CanvasText");
+  await declares(page, line(1), "backgroundColor", "CanvasText", {
+    pseudo: "::before",
+  });
+
+  // 竖排：线 2px 宽，横向的位置是整数。细线画在右边那 1px
+  await open(page, "控件-steps-步骤条--vertical");
+  const column = (nth: number, dx: number) => at(page, line(nth), dx, 4);
+  for (const dx of [0, 1]) {
+    await shows(
+      page,
+      await column(1, dx),
+      "CanvasText",
+      "竖排：走过的那一段线应该是 2px 的实线",
+    );
+  }
+  await shows(
+    page,
+    await column(2, 1),
+    "CanvasText",
+    "竖排：没到的那一段线应该看得见",
+  );
+  await shows(
+    page,
+    await column(2, 0),
+    "Canvas",
+    "竖排：没到的那一段线应该只有 1px",
+  );
+
+  // 第二步有误：不管它本来是什么状态，都是空心框里一个警示图标
+  await open(page, "控件-steps-步骤条--invalid");
+  await shows(page, await corner(2), "Canvas", "有误的节点照旧是空心框");
+});

@@ -75,11 +75,16 @@ const railLayout: Record<StepsOrientation, string> = {
   horizontal: "flex-col @md:flex-row",
 };
 
-/* 线和节点之间留 8px，不从节点后面穿过 */
+/*
+ * 线和节点之间留 8px，不从节点后面穿过。
+ * 高对比模式下线是底色画的，整条都会不见：没到的收成一条 1px 的细线，画成线自己的一条边
+ * （竖排在右、横排在下）；走过的那一段照旧充进来，填上剩下的 1px，还是 2px。
+ * 走没走过是粗对细，不靠两种系统色分
+ */
 const lineLayout: Record<StepsOrientation, string> = {
-  vertical: "my-2 min-h-4 w-0.5",
+  vertical: "my-2 min-h-4 w-0.5 forced-colors:border-r",
   horizontal:
-    "my-2 min-h-4 w-0.5 @md:mx-2 @md:my-0 @md:h-0.5 @md:min-h-0 @md:w-auto",
+    "my-2 min-h-4 w-0.5 @md:mx-2 @md:my-0 @md:h-0.5 @md:min-h-0 @md:w-auto forced-colors:@max-md:border-r forced-colors:@md:border-b",
 };
 
 const bodyLayout: Record<StepsOrientation, string> = {
@@ -161,11 +166,17 @@ const nodeSize: Record<StepsSize, string> = {
   md: "size-6 text-xs [&_svg]:size-3.5",
 };
 
+/*
+ * 高对比模式下底色都被系统换掉：已完成的只剩一个勾浮着，当前的和未到的都成了空心框、
+ * 只差序号的粗细。三种状态还是三种形状——页面字色的实心块、系统"选中"色的实心块、空心框
+ */
 const nodeClass: Record<StepStatus, string> = {
   // 墨底黄勾：和选中的复选框是同一个逻辑
-  done: "bg-surface-inverse text-accent-ink-inverse",
-  // 描一圈最细的线：黄色对白底立不住。颜色跟着文字走，暗色下是近白
-  current: "border border-ink bg-action font-bold text-on-action",
+  done: "bg-surface-inverse text-accent-ink-inverse forced-colors:bg-[CanvasText] forced-colors:text-[Canvas]",
+  // 描一圈最细的线：黄色对白底立不住。颜色跟着文字走，暗色下是近白。
+  // 序号是字，压在"选中"色上要关掉系统的接管（不然字后面会垫一块页面色），边线跟着自己写
+  current:
+    "border border-ink bg-action font-bold text-on-action forced-colors:forced-color-adjust-none forced-colors:border-[Highlight] forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]",
   upcoming: "border border-line-strong text-ink-secondary",
 };
 
@@ -267,6 +278,7 @@ export function Step({
         <span
           className={cn(
             "relative flex-1 overflow-clip bg-line-strong group-last/step:hidden",
+            "forced-colors:border-[CanvasText] forced-colors:before:bg-[CanvasText]",
             "before:absolute before:top-0 before:-right-4 before:-bottom-4 before:left-0 before:origin-top-left before:bg-ink before:transition-[scale] before:duration-(--duration-base) before:ease-exit before:content-['']",
             lineLayout[orientation],
             status === "done" ? "before:scale-100" : "before:scale-0",

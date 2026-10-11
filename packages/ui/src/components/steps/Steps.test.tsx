@@ -65,6 +65,58 @@ describe("Steps", () => {
     expect(node(upcoming!)).not.toHaveClass("bg-action");
   });
 
+  it("高对比模式：已完成是页面字色的实心块，当前是系统「选中」色的块，未到和有误的照旧是空心框", () => {
+    render(
+      <Steps aria-label="建站流程" current={1}>
+        <Step title="建站" />
+        <Step title="测绘" />
+        <Step title="复核" />
+        <Step title="归档" invalid />
+      </Steps>,
+    );
+    const [done, current, upcoming, invalid] = items();
+    // 底色被系统换掉之后只剩一个勾浮着：块用页面的字色，勾用页面色
+    expect(node(done!)).toHaveClass(
+      "forced-colors:bg-[CanvasText]",
+      "forced-colors:text-[Canvas]",
+    );
+    // 序号是字，压在「选中」色上：关掉系统的接管，底、字、边线都自己写
+    expect(node(current!)).toHaveClass(
+      "forced-colors:forced-color-adjust-none",
+      "forced-colors:border-[Highlight]",
+      "forced-colors:bg-[Highlight]",
+      "forced-colors:text-[HighlightText]",
+    );
+    // 带描边的空心框本来就看得出
+    expect(node(upcoming!).className).not.toContain("forced-colors:");
+    expect(node(invalid!).className).not.toContain("forced-colors:");
+  });
+
+  it("高对比模式：连接线没到的收成一条细线，走过的照旧充满；细线画在哪一边跟着排法走", () => {
+    const line = (item: HTMLElement) =>
+      item.querySelector("[aria-hidden=true] > span:last-child")!;
+    const { unmount } = render(<Example current={1} />);
+    for (const item of items()) {
+      expect(line(item)).toHaveClass(
+        "forced-colors:border-[CanvasText]",
+        "forced-colors:before:bg-[CanvasText]",
+        // 横排：容器够宽时线是横的，细线在下；窄了退回竖排，细线在右
+        "forced-colors:@md:border-b",
+        "forced-colors:@max-md:border-r",
+      );
+    }
+    unmount();
+
+    render(
+      <Steps aria-label="建站流程" current={1} orientation="vertical">
+        <Step title="建站" />
+        <Step title="测绘" />
+      </Steps>,
+    );
+    expect(line(items()[0]!)).toHaveClass("forced-colors:border-r");
+    expect(line(items()[0]!).className).not.toContain("@md:");
+  });
+
   it("节点和线对读屏隐藏；状态另有一句读屏才听得到的话", () => {
     render(<Example current={1} />);
     const [done, current, upcoming] = items();
