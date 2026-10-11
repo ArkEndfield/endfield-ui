@@ -27,6 +27,35 @@ function ends(animation: Animation) {
 }
 
 /**
+ * 等这个元素上**正在跑的**、有尽头的过渡和动画走完，再调 `done`；一个都没有
+ * （没有写退场的样式、测试环境里没有动效）就当场调。返回的函数取消这一次等待。
+ */
+export function afterMotion(
+  node: Element | null,
+  done: () => void,
+): () => void {
+  let live = true;
+  const finish = () => {
+    if (live) done();
+  };
+  // 读这一下，浏览器会先把这次的样式变化算完：刚起的过渡已经在里面了。
+  // `finished` 要现在就拿住——过渡被取消之后再去拿，拿到的是一个永远不落定的新承诺
+  const running =
+    typeof node?.getAnimations === "function"
+      ? node.getAnimations().filter(ends)
+      : [];
+  if (running.length === 0) finish();
+  else {
+    void Promise.allSettled(
+      running.map((animation) => animation.finished),
+    ).then(finish);
+  }
+  return () => {
+    live = false;
+  };
+}
+
+/**
  * 退场后再卸载：`open` 变成假之后元素先留着，等它身上的动效走完才卸载。
  *
  * 等的是这个元素上**正在跑的**过渡和动画，不另抄一份时长；一个都没有
@@ -55,29 +84,14 @@ export function usePresence<T extends Element = HTMLElement>(
   useLayoutEffect(() => {
     if (!leaving) return;
     const node = ref.current;
-    let live = true;
     const undo = node ? handlers.current.onLeave?.(node) : undefined;
-    const exit = () => {
-      if (!live) return;
+    const cancel = afterMotion(node, () => {
       setMounted(false);
       handlers.current.onExited?.();
-    };
-
-    // 读这一下，浏览器会先把这次的样式变化算完：刚起的过渡已经在里面了。
-    // `finished` 要现在就拿住——过渡被取消之后再去拿，拿到的是一个永远不落定的新承诺
-    const running =
-      typeof node?.getAnimations === "function"
-        ? node.getAnimations().filter(ends)
-        : [];
-    if (running.length === 0) exit();
-    else {
-      void Promise.allSettled(
-        running.map((animation) => animation.finished),
-      ).then(exit);
-    }
+    });
 
     return () => {
-      live = false;
+      cancel();
       undo?.();
     };
   }, [leaving]);

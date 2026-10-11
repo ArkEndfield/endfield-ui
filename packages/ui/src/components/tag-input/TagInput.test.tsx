@@ -2,6 +2,8 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { FLIP_LIMIT } from "../../hooks/useFlip";
+import { stubAnimations } from "../../test/animations";
 import { Field } from "../field/Field";
 import { TagInput, type TagInputProps } from "./TagInput";
 
@@ -305,6 +307,84 @@ describe("TagInput", () => {
     await user.keyboard("{Enter}");
     expect(tags()).toEqual([]);
     expect(input()).toHaveFocus();
+  });
+
+  it("删掉的小块先留着把淡出走完：这期间它不算数——点不到、读屏读不到，焦点已经到了旁边", async () => {
+    const finish = stubAnimations();
+    const user = userEvent.setup();
+    render(<Example defaultValue={["北岭", "管廊", "泵站"]} name="tags" />);
+    await user.click(input());
+    await user.keyboard("{ArrowLeft}{ArrowLeft}");
+    expect(screen.getByRole("button", { name: "移除管廊" })).toHaveFocus();
+    await user.keyboard("{Delete}");
+
+    // 还在页面上，但已经不是"一个标签"了
+    const gone = screen.getByText("管廊").parentElement!;
+    expect(gone).toHaveAttribute("data-leaving");
+    expect(gone).not.toHaveAttribute("data-tag");
+    expect(gone).toHaveAttribute("inert");
+    expect(gone).toHaveAttribute("aria-hidden", "true");
+    // 脱离排版、原地淡出；别的小块和输入框带着滑回原位用的过渡
+    expect(gone).toHaveClass("data-leaving:absolute", "data-leaving:opacity-0");
+    expect(screen.getByText("泵站").parentElement).toHaveClass(
+      "transition-[color,background-color,translate,opacity]",
+    );
+    expect(input()).toHaveClass("transition-[translate]");
+    expect(gone.parentElement).toHaveClass("relative", "isolate");
+
+    expect(tags()).toEqual(["北岭", "泵站"]);
+    // 焦点不等它：落到原来的下一个上
+    expect(screen.getByRole("button", { name: "移除泵站" })).toHaveFocus();
+    expect(
+      screen.queryByRole("button", { name: "移除管廊" }),
+    ).not.toBeInTheDocument();
+    // 表单里也已经没有它了
+    expect(
+      [
+        ...document.querySelectorAll<HTMLInputElement>("input[type=hidden]"),
+      ].map((field) => field.value),
+    ).toEqual(["北岭", "泵站"]);
+
+    // 方向键走的也只有还在的那几个
+    await user.keyboard("{ArrowLeft}");
+    expect(screen.getByRole("button", { name: "移除北岭" })).toHaveFocus();
+
+    await finish();
+    expect(screen.queryByText("管廊")).not.toBeInTheDocument();
+    expect(tags()).toEqual(["北岭", "泵站"]);
+  });
+
+  it("删了马上又加回来：还是一个标签，不会被当成走着的拿掉", async () => {
+    const finish = stubAnimations();
+    const user = userEvent.setup();
+    render(<Example defaultValue={["北岭", "管廊"]} />);
+    await user.click(input());
+    await user.keyboard("{Backspace}");
+    expect(screen.getByText("管廊").parentElement).toHaveAttribute(
+      "data-leaving",
+    );
+
+    await user.type(input(), "管廊{Enter}");
+    const back = screen.getByText("管廊").parentElement!;
+    expect(back).toHaveAttribute("data-tag");
+    expect(back).not.toHaveAttribute("data-leaving");
+    expect(back).not.toHaveAttribute("inert");
+    await finish();
+    expect(tags()).toEqual(["北岭", "管廊"]);
+  });
+
+  it("小块到了上限就不留：删了就是删了", async () => {
+    stubAnimations();
+    const user = userEvent.setup();
+    const many = Array.from(
+      { length: FLIP_LIMIT + 1 },
+      (_, index) => `站点 ${index + 1}`,
+    );
+    render(<Example defaultValue={many} />);
+    await user.click(input());
+    await user.keyboard("{Backspace}");
+    expect(tags()).toHaveLength(FLIP_LIMIT);
+    expect(document.querySelector("[data-leaving]")).toBeNull();
   });
 
   it("鼠标点小块上的叉：删掉，焦点回到框里", async () => {

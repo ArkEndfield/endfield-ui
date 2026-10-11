@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useAddedKeys } from "../../hooks/useAddedKeys";
 import { useControllableState } from "../../hooks/useControllableState";
+import { useLingering } from "../../hooks/useLingering";
 import { StatusDanger } from "../../icons/StatusDanger";
 import { Upload } from "../../icons/Upload";
 import { cn } from "../../lib/cn";
@@ -16,7 +17,7 @@ import { decor } from "../../lib/decor";
 import { formatFileSize, matchesAccept, sameFile } from "../../lib/file";
 import { focusRingWithin } from "../../lib/focus-ring";
 import { mergeRefs } from "../../lib/merge-refs";
-import { fadeInFast } from "../../lib/motion";
+import { collapse, fadeInFast } from "../../lib/motion";
 import { useFieldControl } from "../field/Field";
 import { FileItem } from "./FileItem";
 
@@ -122,6 +123,46 @@ function droppedFiles(transfer: DataTransfer): File[] {
 }
 
 /**
+ * 列表里的一行。淡入、收起都写在这一层：里面那一行可能是使用方自己画的（renderFile）。
+ * 移除的那一行先留着——高度收到 0 并淡出，连它占的 4px 行距一起收，收完才卸载；
+ * 下面的行和控件后面的内容是被带着上来的。
+ */
+function FileRow({
+  leaving,
+  entering,
+  children,
+}: {
+  leaving: boolean;
+  entering: boolean;
+  children: ReactNode;
+}) {
+  // 走的时候外面不再给内容了（那个文件在使用方那边可能已经清掉）：画的是最后一次的
+  const [last, setLast] = useState(children);
+  if (!leaving && last !== children) setLast(children);
+
+  return (
+    <li
+      data-leaving={leaving ? "" : undefined}
+      // 正在收起的：点不到、Tab 不进去，读屏也读不到
+      inert={leaving}
+      aria-hidden={leaving || undefined}
+      className={cn(
+        collapse,
+        // 小件：高度、行距、淡出都是 200ms
+        "transition-[grid-template-rows,margin,opacity] duration-(--duration-fast)",
+        "data-leaving:-mb-1 data-leaving:opacity-0",
+        entering && fadeInFast,
+      )}
+    >
+      {/* 只在收的时候裁：平时里面的焦点环要画得出去 */}
+      <div className="min-h-0 min-w-0 in-data-leaving:overflow-y-clip">
+        {leaving ? last : children}
+      </div>
+    </li>
+  );
+}
+
+/**
  * 文件上传：选文件，或者把文件拖进来。它只管"选"和"列"——发请求、算进度是使用方的事。
  *
  * 里面是一个真的 `<input type="file">`，铺满整个投放区：点哪儿都是打开系统的文件框。
@@ -170,8 +211,11 @@ export function FileUpload({
     defaultValue: defaultValue ?? [],
     onChange: onValueChange,
   });
+  const keys = files.map(fileKey);
   // 后来加进来的那几行淡入；一开始就有的是静止的
-  const added = useAddedKeys(files.map(fileKey));
+  const added = useAddedKeys(keys);
+  // 移除的那一行先留着收起来，收完才从页面里拿掉
+  const lingering = useLingering<HTMLUListElement>(keys);
   const [rejections, setRejections] = useState<FileRejection[]>([]);
   const [dragging, setDragging] = useState(false);
   // dragenter / dragleave 在每个子元素上都会来一次：数着，归零才算真的离开
@@ -198,8 +242,10 @@ export function FileUpload({
     if (index === null) return;
     pendingFocus.current = null;
     const buttons =
-      listRef.current?.querySelectorAll<HTMLElement>("[data-file-remove]") ??
-      [];
+      // 正在收起的那一行不算
+      listRef.current?.querySelectorAll<HTMLElement>(
+        "li:not([data-leaving]) [data-file-remove]",
+      ) ?? [];
     const target = buttons[Math.min(index, buttons.length - 1)];
     if (target) target.focus();
     else inputRef.current?.focus();
@@ -399,30 +445,33 @@ export function FileUpload({
         )}
       </div>
 
-      {files.length > 0 && (
+      {lingering.entries.length > 0 && (
         <ul
-          ref={listRef}
+          ref={mergeRefs(listRef, lingering.ref)}
           aria-label={labels.list}
-          className="flex flex-col gap-1"
+          // 最后一行也在收了：列表和上面之间那 8px 跟着收，卸载的那一刻后面的内容不跳
+          data-emptying={files.length === 0 ? "" : undefined}
+          className="flex flex-col gap-1 transition-[margin] duration-(--duration-fast) ease-standard data-emptying:-mt-2"
         >
-          {files.map((file, index) => {
+          {lingering.entries.map(({ key, leaving }) => {
+            const index = keys.indexOf(key);
+            const file = files[index];
             const actions = { remove: () => remove(index), index };
-            const key = fileKey(file);
             return (
-              // 淡入写在这一层：里面那一行可能是使用方自己画的（renderFile）
-              <li key={key} className={added.has(key) ? fadeInFast : undefined}>
-                {renderFile ? (
-                  renderFile(file, actions)
-                ) : (
-                  <FileItem
-                    name={file.name}
-                    size={file.size}
-                    disabled={disabled}
-                    removeLabel={removeLabel(file.name)}
-                    onRemove={actions.remove}
-                  />
-                )}
-              </li>
+              <FileRow key={key} leaving={leaving} entering={added.has(key)}>
+                {file !== undefined &&
+                  (renderFile ? (
+                    renderFile(file, actions)
+                  ) : (
+                    <FileItem
+                      name={file.name}
+                      size={file.size}
+                      disabled={disabled}
+                      removeLabel={removeLabel(file.name)}
+                      onRemove={actions.remove}
+                    />
+                  ))}
+              </FileRow>
             );
           })}
         </ul>

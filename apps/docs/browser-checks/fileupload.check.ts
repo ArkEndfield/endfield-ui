@@ -251,7 +251,11 @@ test("移除之后焦点有去处：下一行的移除钮，一个不剩回到�
   );
   await page.key("Enter");
   await page.waitFocused("input:交接附件", "一个不剩时焦点应该回到投放区");
-  assert.deepEqual(await names(page), []);
+  // 移除的那一行是收完才从页面里拿掉的：焦点先到，行晚一点才没
+  await page.waitFor(
+    async () => (await names(page)).length === 0,
+    "移除的那一行收完之后，列表里应该一行都不剩",
+  );
 });
 
 test("只收一个：再放一个替掉原来的", async () => {

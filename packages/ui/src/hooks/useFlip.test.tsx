@@ -1,5 +1,6 @@
 import { act, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { stubAnimations } from "../test/animations";
 import { FLIP_LIMIT, useFlip } from "./useFlip";
 
 /* jsdom 不排版：按 data-box 给每个元素一个假的矩形 [left, top, width, height] */
@@ -7,6 +8,8 @@ type Box = [number, number, number, number];
 let boxes: Record<string, Box> = {};
 /* 正滑到一半的项：它眼下挂着的位移 */
 let flights: Record<string, string> = {};
+/* 容器的高度正收到一半时，眼下是多高（没在收是 null） */
+let rowFlight: number | null = null;
 
 beforeEach(() => {
   boxes = {
@@ -17,11 +20,18 @@ beforeEach(() => {
     d: [316, 54, 100, 24],
   };
   flights = {};
+  rowFlight = null;
   vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(
     function (this: Element) {
-      const [left, top, width, height] = boxes[
-        (this as HTMLElement).dataset.box ?? ""
-      ] ?? [0, 0, 0, 0];
+      const node = this as HTMLElement;
+      const [left, top, width, natural] = boxes[node.dataset.box ?? ""] ?? [
+        0, 0, 0, 0,
+      ];
+      // 容器被 min-height 撑着的时候，量到的不是内容的高度
+      const held = Number.parseFloat(node.style.minHeight);
+      const height = Number.isNaN(held)
+        ? natural
+        : Math.max(natural, rowFlight ?? held);
       return {
         left,
         top,
@@ -249,9 +259,64 @@ describe("useFlip", () => {
       boxes[name] = [(index + 1) * 10, 0, 8, 20];
     });
     again.rerender(<Row items={many} leaving={["n1"]} />);
-    expect(written()).toEqual({});
+    // 上一次量的时候超了上限，没记过位置：各项都不摆回去
+    expect(Object.keys(written()).filter((name) => name !== "row")).toEqual([]);
     expect(item("n1").style.display).toBe("none");
     expect(item("n2")).not.toHaveAttribute("style");
+    expect(screen.getByTestId("row")).not.toHaveAttribute("style");
+  });
+
+  it("少了一行，容器矮了：高度先撑在原来的数上（不过渡），再放到新的，收完撤掉", () => {
+    // 两行：d 在第二行
+    boxes.row = [100, 50, 400, 68];
+    boxes.d = [104, 82, 100, 24];
+    const { rerender } = render(<Row />);
+    const written = watchStyles();
+    // b 走了，d 回到第一行：只剩一行高
+    boxes.row = [100, 50, 400, 40];
+    closeGap();
+    rerender(<Row leaving={["b"]} />);
+
+    const { row } = written();
+    expect(row).toContain("transition: none; min-height: 68px;");
+    expect(row).toContain("min-height: 40px;");
+    // 没有动效可等（测试环境）：当场撤掉，不留在容器上
+    expect(screen.getByTestId("row")).not.toHaveAttribute("style");
+  });
+
+  it("没有变矮（走的那一项不占一整行）：不碰容器的高度", () => {
+    const { rerender } = render(<Row />);
+    const written = watchStyles();
+    closeGap();
+    rerender(<Row leaving={["b"]} />);
+    expect(written().row?.join(" ") ?? "").not.toContain("min-height");
+    expect(screen.getByTestId("row")).not.toHaveAttribute("style");
+  });
+
+  it("高度正收到一半又少一行：从眼前的高度接着收；收完才撤", async () => {
+    const finish = stubAnimations();
+    boxes.row = [100, 50, 400, 96];
+    const { rerender, unmount } = render(<Row />);
+    boxes.row = [100, 50, 400, 68];
+    closeGap();
+    rerender(<Row leaving={["b"]} />);
+    const row = screen.getByTestId("row");
+    // 还在收：目标留在容器上
+    expect(row.style.minHeight).toBe("68px");
+
+    // 收到 80 的时候 c 也走了，内容只剩 40 高
+    rowFlight = 80;
+    boxes.row = [100, 50, 400, 40];
+    boxes.d = [168, 54, 100, 24];
+    const written = watchStyles();
+    rerender(<Row leaving={["b", "c"]} />);
+    expect(written().row).toContain("transition: none; min-height: 80px;");
+    expect(row.style.minHeight).toBe("40px");
+
+    rowFlight = null;
+    await finish();
+    expect(row).not.toHaveAttribute("style");
+    unmount();
   });
 
   it("容器的尺寸变了：只重记位置，不补位", () => {

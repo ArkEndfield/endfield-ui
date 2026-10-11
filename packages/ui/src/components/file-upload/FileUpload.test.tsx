@@ -2,6 +2,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
+import { stubAnimations } from "../../test/animations";
 import { Field } from "../field/Field";
 import { FileItem } from "./FileItem";
 import { FileUpload, type FileUploadProps } from "./FileUpload";
@@ -226,6 +227,97 @@ describe("FileUpload", () => {
     await user.click(remove("交接单.pdf"));
     expect(screen.queryByRole("list")).not.toBeInTheDocument();
     expect(input()).toHaveFocus();
+  });
+
+  it("移除的那一行先留着收起来：这期间点不到、读屏读不到，焦点已经到了下一行；收完才拿掉", async () => {
+    const finish = stubAnimations();
+    const user = userEvent.setup();
+    render(<Example multiple defaultValue={[pdf, png]} />);
+    const list = screen.getByRole("list", { name: "已选的文件" });
+    await user.click(screen.getByRole("button", { name: "移除交接单.pdf" }));
+
+    const rows = [...list.children];
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toHaveAttribute("data-leaving");
+    expect(rows[0]).toHaveAttribute("inert");
+    expect(rows[0]).toHaveAttribute("aria-hidden", "true");
+    // 高度收到 0、淡出，连它占的那 4px 行距一起收
+    expect(rows[0]).toHaveClass(
+      "data-leaving:grid-rows-[0fr]",
+      "data-leaving:opacity-0",
+      "data-leaving:-mb-1",
+      "transition-[grid-template-rows,margin,opacity]",
+    );
+    // 画的还是它最后的样子
+    expect(rows[0]).toHaveTextContent("交接单.pdf");
+    expect(rows[1]).not.toHaveAttribute("data-leaving");
+    expect(names()).toEqual(["现场.png"]);
+    // 焦点不等它
+    expect(screen.getByRole("button", { name: "移除现场.png" })).toHaveFocus();
+    expect(list).not.toHaveAttribute("data-emptying");
+
+    await finish();
+    expect(list.children).toHaveLength(1);
+    expect(names()).toEqual(["现场.png"]);
+  });
+
+  it("最后一行也移除了：列表等它收完才撤，和上面之间的间距跟着收；焦点已经回到投放区", async () => {
+    const finish = stubAnimations();
+    const user = userEvent.setup();
+    render(<Example defaultValue={[pdf]} />);
+    await user.click(screen.getByRole("button", { name: "移除交接单.pdf" }));
+
+    const list = document.querySelector("ul")!;
+    expect(list).toHaveAttribute("data-emptying");
+    expect(list).toHaveClass("data-emptying:-mt-2", "transition-[margin]");
+    expect(list.children).toHaveLength(1);
+    expect(input()).toHaveFocus();
+    // 读屏听到的已经是"没有文件"
+    expect(screen.getByText("没有文件")).toBeInTheDocument();
+
+    await finish();
+    expect(document.querySelector("ul")).toBeNull();
+  });
+
+  it("renderFile：正在收起的那一行不再为它调 renderFile，画的是最后一次的", async () => {
+    const finish = stubAnimations();
+    const user = userEvent.setup();
+    const renderFile = vi.fn(
+      (item: File, { remove }: { remove: () => void }) => (
+        <FileItem
+          name={item.name}
+          size={item.size}
+          status="uploading"
+          progress={40}
+          onRemove={remove}
+        />
+      ),
+    );
+    render(
+      <Example multiple defaultValue={[pdf, png]} renderFile={renderFile} />,
+    );
+    const list = screen.getByRole("list", { name: "已选的文件" });
+    renderFile.mockClear();
+
+    await user.click(screen.getByRole("button", { name: "移除交接单.pdf" }));
+    expect(renderFile).toHaveBeenCalled();
+    expect(renderFile.mock.calls.every(([item]) => item === png)).toBe(true);
+    expect(list.children[0]).toHaveAttribute("data-leaving");
+    expect(list.children[0]).toHaveTextContent("交接单.pdf");
+    expect(list.children[0]).toHaveTextContent("40%");
+    await finish();
+    expect(list.children).toHaveLength(1);
+  });
+
+  it("只收一个：换上来的那一个是直接换的，旧的不留着收", async () => {
+    stubAnimations();
+    const user = userEvent.setup();
+    render(<Example defaultValue={[pdf]} />);
+    await user.upload(input(), png);
+    const list = screen.getByRole("list", { name: "已选的文件" });
+    expect(list.children).toHaveLength(1);
+    expect(list.querySelector("[data-leaving]")).toBeNull();
+    expect(names()).toEqual(["现场.png"]);
   });
 
   it("受控：只报告，列的是传进来的值", async () => {

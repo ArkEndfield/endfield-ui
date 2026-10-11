@@ -2915,3 +2915,422 @@ test("月历翻月：新的一个月从翻的那一侧来（8px，300ms）并淡
     opacity: "1",
   });
 });
+
+test("标签输入：删一个小块，它钉在原处淡出，同时后面的和输入框从旧位置滑过来（200ms）；焦点不等它；走完才卸载", async () => {
+  const { page } = storybook;
+  const CHIP = "#storybook-root [data-tag]";
+  const near = (a: number[], b: number[]) =>
+    a.length === b.length &&
+    a.every((value, at) => Math.abs(value - b[at]!) < 0.6);
+
+  /** 这一排现在的样子：每一项在哪（小块按文字认，输入框叫 input）、有没有走着的、有没有留下内联样式 */
+  const row = () =>
+    page.evaluate((css) => {
+      const host = document.querySelector(css)!.parentElement!;
+      return {
+        places: Object.fromEntries(
+          [...host.children].map((item) => {
+            const rect = item.getBoundingClientRect();
+            return [
+              item.tagName === "INPUT" ? "input" : (item.textContent ?? ""),
+              [rect.left, rect.top],
+            ];
+          }),
+        ),
+        tags: [...host.querySelectorAll("[data-tag]")].map(
+          (item) => item.textContent,
+        ),
+        leaving: host.querySelectorAll("[data-leaving]").length,
+        styled: host.querySelectorAll(":scope > [style]").length,
+        shifted: [...host.children].filter(
+          (item) => getComputedStyle(item).translate !== "none",
+        ).length,
+      };
+    }, CHIP);
+
+  /**
+   * 点第几个小块上的叉。同一步里把刚起的过渡都停在第一帧，读走的那一块和其余各项；
+   * 再等一拍读焦点——这时候走的那一块还停在淡出的第一帧上，一定还在页面里
+   */
+  const remove = (index: number) =>
+    page.evaluate(
+      async ({ css, at }) => {
+        const host = document.querySelector(css)!.parentElement!;
+        const name = (item: Element) =>
+          item.tagName === "INPUT" ? "input" : (item.textContent ?? "");
+        const place = (item: Element) => {
+          const rect = item.getBoundingClientRect();
+          return [rect.left, rect.top, rect.width, rect.height];
+        };
+        const target = host.querySelectorAll<HTMLElement>("[data-tag]")[at]!;
+        const before = Object.fromEntries(
+          [...host.children].map((item) => [name(item), place(item)]),
+        );
+        target.querySelector("button")!.click();
+        await Promise.resolve();
+
+        const held: Animation[] = [];
+        const moving: string[] = [];
+        const starting: Record<string, number[]> = {};
+        for (const item of host.children) {
+          const running = item.getAnimations() as CSSTransition[];
+          for (const animation of running) {
+            animation.pause();
+            animation.currentTime = 0;
+            held.push(animation);
+          }
+          if (
+            running.some(
+              (animation) => animation.transitionProperty === "translate",
+            )
+          ) {
+            moving.push(name(item));
+          }
+          starting[name(item)] = place(item);
+        }
+        const ghost = host.querySelector<HTMLElement>("[data-leaving]");
+        const found = {
+          before,
+          starting,
+          moving,
+          gone: name(target),
+          ghost: ghost && {
+            same: ghost === target,
+            inert: ghost.inert,
+            hidden: ghost.getAttribute("aria-hidden"),
+            position: getComputedStyle(ghost).position,
+            fading: (ghost.getAnimations() as CSSTransition[]).map(
+              (animation) => [
+                animation.transitionProperty,
+                animation.effect!.getComputedTiming().duration,
+              ],
+            ),
+          },
+          live: host.querySelectorAll("[data-tag]").length,
+          focused: "",
+          there: false,
+        };
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        found.focused =
+          document.activeElement?.getAttribute("aria-label") ??
+          document.activeElement?.tagName ??
+          "";
+        found.there = ghost !== null && host.contains(ghost);
+        for (const animation of held) animation.play();
+        return found;
+      },
+      { css: CHIP, at: index },
+    );
+  const gone = (message: string) =>
+    page.waitFor(async () => {
+      const found = await row();
+      return found.leaving === 0 ? found : null;
+    }, message);
+
+  await withMotion(page, async () => {
+    await page.story("控件-taginput-标签输入--narrow");
+    const start = await row();
+    assert.equal(start.tags.length, 4);
+    assert.deepEqual([start.leaving, start.styled], [0, 0]);
+
+    const removed = await remove(1);
+    assert.deepEqual(
+      removed.ghost,
+      {
+        same: true,
+        inert: true,
+        hidden: "true",
+        position: "absolute",
+        fading: [["opacity", 200]],
+      },
+      "走的那一块应该留在页面上：脱离排版、对键盘和读屏隐藏、在淡出",
+    );
+    assert.ok(
+      near(removed.starting[removed.gone]!, removed.before[removed.gone]!),
+      `走的那一块应该钉在原来的位置上：${JSON.stringify([removed.before[removed.gone], removed.starting[removed.gone]])}`,
+    );
+    assert.equal(removed.live, 3, "它当场就不算一个标签了");
+    assert.equal(removed.there, true);
+    assert.equal(
+      removed.focused,
+      `移除${start.tags[2]}`,
+      "焦点不等退场：已经落到原来的下一个上",
+    );
+    // 其余各项：过渡的第一帧还在旧位置上（没挪地方的本来就在）
+    for (const [name, at] of Object.entries(removed.starting)) {
+      assert.ok(
+        near(at.slice(0, 2), removed.before[name]!.slice(0, 2)),
+        `${name} 应该从旧位置出发：${JSON.stringify([removed.before[name], at])}`,
+      );
+    }
+
+    await page.settled("#storybook-root");
+    const after = await gone("淡出走完之后，走的那一块应该卸载");
+    assert.deepEqual(after.tags, [start.tags[0], start.tags[2], start.tags[3]]);
+    // 真的挪了地方的那几项，就是刚才带着位移过渡的那几项
+    const moved = Object.keys(after.places).filter(
+      (name) => !near(after.places[name]!, removed.before[name]!.slice(0, 2)),
+    );
+    assert.ok(moved.length > 0, "删了中间的一个，后面应该有挪了地方的");
+    assert.deepEqual(removed.moving.sort(), moved.sort());
+    assert.deepEqual(
+      [after.styled, after.shifted],
+      [0, 0],
+      "走完之后各项身上不该留着位移和内联样式",
+    );
+
+    // 连着删两个：各走各的，最后停在对的地方
+    await page.evaluate(async (css) => {
+      const host = document.querySelector(css)!.parentElement!;
+      host.querySelector<HTMLElement>("[data-tag] button")!.click();
+      await new Promise((resolve) => setTimeout(resolve, 40));
+      host.querySelector<HTMLElement>("[data-tag] button")!.click();
+    }, CHIP);
+    await page.settled("#storybook-root");
+    const last = await gone("连着删的也应该都卸载");
+    assert.deepEqual(last.tags, [start.tags[3]]);
+    assert.deepEqual([last.styled, last.shifted], [0, 0]);
+
+    // 少了一行：那一排的高度从原来的收到新的，不是当场缩上去。
+    // 把外框压窄到一行只放得下一个（不靠字宽：各台机器上字体不一样），删一个就少一行
+    await page.story("控件-taginput-标签输入--narrow");
+    const shrink = await page.evaluate(async (css) => {
+      const host = document.querySelector<HTMLElement>(css)!.parentElement!;
+      host.closest<HTMLElement>("[data-variant]")!.style.width = "96px";
+      // 换行变了：等补位的钩子把新位置记下来（它盯着这一排的尺寸）
+      await new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      );
+      const tall = () => host.getBoundingClientRect().height;
+      const rows = () =>
+        new Set(
+          [...host.querySelectorAll("[data-tag]")].map((item) =>
+            Math.round(item.getBoundingClientRect().top),
+          ),
+        ).size;
+      const before = { height: tall(), rows: rows() };
+      host.querySelector<HTMLElement>("[data-tag] button")!.click();
+      await Promise.resolve();
+      const closing = host.getAnimations() as CSSTransition[];
+      for (const animation of closing) {
+        animation.pause();
+        animation.currentTime = 0;
+      }
+      const found = {
+        before,
+        // 过渡的第一帧：还撑在原来的高度上
+        starting: tall(),
+        closing: closing.map((animation) => [
+          animation.transitionProperty,
+          animation.effect!.getComputedTiming().duration,
+        ]),
+        clip: getComputedStyle(host).overflowY,
+      };
+      for (const animation of closing) animation.play();
+      return found;
+    }, CHIP);
+    assert.equal(
+      shrink.before.rows,
+      4,
+      "压窄之后应该一行一个小块（不然这一段测不到少一行）",
+    );
+    assert.deepEqual(
+      [shrink.closing, shrink.clip],
+      [[["min-height", 200]], "clip"],
+      "少了一行，那一排的高度应该过渡过去，这期间把竖向超出去的裁掉",
+    );
+    assert.ok(
+      Math.abs(shrink.starting - shrink.before.height) < 0.6,
+      `高度应该从原来的出发：原来 ${shrink.before.height}，第一帧 ${shrink.starting}`,
+    );
+    await page.settled("#storybook-root");
+    await gone("走的那一块应该卸载");
+    const settled = await page.waitFor(
+      () =>
+        page.evaluate((css) => {
+          const host = document.querySelector<HTMLElement>(css)!.parentElement!;
+          // 收完之后写上去的要撤掉：等它撤
+          return host.hasAttribute("style")
+            ? null
+            : { height: host.getBoundingClientRect().height };
+        }, CHIP),
+      "高度收完之后，那一排身上不该留着内联样式",
+    );
+    assert.ok(
+      settled.height < shrink.before.height - 10,
+      `少了一行应该矮下来：${shrink.before.height} → ${settled.height}`,
+    );
+  });
+
+  // 减少动态效果：删了就没了，直接到位
+  await page.story("控件-taginput-标签输入--narrow");
+  await page.evaluate((css) => {
+    document.querySelectorAll<HTMLElement>(`${css} button`)[1]!.click();
+  }, CHIP);
+  const reduced = await gone("减少动态效果下走的那一块也应该卸载");
+  assert.equal(reduced.tags.length, 3);
+  await page.settled("#storybook-root");
+  assert.deepEqual([(await row()).styled, (await row()).shifted], [0, 0]);
+});
+
+test("文件列表：移除一行，它按高度收起并淡出（200ms），连行距一起收，收完才卸载；焦点不等它；卸载的那一刻后面的内容不跳", async () => {
+  const { page } = storybook;
+  const ROOT = "#storybook-root div:has(> [data-dropzone])";
+
+  /**
+   * 点第几行的移除钮。同一步里读正在收起的那一行；它收完的那一刻（还在页面里）
+   * 量一次整个控件的高度存起来，卸载之后再量一次对着看
+   */
+  const remove = (index: number) =>
+    page.evaluate(
+      async ({ css, at }) => {
+        const host = document.querySelector<HTMLElement>(css)!;
+        const list = host.querySelector("ul")!;
+        const target = list.children[at] as HTMLElement;
+        const store = window as unknown as {
+          __collapsed: { height: number; there: boolean } | null;
+        };
+        store.__collapsed = null;
+        target.querySelector<HTMLElement>("[data-file-remove]")!.click();
+        await Promise.resolve();
+
+        const ghost = list.querySelector<HTMLElement>("li[data-leaving]");
+        const running = (ghost?.getAnimations() ?? []) as CSSTransition[];
+        for (const animation of running) animation.pause();
+        ghost?.addEventListener("transitionend", (event) => {
+          if (event.propertyName !== "grid-template-rows") return;
+          store.__collapsed = {
+            height: host.getBoundingClientRect().height,
+            there: document.contains(ghost),
+          };
+        });
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        const found = {
+          same: ghost === target,
+          inert: ghost?.inert ?? null,
+          hidden: ghost?.getAttribute("aria-hidden") ?? null,
+          transitions: running
+            .map(
+              (animation) =>
+                `${animation.transitionProperty} ${String(animation.effect!.getComputedTiming().duration)}`,
+            )
+            .sort(),
+          focused:
+            document.activeElement?.getAttribute("aria-label") ??
+            document.activeElement?.tagName ??
+            "",
+          rows: list.querySelectorAll("li:not([data-leaving])").length,
+          emptying: list.hasAttribute("data-emptying"),
+          closing: (list.getAnimations() as CSSTransition[]).map(
+            (animation) => animation.transitionProperty,
+          ),
+        };
+        for (const animation of running) animation.play();
+        return found;
+      },
+      { css: ROOT, at: index },
+    );
+  /** 等走的那一行卸载（列表也可能跟着撤了），拿到收完那一刻和现在的高度 */
+  const unmounted = (message: string) =>
+    page.waitFor(
+      () =>
+        page.evaluate((css) => {
+          const host = document.querySelector<HTMLElement>(css)!;
+          if (host.querySelector("li[data-leaving]")) return null;
+          return {
+            collapsed: (
+              window as unknown as {
+                __collapsed: { height: number; there: boolean } | null;
+              }
+            ).__collapsed,
+            height: host.getBoundingClientRect().height,
+            rows: host.querySelectorAll("ul > li").length,
+            list: host.querySelector("ul") !== null,
+          };
+        }, ROOT),
+      message,
+    );
+
+  await withMotion(page, async () => {
+    await page.story("控件-fileupload-文件上传--with-files");
+
+    const first = await remove(0);
+    assert.deepEqual(
+      first,
+      {
+        same: true,
+        inert: true,
+        hidden: "true",
+        transitions: [
+          "grid-template-rows 200",
+          "margin-bottom 200",
+          "opacity 200",
+        ],
+        focused: "移除北段管廊-现场.png",
+        rows: 1,
+        emptying: false,
+        closing: [],
+      },
+      "移除的那一行应该留着收起来：高度、行距、透明度一起走，焦点已经到下一行",
+    );
+    const one = await unmounted("收完之后，移除的那一行应该卸载");
+    assert.deepEqual([one.rows, one.list], [1, true]);
+    assert.equal(one.collapsed?.there, true, "收完的那一刻它还在页面里");
+    assert.ok(
+      Math.abs(one.collapsed.height - one.height) < 0.6,
+      `卸载的那一刻后面的内容不该跳：收完时 ${one.collapsed.height}，卸载后 ${one.height}`,
+    );
+
+    // 最后一行：列表和上面之间的间距跟着收，列表等它收完才撤
+    const last = await remove(0);
+    assert.deepEqual(
+      [last.same, last.focused, last.rows, last.emptying, last.closing],
+      [true, "交接附件", 0, true, ["margin-top"]],
+      "最后一行也在收的时候，列表应该跟着把它上面的间距收掉；焦点回到投放区",
+    );
+    const none = await unmounted("最后一行收完之后应该卸载");
+    assert.deepEqual([none.rows, none.list], [0, false]);
+    assert.ok(
+      Math.abs(none.collapsed!.height - none.height) < 0.6,
+      `列表撤掉的那一刻后面的内容不该跳：收完时 ${none.collapsed!.height}，撤掉后 ${none.height}`,
+    );
+
+    // 只收一个：换上来的那一个是直接换的，旧的不留着收
+    await page.story("控件-fileupload-文件上传--single");
+    const swapped = await page.evaluate(async () => {
+      const data = new DataTransfer();
+      data.items.add(
+        new File([new Uint8Array(4096)], "信标照片.png", {
+          type: "image/png",
+          lastModified: 1,
+        }),
+      );
+      document.querySelector("#storybook-root [data-dropzone]")!.dispatchEvent(
+        new DragEvent("drop", {
+          dataTransfer: data,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+      await Promise.resolve();
+      const rows = [...document.querySelectorAll("#storybook-root ul > li")];
+      return {
+        rows: rows.length,
+        leaving: rows.filter((row) => row.hasAttribute("data-leaving")).length,
+        name: rows[0]?.querySelector("[title]")?.textContent ?? null,
+      };
+    });
+    assert.deepEqual(swapped, { rows: 1, leaving: 0, name: "信标照片.png" });
+    await page.settled("#storybook-root");
+  });
+
+  // 减少动态效果：移除了就没了
+  await page.story("控件-fileupload-文件上传--with-files");
+  await page.evaluate(() => {
+    document
+      .querySelector<HTMLElement>("#storybook-root [data-file-remove]")!
+      .click();
+  });
+  const reduced = await unmounted("减少动态效果下移除的那一行也应该卸载");
+  assert.deepEqual([reduced.rows, reduced.list], [1, true]);
+});

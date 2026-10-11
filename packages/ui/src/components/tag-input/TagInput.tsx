@@ -12,11 +12,13 @@ import {
 } from "react";
 import { useAddedKeys } from "../../hooks/useAddedKeys";
 import { useControllableState } from "../../hooks/useControllableState";
+import { FLIP_LIMIT, useFlip } from "../../hooks/useFlip";
+import { useLingering } from "../../hooks/useLingering";
 import { Close } from "../../icons/Close";
 import { StatusDanger } from "../../icons/StatusDanger";
 import { cn } from "../../lib/cn";
 import { mergeRefs } from "../../lib/merge-refs";
-import { fadeInFast } from "../../lib/motion";
+import { fadeInFast, flipBox, flipLeaving } from "../../lib/motion";
 import { useFieldControl } from "../field/Field";
 import {
   controlBox,
@@ -186,6 +188,13 @@ export function TagInput({
   const full = max !== undefined && tags.length >= max;
   // 后来加的那几个淡入；一开始就有的是静止的
   const added = useAddedKeys(tags);
+  // 删掉的那一块先留着把淡出走完，其余的小块和输入框同时补位。
+  // 补位的钩子排在前面：它钉不住的（小块太多、量不到位置）当场藏掉，后面那个就不等了
+  const rowRef = useFlip<HTMLDivElement>();
+  const lingering = useLingering<HTMLDivElement>(
+    tags,
+    tags.length < FLIP_LIMIT,
+  );
 
   useEffect(() => {
     if (flash === null) return;
@@ -371,49 +380,66 @@ export function TagInput({
         className,
       )}
     >
-      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1 py-1 pl-2">
-        {tags.map((tag, index) => (
-          <span
-            key={tag}
-            data-tag=""
-            data-flash={flash === tag ? "" : undefined}
-            className={cn(
-              valueChip,
-              valueChipSize[size],
-              "transition-colors duration-(--duration-fast) ease-standard",
-              // 重复时闪一下：填充反转。不用黄色——这不是"选中"
-              "data-flash:bg-surface-inverse data-flash:text-ink-inverse",
-              added.has(tag) && fadeInFast,
-              disabled && "text-ink-disabled",
-              !editable && "pr-2",
-            )}
-          >
-            <span className="min-w-0 truncate">{tag}</span>
-            {editable && (
-              <button
-                type="button"
-                // 整个控件只占一个 Tab 停靠点：小块用方向键走
-                tabIndex={-1}
-                aria-label={removeLabel(tag)}
-                onClick={(event) =>
-                  // 键盘触发的（回车、空格）焦点留在小块这一排；鼠标点的回到输入框
-                  remove(
-                    index,
-                    event.detail === 0 && tags.length > 1 ? index : "input",
-                  )
-                }
-                onKeyDown={(event) => handleChipKeyDown(event, index)}
-                className={cn(
-                  valueChipRemove,
-                  "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus",
-                  flash === tag && "text-ink-inverse",
-                )}
-              >
-                <Close size={12} />
-              </button>
-            )}
-          </span>
-        ))}
+      <div
+        ref={mergeRefs(rowRef, lingering.ref)}
+        className={cn(
+          "flex min-w-0 flex-1 flex-wrap items-center gap-1 py-1 pl-2",
+          flipBox,
+        )}
+      >
+        {lingering.entries.map(({ key: tag, leaving }) => {
+          // 正在走的那一块已经不在 tags 里了，下面按位置算的事它都用不上
+          const index = tags.indexOf(tag);
+          return (
+            <span
+              key={tag}
+              // 正在走的不算数：删掉之后焦点落到哪、整排怎么用方向键走，看到的只有还在的
+              data-tag={leaving ? undefined : ""}
+              data-leaving={leaving ? "" : undefined}
+              data-flash={flash === tag && !leaving ? "" : undefined}
+              // 它点不到、Tab 不进去，读屏也读不到：状态在删的那一刻就变了，画面后到
+              inert={leaving}
+              aria-hidden={leaving || undefined}
+              className={cn(
+                valueChip,
+                valueChipSize[size],
+                // 换色、补位时滑回原位、走的时候淡出，都是 200ms
+                "transition-[color,background-color,translate,opacity] duration-(--duration-fast) ease-standard",
+                // 重复时闪一下：填充反转。不用黄色——这不是"选中"
+                "data-flash:bg-surface-inverse data-flash:text-ink-inverse",
+                flipLeaving,
+                added.has(tag) && fadeInFast,
+                disabled && "text-ink-disabled",
+                !editable && "pr-2",
+              )}
+            >
+              <span className="min-w-0 truncate">{tag}</span>
+              {editable && (
+                <button
+                  type="button"
+                  // 整个控件只占一个 Tab 停靠点：小块用方向键走
+                  tabIndex={-1}
+                  aria-label={removeLabel(tag)}
+                  onClick={(event) =>
+                    // 键盘触发的（回车、空格）焦点留在小块这一排；鼠标点的回到输入框
+                    remove(
+                      index,
+                      event.detail === 0 && tags.length > 1 ? index : "input",
+                    )
+                  }
+                  onKeyDown={(event) => handleChipKeyDown(event, index)}
+                  className={cn(
+                    valueChipRemove,
+                    "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus",
+                    flash === tag && "text-ink-inverse",
+                  )}
+                >
+                  <Close size={12} />
+                </button>
+              )}
+            </span>
+          );
+        })}
         <input
           {...props}
           ref={mergeRefs(inputRef, ref)}
@@ -451,6 +477,8 @@ export function TagInput({
             controlElement,
             "min-w-12 px-1",
             valueInputHeight[size],
+            // 删了一个小块：和后面的小块一起滑到新位置
+            "transition-[translate] duration-(--duration-fast) ease-standard",
           )}
         />
       </div>

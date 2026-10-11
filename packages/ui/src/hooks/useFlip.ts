@@ -1,11 +1,24 @@
-import { useLayoutEffect, useRef, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
 import { dropEmptyStyle } from "../lib/inline-style";
+import { afterMotion } from "./usePresence";
 
 /** 一排里超过这么多项就不补位：一项一项量、一项一项起过渡，多了不划算，也看不清谁去了哪 */
 export const FLIP_LIMIT = 50;
 
 /** 一项在容器里的排版位置：相对容器的内边距盒，不算它身上挂着的位移 */
 type Place = { left: number; top: number; width: number; height: number };
+
+/** 一个容器记着的事 */
+type Memory = {
+  /** 上一次量的时候各项在哪 */
+  seen: Map<Element, Place>;
+  /** 上一次量的时候容器多高 */
+  height: number;
+  /** 钉过的（或者钉不住藏起来的）那几项 */
+  pinned: WeakSet<Element>;
+  /** 容器的高度正在收：取消"收完把写上去的撤掉"的那一次等待 */
+  settle: (() => void) | null;
+};
 
 const px = (value: number) => `${Math.round(value * 100) / 100}px`;
 
@@ -31,13 +44,11 @@ const HELD = [...PIN, "display"] as const;
 
 /**
  * 量一遍、记下来。这一次有一项刚走，就补位：走的钉在原处，
- * 其余挪了地方的先摆回旧位置（不过渡），再撤掉——撤的那一下滑回原位。
+ * 其余挪了地方的先摆回旧位置（不过渡），再撤掉——撤的那一下滑回原位；
+ * 容器因此变矮了的话，高度也从原来的收到新的。
  */
-function arrange(
-  node: HTMLElement,
-  seen: Map<Element, Place>,
-  pinned: WeakSet<Element>,
-) {
+function arrange(node: HTMLElement, memory: Memory) {
+  const { seen, pinned } = memory;
   const items = [...node.children] as HTMLElement[];
   const leaving = (item: Element) => item.hasAttribute("data-leaving");
   // 走到一半又回来了的（删了马上又加回来）：往它上面写过的撤掉
@@ -56,6 +67,7 @@ function arrange(
     items.filter((item) => !leaving(item)).length > FLIP_LIMIT
   ) {
     seen.clear();
+    memory.height = 0;
     for (const item of items) {
       if (!leaving(item) || pinned.has(item)) continue;
       pinned.add(item);
@@ -96,6 +108,12 @@ function arrange(
   seen.clear();
   for (const [item, place] of next) seen.set(item, place);
 
+  // 容器眼前有多高。高度正收到一半时，量到的就是收到一半的那个数
+  const tall = box.height / scale;
+  const shrinking = memory.settle !== null;
+  const from = shrinking ? tall : memory.height;
+  if (!shrinking) memory.height = tall;
+
   // 只在有一项刚走的那一次补位。加了一项、容器宽了、字体到了，别的项都是直接到位的
   if (gone.length === 0) return;
 
@@ -108,7 +126,18 @@ function arrange(
       item.style.setProperty("display", "none");
     }
   }
-  if (moved.length === 0) return;
+
+  // 少了一行，容器就矮了：高度也跟着收，不然它当场缩上去，还在滑的那几项会露在外面，
+  // 后面的内容也跟着跳一下。量着收——先撑在眼前的高度上，再放到新的高度
+  memory.settle?.();
+  memory.settle = null;
+  node.style.setProperty("transition", "none");
+  node.style.removeProperty("min-height");
+  const to = node.getBoundingClientRect().height / scale;
+  memory.height = to;
+  const shrink = from - to >= 0.5;
+  if (shrink) node.style.setProperty("min-height", px(from));
+
   for (const [item, dx, dy] of moved) {
     item.style.setProperty("transition", "none");
     item.style.setProperty("translate", `${px(dx)} ${px(dy)}`);
@@ -116,6 +145,17 @@ function arrange(
   // 让"还在旧位置上"这一下落定，再撤掉：撤的那一下由各项自己的过渡滑回原位
   node.getBoundingClientRect();
   for (const [item] of moved) unset(item, ["transition", "translate"]);
+  node.style.removeProperty("transition");
+  if (shrink) {
+    node.style.setProperty("min-height", px(to));
+    // 收完就把写上去的撤掉：留着的话，下一次内容少了它不会跟着矮
+    memory.settle = afterMotion(node, () => {
+      memory.settle = null;
+      unset(node, ["min-height"]);
+    });
+  } else {
+    dropEmptyStyle(node);
+  }
 }
 
 /**
@@ -126,7 +166,9 @@ function arrange(
  *   钩子把它钉在原来的位置上，它在那里把退场走完；容器要是定位的参照（`flipBox`）。
  * - 其余各项要给 `translate` 加上过渡：钩子只负责把它们摆回旧位置再放手，
  *   滑回来靠的是 CSS——所以系统开了"减少动态效果"时是直接到位的。
- * - 只动 `translate`，不碰布局。正滑到一半又少一项，从眼前的位置接着走。
+ * - 容器因此变矮了（少了一行），它的高度也从原来的收到新的（量着收，过渡同样在
+ *   `flipBox` 里）；收完撤掉，不留在容器上。
+ * - 各项只动 `translate`。正滑到一半又少一项，从眼前的位置接着走。
  * - 只有"少了一项"才补位；加一项、容器尺寸变了，各项直接到位。
  * - 超过 `FLIP_LIMIT` 项、量不到位置时不做：走的那一项也不留，照旧直接消失。
  */
@@ -134,13 +176,17 @@ export function useFlip<
   T extends HTMLElement = HTMLElement,
 >(): RefObject<T | null> {
   const ref = useRef<T>(null);
-  const seen = useRef(new Map<Element, Place>());
-  const pinned = useRef(new WeakSet<Element>());
+  const memory = useRef<Memory>({
+    seen: new Map(),
+    height: 0,
+    pinned: new WeakSet(),
+    settle: null,
+  });
 
   // 每次渲染后量一遍：哪一次渲染会少一项事先不知道，旧位置得一直是新的
   useLayoutEffect(() => {
     const node = ref.current;
-    if (node) arrange(node, seen.current, pinned.current);
+    if (node) arrange(node, memory.current);
   });
 
   // 容器的尺寸变了（窗口窄了、换行变了）没有渲染：重记一遍位置。
@@ -148,11 +194,17 @@ export function useFlip<
   useLayoutEffect(() => {
     const node = ref.current;
     if (!node || typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(() =>
-      arrange(node, seen.current, pinned.current),
-    );
+    const observer = new ResizeObserver(() => arrange(node, memory.current));
     observer.observe(node);
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const held = memory.current;
+    return () => {
+      held.settle?.();
+      held.settle = null;
+    };
   }, []);
 
   return ref;
