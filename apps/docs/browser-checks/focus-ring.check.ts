@@ -177,6 +177,59 @@ for (const theme of ["light", "dark"] as const) {
     );
   });
 
+  test(`${theme}：深色面板里打开下拉，焦点落在黄底的当前项上，焦点环和黄底分得开`, async () => {
+    const { page } = storybook;
+    await page.story("控件-select-下拉选择--strong-panel", theme);
+    await page.key("Tab");
+    await page.waitFocused("combobox:语言");
+    await page.key("Enter");
+    await page.waitVisible("[role=listbox]");
+    await page.waitFocused("option:简体中文");
+    // 面板是深色的局部主题，焦点色是黄的；墨色的环贴着边又和面板分不开，所以往里收
+    await waitRingOnFill(
+      page,
+      "深色面板的当前项",
+      { ring: "--ef-on-action", fill: "--ef-action" },
+      { offset: "-4px" },
+    );
+
+    // 别的项压在深色的面板上：照旧是贴边的普通焦点色
+    await page.key("ArrowDown");
+    await page.waitFocused("option:English");
+    await page.settled();
+    await waitRing(page, "深色面板里不是当前项的选项");
+  });
+
+  test(`${theme}：深色面板的单选菜单，当前项的焦点环和黄底分得开`, async () => {
+    const { page } = storybook;
+    await page.story("控件-dropdownmenu-下拉菜单--language", theme);
+    await page.key("Tab");
+    await page.key("Enter");
+    await page.waitVisible("[role=menu]");
+    await page.waitFocused("menuitemradio:简体中文");
+    await waitRingOnFill(
+      page,
+      "深色面板里选中的单选项",
+      { ring: "--ef-on-action", fill: "--ef-action" },
+      { offset: "-4px" },
+    );
+  });
+
+  test(`${theme}：全屏菜单当前项的焦点环和黄底分得开，而且不贴边`, async () => {
+    const { page } = storybook;
+    await page.story("控件-topbar-顶栏与全屏菜单--menu-open", theme);
+    await page.waitVisible("[role=dialog]");
+    await page.waitFocused("a:总览");
+    await page.key("Tab");
+    await page.waitFocused("a:调度");
+    await waitRingOnFill(
+      page,
+      "全屏菜单的当前项",
+      { ring: "--ef-on-action", fill: "--ef-action" },
+      { offset: "-4px" },
+    );
+  });
+
   test(`${theme}：菜单项有焦点环`, async () => {
     const { page } = storybook;
     await page.story("控件-dropdownmenu-下拉菜单--playground", theme);

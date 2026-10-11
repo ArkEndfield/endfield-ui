@@ -45,6 +45,10 @@ export const menuItemHover = "data-highlighted:bg-ink/5";
 /**
  * 当前项（下拉选择的已选项、单选菜单项的选中项）。
  *
+ * `strong` 的当前项是一整行黄底，而面板是深色的局部主题，焦点色也是黄的：
+ * 画在里面的焦点环换成压得住黄底的颜色，并且再往里收 2px——那个颜色是墨色，
+ * 贴着边的话和深色的面板分不开，看上去只是黄底小了一圈。
+ *
  * 高对比模式下底色都被系统换掉：两种面板的当前项都是左缘一条系统"选中"色的竖条
  * （`strong` 平时没有这一条，只在这时候画）
  */
@@ -52,7 +56,7 @@ export const menuItemCurrent: Record<MenuVariant, string> = {
   plain:
     "bg-surface-muted font-medium before:absolute before:inset-y-0 before:left-0 before:w-[3px] before:bg-ink before:content-[''] forced-colors:before:bg-[Highlight]",
   strong:
-    "bg-action font-medium text-on-action forced-colors:before:absolute forced-colors:before:inset-y-0 forced-colors:before:left-0 forced-colors:before:w-[3px] forced-colors:before:bg-[Highlight] forced-colors:before:content-['']",
+    "bg-action font-medium text-on-action focus-visible:-outline-offset-4 focus-visible:outline-on-action forced-colors:before:absolute forced-colors:before:inset-y-0 forced-colors:before:left-0 forced-colors:before:w-[3px] forced-colors:before:bg-[Highlight] forced-colors:before:content-['']",
 };
 
 export const menuGroupLabel = "px-3 pt-2 pb-1 text-xs text-ink-tertiary";

@@ -193,6 +193,20 @@ describe("Select", () => {
       "data-theme",
       "dark",
     );
+    // 打开时焦点就落在这一项上。深色面板里焦点色也是黄的：环换成压得住黄底的颜色，往里收
+    expect(current).toHaveClass(
+      "focus-visible:-outline-offset-4",
+      "focus-visible:outline-on-action",
+    );
+    expect(current).not.toHaveClass(
+      "focus-visible:-outline-offset-2",
+      "focus-visible:outline-focus",
+    );
+    const other = screen.getAllByRole("option").find((o) => o !== current)!;
+    expect(other).toHaveClass(
+      "focus-visible:-outline-offset-2",
+      "focus-visible:outline-focus",
+    );
   });
 
   it("高对比模式：已选项是左缘一条系统「选中」色的竖条", async () => {

@@ -114,8 +114,16 @@ describe("NavMenu", () => {
       "font-bold",
       "before:bg-on-action",
     );
-    // 暗色主题下普通的焦点色也是黄的：当前项的焦点环换成压得住黄底的颜色
-    expect(current).toHaveClass("focus-visible:outline-on-action");
+    // 暗色主题下普通的焦点色也是黄的：当前项的焦点环换成压得住黄底的颜色，
+    // 并且往里收——墨色的环贴着边时，在暗色页面上和页面分不开
+    expect(current).toHaveClass(
+      "focus-visible:outline-on-action",
+      "focus-visible:-outline-offset-4",
+    );
+    expect(current).not.toHaveClass(
+      "focus-visible:outline-focus",
+      "focus-visible:-outline-offset-2",
+    );
     expect(screen.getByRole("link", { name: "总览" })).toHaveClass(
       "bg-surface-sunken",
     );

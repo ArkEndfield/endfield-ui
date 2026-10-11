@@ -226,8 +226,9 @@ export function NavMenuItem({
             // 黄和旁边的浅灰明度很接近：另加粗体和左缘一条墨色竖条，不只靠颜色
             "bg-action font-bold text-on-action",
             "before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-on-action before:content-['']",
-            // 普通的焦点色在暗色主题下也是黄的，压在黄底上看不见
-            "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-on-action",
+            // 普通的焦点色在暗色主题下也是黄的，压在黄底上看不见。换成墨色之后再往里收 2px：
+            // 贴着边的话它在暗色页面上和页面分不开，看上去只是黄条小了一圈
+            "focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-on-action",
           ]
         : [
             "bg-surface-sunken text-ink hover:bg-surface-muted active:bg-line",

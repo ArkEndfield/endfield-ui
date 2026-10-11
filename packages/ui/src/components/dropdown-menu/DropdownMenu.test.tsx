@@ -209,6 +209,44 @@ describe("DropdownMenu", () => {
     );
   });
 
+  it("strong 面板当前项的焦点环换成压得住黄底的颜色，并且往里收；别的项照旧", async () => {
+    for (const variant of ["strong", "plain"] as const) {
+      const { unmount } = render(
+        <DropdownMenu
+          defaultOpen
+          variant={variant}
+          trigger={<button type="button">语言</button>}
+        >
+          <DropdownMenuRadioGroup defaultValue="zh">
+            <DropdownMenuRadioItem value="zh">简体中文</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="en">English</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </DropdownMenu>,
+      );
+      const current = await screen.findByRole("menuitemradio", {
+        name: "简体中文",
+      });
+      const other = screen.getByRole("menuitemradio", { name: "English" });
+      const recolored = [
+        "focus-visible:-outline-offset-4",
+        "focus-visible:outline-on-action",
+      ];
+      const usual = [
+        "focus-visible:-outline-offset-2",
+        "focus-visible:outline-focus",
+      ];
+      // 面板是深色的局部主题，焦点色是黄的：只有压在黄底上的那一项要换。
+      // 同一样东西的两个类不能都留着——谁赢要看它们在生成的 CSS 里的先后
+      const [wanted, unwanted] =
+        variant === "strong" ? [recolored, usual] : [usual, recolored];
+      expect(current).toHaveClass("focus-visible:outline-2", ...wanted);
+      expect(current).not.toHaveClass(...unwanted);
+      expect(other).toHaveClass("focus-visible:outline-2", ...usual);
+      expect(other).not.toHaveClass(...recolored);
+      unmount();
+    }
+  });
+
   it("高对比模式：两种面板的当前项都是左缘一条系统「选中」色的竖条", async () => {
     for (const variant of ["plain", "strong"] as const) {
       const { unmount } = render(
