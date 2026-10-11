@@ -1,6 +1,7 @@
 import {
   useEffect,
   useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -202,6 +203,37 @@ export function Calendar({
       ?.focus();
   }, [focused, month]);
 
+  // 翻月：新的一个月从翻的那一侧来。行是按日期当 key 的，相邻月份重叠的那几行是同一批元素
+  // （焦点靠这个留得住），所以不重挂——在日期那一块上标一下方向，撤了再标就重播
+  const turned = useRef({ month, until: 0, length: 0 });
+  useLayoutEffect(() => {
+    const last = turned.current;
+    if (last.month === month) return;
+    const forward = month > last.month;
+    last.month = month;
+    const grid = gridRef.current;
+    if (!grid) return;
+
+    const now = performance.now();
+    delete grid.dataset.turn;
+    // 上一次的还没播完又翻了（按住 PageDown、连点翻月钮）：这一次不播，直接换。
+    // 每次都从透明起的话，格子会一直闪。一直连着翻就一直不播
+    if (now < last.until) {
+      last.until = now + last.length;
+      return;
+    }
+    // 先让上一次的撤干净：同一个方向连着翻，标记没变也要重播
+    void grid.offsetWidth;
+    grid.dataset.turn = forward ? "next" : "previous";
+    // 多久算"还没播完"：问刚起的这一个动画，不另抄一份时长
+    const running =
+      typeof grid.getAnimations === "function"
+        ? grid.getAnimations()[0]
+        : undefined;
+    last.length = Number(running?.effect?.getComputedTiming().endTime ?? 0);
+    last.until = now + last.length;
+  }, [month]);
+
   const weeks = useMemo(
     () => monthGrid(month, weekStartsOn),
     [month, weekStartsOn],
@@ -331,6 +363,8 @@ export function Calendar({
         </thead>
         <tbody
           ref={gridRef}
+          // 翻月时从翻的那一侧来 8px 并淡入；方向标在 data-turn 上（见上面的 turned）
+          className="data-turn:animate-shift-in data-[turn=next]:[--shift-x:var(--motion-shift-lg)] data-[turn=previous]:[--shift-x:calc(var(--motion-shift-lg)*-1)]"
           onPointerLeave={() => setHovered(null)}
           onKeyDown={(event) => {
             // 起始日定了之后按 Esc：取消这一次，回到原来的那一段

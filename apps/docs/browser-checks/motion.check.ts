@@ -2708,3 +2708,201 @@ test("页内目录：点一项，这一次跳转滚得平滑——点的那一�
   assert.equal(reduced.scrolled, smooth.scrolled, "两种到的应该是同一个位置");
   assert.equal(reduced.current, "本月排期");
 });
+
+test("月历翻月：新的一个月从翻的那一侧来（8px，300ms）并淡入；连着翻不播；焦点不丢；日期选择的面板里一样", async () => {
+  const { page } = storybook;
+  const GRID = "#storybook-root tbody";
+
+  /**
+   * 翻一下——点某个钮，或者在焦点所在的格子上连按几个键——同一步里把日期那一块读出来：
+   * 标的方向、动画的名字和时长、第一帧的位移和透明度。不赌读的时候它正好播到哪
+   */
+  const turn = (scope: string, action: { button?: string; keys?: string[] }) =>
+    page.evaluate(
+      async ({ css, button, keys }) => {
+        const host = document.querySelector<HTMLElement>(css)!;
+        const grid = host.querySelector<HTMLElement>("tbody")!;
+        const settle = () => Promise.resolve();
+        if (button !== null) {
+          [...host.querySelectorAll<HTMLElement>("button")]
+            .find((item) => item.getAttribute("aria-label") === button)!
+            .click();
+          await settle();
+        }
+        for (const key of keys) {
+          // 上一下把焦点交给了新的那一格：等它到了再按下一个，和真的连按一样
+          for (let waited = 0; waited < 50; waited += 1) {
+            if (document.activeElement?.hasAttribute("data-date")) break;
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          }
+          document.activeElement!.dispatchEvent(
+            new KeyboardEvent("keydown", {
+              key,
+              bubbles: true,
+              cancelable: true,
+            }),
+          );
+          await settle();
+        }
+        const animation = grid.getAnimations()[0] as CSSAnimation | undefined;
+        let first: string[] | null = null;
+        if (animation) {
+          animation.pause();
+          animation.currentTime = 0;
+          const style = getComputedStyle(grid);
+          first = [style.translate, style.opacity];
+          animation.play();
+        }
+        return {
+          mark: grid.dataset.turn ?? null,
+          month: host.querySelector("[data-month]")!.getAttribute("data-month"),
+          name: animation?.animationName ?? null,
+          duration: animation?.effect?.getComputedTiming().duration ?? null,
+          first,
+        };
+      },
+      { css: scope, button: action.button ?? null, keys: action.keys ?? [] },
+    );
+  const rest = (selector: string) =>
+    page.evaluate((css) => {
+      const grid = document.querySelector<HTMLElement>(css)!;
+      const style = getComputedStyle(grid);
+      return {
+        mark: grid.dataset.turn ?? null,
+        animations: grid
+          .getAnimations()
+          .filter((animation) => animation.playState === "running").length,
+        // 走完之后：没有位移，不透明
+        placed: ["none", "0px"].includes(style.translate),
+        opacity: style.opacity,
+      };
+    }, selector);
+  const focusedDate = () =>
+    page.evaluate(
+      () => document.activeElement?.getAttribute("data-date") ?? null,
+    );
+
+  await withMotion(page, async () => {
+    await page.story("控件-calendar-月历--playground");
+    assert.deepEqual(
+      await rest(GRID),
+      { mark: null, animations: 0, placed: true, opacity: "1" },
+      "载入时就显示着的那个月不该播",
+    );
+
+    // 往后翻：从右来
+    assert.deepEqual(
+      await turn("#storybook-root", { button: "下个月" }),
+      {
+        mark: "next",
+        month: "2026-11",
+        name: "ef-shift-in",
+        duration: 300,
+        first: ["8px", "0"],
+      },
+      "往后翻，新的一个月应该从右边 8px 处淡入",
+    );
+    await page.settled(GRID);
+    assert.deepEqual(await rest(GRID), {
+      mark: "next",
+      animations: 0,
+      placed: true,
+      opacity: "1",
+    });
+
+    // 往前翻：从左来。离上一次够久了（上一次的播完了）才算"不是连着翻"
+    await page.pause(350);
+    assert.deepEqual(
+      await turn("#storybook-root", { button: "上个月" }),
+      {
+        mark: "previous",
+        month: "2026-10",
+        name: "ef-shift-in",
+        duration: 300,
+        first: ["-8px", "0"],
+      },
+      "往前翻，新的一个月应该从左边 8px 处淡入",
+    );
+    await page.settled(GRID);
+
+    // 连按三下 PageDown：第一下播，后两下来的时候上一次还没播完——不播，直接换
+    await page.pause(350);
+    await page.evaluate(() => {
+      document
+        .querySelector<HTMLElement>(
+          '#storybook-root [data-date][tabindex="0"]',
+        )!
+        .focus();
+    });
+    const rapid = await turn("#storybook-root", {
+      keys: ["PageDown", "PageDown", "PageDown"],
+    });
+    assert.deepEqual(
+      rapid,
+      {
+        mark: null,
+        month: "2027-01",
+        name: null,
+        duration: null,
+        first: null,
+      },
+      "连着翻的时候不该每次都从透明重播一遍",
+    );
+    await page.waitFor(
+      async () => (await focusedDate()) === "2027-01-09",
+      "连翻三个月，焦点应该跟到 2027-01-09",
+    );
+    assert.deepEqual(await rest(GRID), {
+      mark: null,
+      animations: 0,
+      placed: true,
+      opacity: "1",
+    });
+
+    // 停下来再翻：方向键走出这个月，照样播，焦点跟到新的那一格
+    await page.pause(350);
+    const crossed = await turn("#storybook-root", {
+      keys: ["ArrowUp", "ArrowUp"],
+    });
+    assert.deepEqual(
+      [crossed.mark, crossed.month, crossed.first],
+      ["previous", "2026-12", ["-8px", "0"]],
+      "方向键走出这个月也是翻月",
+    );
+    await page.waitFor(
+      async () => (await focusedDate()) === "2026-12-26",
+      "焦点应该跟到上个月的那一格",
+    );
+    await page.settled(GRID);
+
+    // 日期选择的面板里是同一个月历
+    await page.story("控件-datepicker-日期选择--in-form");
+    await page.click("#storybook-root button[aria-haspopup]");
+    await page.waitVisible("[role=dialog]");
+    await page.settled("[role=dialog]");
+    assert.deepEqual(
+      await rest("[role=dialog] tbody"),
+      { mark: null, animations: 0, placed: true, opacity: "1" },
+      "面板打开时月历不该播翻月",
+    );
+    const inPanel = await turn("[role=dialog]", { button: "下个月" });
+    assert.deepEqual(
+      [inPanel.mark, inPanel.month, inPanel.name, inPanel.first],
+      ["next", "2026-11", "ef-shift-in", ["8px", "0"]],
+      "日期选择的面板里翻月也带方向",
+    );
+    await page.settled("[role=dialog]");
+  });
+
+  // 减少动态效果：直接到
+  await page.story("控件-calendar-月历--playground");
+  const reduced = await turn("#storybook-root", { button: "下个月" });
+  assert.deepEqual([reduced.mark, reduced.month], ["next", "2026-11"]);
+  await page.settled(GRID);
+  assert.deepEqual(await rest(GRID), {
+    mark: "next",
+    animations: 0,
+    placed: true,
+    opacity: "1",
+  });
+});

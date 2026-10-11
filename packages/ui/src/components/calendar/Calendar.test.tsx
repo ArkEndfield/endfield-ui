@@ -1,7 +1,7 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, onTestFinished, vi } from "vitest";
 import {
   Calendar,
   type CalendarRangeProps,
@@ -219,6 +219,100 @@ describe("Calendar", () => {
     await user.click(day("2026-11-03"));
     expect(onValueChange).toHaveBeenLastCalledWith("2026-11-03");
     expect(title()).toHaveTextContent("2026年11月");
+  });
+
+  /** 日期那一块上标的翻月方向；没标是 null */
+  const turn = () => document.querySelector("tbody")!.getAttribute("data-turn");
+
+  it("翻月：新的一个月从翻的那一侧来——往后翻标 next，往前翻标 previous；一开始没有", async () => {
+    const user = userEvent.setup();
+    render(<October />);
+    const grid = document.querySelector("tbody")!;
+    expect(grid).not.toHaveAttribute("data-turn");
+    expect(grid).toHaveClass(
+      "data-turn:animate-shift-in",
+      "data-[turn=next]:[--shift-x:var(--motion-shift-lg)]",
+      "data-[turn=previous]:[--shift-x:calc(var(--motion-shift-lg)*-1)]",
+    );
+
+    await user.click(screen.getByRole("button", { name: "下个月" }));
+    expect(turn()).toBe("next");
+    await user.click(screen.getByRole("button", { name: "上个月" }));
+    expect(turn()).toBe("previous");
+    // 同一个方向再翻一次：还是它
+    await user.click(screen.getByRole("button", { name: "上个月" }));
+    expect(title()).toHaveTextContent("2026年9月");
+    expect(turn()).toBe("previous");
+  });
+
+  it("翻月：键盘走出这个月、跨年、点不在本月的日子都一样，焦点照旧跟到新的那一格", async () => {
+    const user = userEvent.setup();
+    render(<October />);
+    day("2026-10-09").focus();
+
+    await user.keyboard("{Shift>}{PageDown}{/Shift}");
+    expect(title()).toHaveTextContent("2027年10月");
+    expect(turn()).toBe("next");
+    expect(day("2027-10-09")).toHaveFocus();
+
+    await user.keyboard("{PageUp}");
+    expect(turn()).toBe("previous");
+    expect(day("2027-09-09")).toHaveFocus();
+
+    // 这个月的网格里带着下个月头上的几天
+    await user.click(day("2027-10-01"));
+    expect(title()).toHaveTextContent("2027年10月");
+    expect(turn()).toBe("next");
+
+    // 选本月的一天不是翻月：标记还是上一次的，不会重播
+    await user.click(day("2027-10-15"));
+    expect(turn()).toBe("next");
+  });
+
+  it("翻月：受控的月份从外面换了也带方向", () => {
+    const { rerender } = render(<October month="2026-10" />);
+    expect(turn()).toBeNull();
+    rerender(<October month="2026-07" />);
+    expect(turn()).toBe("previous");
+    rerender(<October month="2027-01" />);
+    expect(turn()).toBe("next");
+  });
+
+  it("翻月：上一次的还没播完又翻了，这一次不播、直接换；停下来再翻才播", () => {
+    let now = 1000;
+    const clock = vi.spyOn(performance, "now").mockImplementation(() => now);
+    // jsdom 没有动效：桩一个 300ms 的
+    Object.defineProperty(Element.prototype, "getAnimations", {
+      configurable: true,
+      value: () => [
+        { effect: { getComputedTiming: () => ({ endTime: 300 }) } },
+      ],
+    });
+    onTestFinished(() => {
+      clock.mockRestore();
+      delete (Element.prototype as { getAnimations?: unknown }).getAnimations;
+    });
+
+    render(<October />);
+    const next = screen.getByRole("button", { name: "下个月" });
+    fireEvent.click(next);
+    expect(turn()).toBe("next");
+
+    now += 100;
+    fireEvent.click(next);
+    expect(title()).toHaveTextContent("2026年12月");
+    expect(turn()).toBeNull();
+
+    // 一直连着翻就一直不播：离上一次（没播的那一次）还不到 300ms
+    now += 250;
+    fireEvent.click(next);
+    expect(title()).toHaveTextContent("2027年1月");
+    expect(turn()).toBeNull();
+
+    // 停够了再翻：播
+    now += 300;
+    fireEvent.click(screen.getByRole("button", { name: "上个月" }));
+    expect(turn()).toBe("previous");
   });
 
   it("受控：值和月份都由外面决定", async () => {
