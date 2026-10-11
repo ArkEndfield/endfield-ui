@@ -91,6 +91,129 @@ describe("Button", () => {
     expect(button).not.toHaveClass("min-w-24");
   });
 
+  it("高对比模式：带底色的变体补一圈线，竖条和分隔线用按钮的字色；text 靠下划线，不补", () => {
+    for (const variant of [
+      "control",
+      "action",
+      "light",
+      "back",
+      "danger",
+    ] as const) {
+      const { unmount } = render(<Button variant={variant}>确认</Button>);
+      expect(screen.getByRole("button")).toHaveClass(
+        "forced-colors:border",
+        "forced-colors:border-[ButtonText]",
+      );
+      unmount();
+    }
+
+    const control = render(<Button>确认</Button>);
+    expect(control.container.querySelector(".marker-bar")).toHaveClass(
+      "forced-colors:bg-[ButtonText]",
+    );
+    control.unmount();
+
+    // 分隔线平时悬停、按下各深一档：那两档带着状态，高对比模式下要各写一份才盖得住
+    const action = render(<Button variant="action">确认</Button>);
+    expect(
+      action.container.querySelector("button > span[aria-hidden]"),
+    ).toHaveClass(
+      "forced-colors:bg-[ButtonText]",
+      "forced-colors:group-hover:bg-[ButtonText]",
+      "forced-colors:group-active:bg-[ButtonText]",
+    );
+    action.unmount();
+
+    render(<Button variant="text">查看全部</Button>);
+    expect(screen.getByRole("button").className).not.toContain(
+      "forced-colors:",
+    );
+  });
+
+  it("高对比模式：禁用的线、字、记号都是灰字色，链接形态也是", () => {
+    const { container, unmount } = render(<Button disabled>确认</Button>);
+    const button = screen.getByRole("button");
+    expect(button).toHaveClass(
+      "forced-colors:border",
+      "forced-colors:border-[GrayText]",
+      "forced-colors:text-[GrayText]",
+    );
+    expect(button).not.toHaveClass("forced-colors:border-[ButtonText]");
+    const bar = container.querySelector(".marker-bar");
+    expect(bar).toHaveClass("forced-colors:bg-[GrayText]");
+    expect(bar).not.toHaveClass("forced-colors:bg-[ButtonText]");
+    unmount();
+
+    const action = render(
+      <Button variant="action" disabled>
+        确认
+      </Button>,
+    );
+    const divider = action.container.querySelector(
+      "button > span[aria-hidden]",
+    );
+    expect(divider).toHaveClass("forced-colors:bg-[GrayText]");
+    expect(divider?.className).not.toContain("[ButtonText]");
+    action.unmount();
+
+    // 去掉了地址的 <a> 不是真的禁用，系统不会替它把字换灰：字色是自己写的
+    const link = render(
+      <Button href="/news" disabled>
+        查看全部
+      </Button>,
+    );
+    expect(screen.getByRole("link")).toHaveClass(
+      "forced-colors:border-[GrayText]",
+      "forced-colors:text-[GrayText]",
+    );
+    link.unmount();
+
+    // text 变体不补线，但下划线和字一起写明
+    render(
+      <Button variant="text" disabled>
+        查看全部
+      </Button>,
+    );
+    const text = screen.getByRole("button");
+    expect(text).toHaveClass(
+      "forced-colors:border-[GrayText]",
+      "forced-colors:text-[GrayText]",
+    );
+    expect(text).not.toHaveClass("forced-colors:border");
+  });
+
+  it("高对比模式：加载中线和字照旧，占着记号位的方块用按钮的字色", () => {
+    for (const variant of [
+      "control",
+      "action",
+      "light",
+      "back",
+      "danger",
+      "text",
+    ] as const) {
+      const { container, unmount } = render(
+        <Button variant={variant} loading>
+          提交
+        </Button>,
+      );
+      const button = screen.getByRole("button");
+      expect(button).toHaveClass("forced-colors:text-[ButtonText]");
+      expect(button.className).not.toContain("[GrayText]");
+      // 加载指示自己写的是页面的字色，在按钮里换成按钮的字色
+      const spinner = container.querySelector(".animate-spin");
+      expect(spinner).toHaveClass("forced-colors:bg-[ButtonText]");
+      expect(spinner).not.toHaveClass("forced-colors:bg-[CanvasText]");
+      unmount();
+    }
+
+    // 那一圈线也照旧
+    render(<Button loading>提交</Button>);
+    expect(screen.getByRole("button")).toHaveClass(
+      "forced-colors:border",
+      "forced-colors:border-[ButtonText]",
+    );
+  });
+
   it("render：交给路由库的链接组件来渲染，长相和状态属性都还在", async () => {
     const onClick = vi.fn();
     render(

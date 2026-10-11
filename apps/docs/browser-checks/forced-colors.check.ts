@@ -1693,3 +1693,150 @@ test("日期选择：外框里的日历图标是按钮的字色，禁用的是�
     );
   }
 });
+
+/** 指针是不是停在这个元素上：断言"悬停时仍然……"之前先确认悬停真的生效了 */
+const hovering = (page: Page, selector: string) =>
+  page.waitFor(
+    () =>
+      page.evaluate(
+        (css) => document.querySelector(css)?.matches(":hover") ?? false,
+        selector,
+      ),
+    `指针应该停在 ${selector} 上`,
+  );
+
+test("按钮：带底色的变体各有一圈线，竖条和分隔线看得见，悬停时竖条变成箭头；禁用的是灰字色，加载中的照旧", async () => {
+  const { page } = storybook;
+  await open(page, "控件-button-按钮--variants");
+  const button = (variant: string) => `${ROOT} [data-variant=${variant}]`;
+  // 按钮纵向的位置是整数，横向跟着前面几个的字宽走：线取上沿那一条，不取左边那一条。
+  // 离左边 6px 的地方没有记号也没有字
+  const edge = (selector: string, nth = 0) => at(page, selector, 6, 0, nth);
+  const inside = (selector: string, nth = 0) => at(page, selector, 6, 4, nth);
+
+  for (const variant of ["action", "control", "light", "back", "danger"]) {
+    await shows(
+      page,
+      await edge(button(variant)),
+      "ButtonText",
+      `${variant} 应该有一圈线`,
+    );
+    await differs(
+      page,
+      await inside(button(variant)),
+      "ButtonText",
+      `${variant} 应该是空心的`,
+    );
+    await declares(page, button(variant), "borderTopColor", "ButtonText");
+  }
+  // 文字链接那种靠下划线成形，不补线
+  await page.waitFor(
+    () =>
+      page.evaluate(
+        (css) =>
+          getComputedStyle(document.querySelector(css)!).borderTopWidth ===
+          "0px",
+        button("text"),
+      ),
+    "text 变体不该多出一圈线",
+  );
+
+  // 竖条只有 3px 宽：往右 4px 的地方平时是空的，变成箭头之后才盖得到
+  const bar = `${button("control")} .marker-bar`;
+  await shows(
+    page,
+    await at(page, bar, 1, "center"),
+    "ButtonText",
+    "左侧的竖条应该看得见",
+  );
+  await declares(page, bar, "backgroundColor", "ButtonText");
+  await differs(
+    page,
+    await at(page, bar, 4, "center"),
+    "ButtonText",
+    "竖条右边平时应该是空的",
+  );
+  await page.moveTo(button("control"));
+  await hovering(page, button("control"));
+  // 箭头是连着位移一起过渡过去的：等它停下再取点
+  await page.settled();
+  await shows(
+    page,
+    await at(page, bar, 4, "center"),
+    "ButtonText",
+    "指针停在按钮上：竖条应该变成箭头",
+  );
+
+  const divider = `${button("action")} > span[aria-hidden=true]`;
+  await shows(
+    page,
+    await at(page, divider, 1, "center"),
+    "ButtonText",
+    "主行动右侧的分隔线应该看得见",
+  );
+  await declares(page, divider, "backgroundColor", "ButtonText");
+  // 分隔线平时悬停要深一档。那一档带着状态，优先级比单写的高：盖不住的话，一悬停线就没了
+  await page.moveTo(button("action"));
+  await hovering(page, button("action"));
+  await page.settled();
+  await page.pause(300);
+  assert.ok(
+    await declared(page, divider, "backgroundColor", "ButtonText"),
+    "指针停在主行动上：分隔线不该被悬停那一档的颜色盖掉",
+  );
+
+  // 每种变体一行：平时、禁用、加载中
+  await open(page, "控件-button-按钮--states");
+  const control = button("control");
+  await shows(
+    page,
+    await edge(control, 1),
+    "GrayText",
+    "禁用的按钮应该是灰字色的线",
+  );
+  await declares(page, control, "borderTopColor", "GrayText", { nth: 1 });
+  // 加载中的那个没有竖条（换成了方块），所以第二根竖条就是禁用的那个的
+  await shows(
+    page,
+    await at(page, `${control} .marker-bar`, 1, "center", 1),
+    "GrayText",
+    "禁用的按钮：竖条也是灰字色",
+  );
+  await shows(
+    page,
+    await at(
+      page,
+      `${button("action")} > span[aria-hidden=true]`,
+      1,
+      "center",
+      1,
+    ),
+    "GrayText",
+    "禁用的主行动：分隔线也是灰字色",
+  );
+  await shows(
+    page,
+    await edge(control, 2),
+    "ButtonText",
+    "加载中的按钮线照旧：它不是禁用",
+  );
+  // 占着记号位的方块，"减少动态效果"下停成一个菱形：取正中
+  await shows(
+    page,
+    await at(page, `${control} .animate-spin`, "center", "center"),
+    "ButtonText",
+    "加载中的方块应该看得见",
+  );
+
+  // 链接形态禁用时是一个去掉了地址的 <a>：不是真的禁用，系统不会替它把字换灰
+  await open(page, "控件-button-按钮--as-link");
+  const off = `${ROOT} a[aria-disabled=true]`;
+  await shows(
+    page,
+    await edge(off),
+    "GrayText",
+    "禁用的链接形态应该是灰字色的线",
+  );
+  await declares(page, off, "borderTopColor", "GrayText");
+  await declares(page, off, "color", "GrayText");
+});

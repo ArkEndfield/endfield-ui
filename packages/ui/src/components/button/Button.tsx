@@ -139,6 +139,17 @@ const enabledClass: Record<ButtonVariant, string> = {
   text: "text-ink active:text-ink-secondary",
 };
 
+/*
+ * 高对比模式（forced-colors）下底色被系统换成页面色，带底色的变体只剩一行字：
+ * 补一圈线，竖条、分隔线、加载中的方块这些底色画的记号改用按钮的字色。
+ * 禁用的线、字、记号都是灰字色——链接形态禁用时是一个去掉了地址的 <a>，
+ * 系统不会替它把字换灰，所以字色也写明
+ */
+const forcedOutline = "forced-colors:border";
+const forcedEnabled = "forced-colors:border-[ButtonText]";
+const forcedDisabled =
+  "forced-colors:border-[GrayText] forced-colors:text-[GrayText]";
+
 export function Button(props: ButtonProps) {
   const {
     variant = "control",
@@ -158,6 +169,10 @@ export function Button(props: ButtonProps) {
   const isText = variant === "text";
   const marker = markerColor[variant];
   const iconSize = inlineIconSize[size];
+  // 记号在高对比模式下的颜色：竖条、分隔线、占着记号位的旋转方块共用
+  const forcedMark = disabled
+    ? "forced-colors:bg-[GrayText]"
+    : "forced-colors:bg-[ButtonText]";
 
   const classes = cn(
     "group relative inline-flex shrink-0 items-center justify-center font-medium leading-none whitespace-nowrap select-none",
@@ -173,6 +188,11 @@ export function Button(props: ButtonProps) {
         ? "cursor-not-allowed text-ink-disabled"
         : "cursor-not-allowed bg-disabled text-on-disabled"
       : enabledClass[variant],
+    // text 变体靠下划线成形，不补线；它的下划线跟着字色走，禁用时一起写明
+    !isText && forcedOutline,
+    disabled ? forcedDisabled : !isText && forcedEnabled,
+    // 加载中不是禁用：线和字照旧。链接形态这时候同样去掉了地址，字色写明，和线一个颜色
+    loading && !disabled && "forced-colors:text-[ButtonText]",
     loading && "pointer-events-none",
     block && "flex w-full",
     className,
@@ -187,7 +207,7 @@ export function Button(props: ButtonProps) {
         className="inline-flex items-center justify-center"
         style={{ width: iconSize, height: iconSize }}
       >
-        <Spinner label={null} className="size-2" />
+        <Spinner label={null} className={cn("size-2", forcedMark)} />
       </span>
     ) : (
       <ChevronLeft size={iconSize} />
@@ -199,7 +219,7 @@ export function Button(props: ButtonProps) {
         className="inline-flex items-center justify-center"
         style={{ width: iconSize, height: iconSize }}
       >
-        <Spinner label={null} className="size-2" />
+        <Spinner label={null} className={cn("size-2", forcedMark)} />
       </span>
     ) : (
       <ArrowCorner
@@ -244,7 +264,10 @@ export function Button(props: ButtonProps) {
               markerSpinner[size],
             )}
           >
-            <Spinner label={null} className={cn("block size-full", marker)} />
+            <Spinner
+              label={null}
+              className={cn("block size-full", marker, forcedMark)}
+            />
           </span>
         ) : (
           <span
@@ -253,6 +276,7 @@ export function Button(props: ButtonProps) {
               "marker-bar pointer-events-none absolute top-1/2 -translate-y-1/2",
               "transition-[clip-path,translate] duration-(--duration-base) ease-standard",
               markerBox[size],
+              forcedMark,
               disabled
                 ? "bg-on-disabled"
                 : [
@@ -276,7 +300,12 @@ export function Button(props: ButtonProps) {
               actionDivider[size],
               disabled
                 ? "bg-on-disabled/20"
-                : "bg-on-action/10 group-hover:bg-on-action/15 group-active:bg-on-action/20",
+                : [
+                    "bg-on-action/10 group-hover:bg-on-action/15 group-active:bg-on-action/20",
+                    // 悬停、按下那两档带着状态，优先级比单写的高：高对比模式下各写一份
+                    "forced-colors:group-hover:bg-[ButtonText] forced-colors:group-active:bg-[ButtonText]",
+                  ],
+              forcedMark,
             )}
           />
           {loading && (
@@ -286,7 +315,10 @@ export function Button(props: ButtonProps) {
                 actionSpinner[size],
               )}
             >
-              <Spinner label={null} className="block size-full" />
+              <Spinner
+                label={null}
+                className={cn("block size-full", forcedMark)}
+              />
             </span>
           )}
         </>
