@@ -16,6 +16,15 @@ export type ProgressRingProps = Omit<ComponentProps<"div">, "children"> & {
   children?: ReactNode;
 };
 
+/*
+ * 高对比模式：SVG 上写的颜色系统不换，轨道和弧还是主题里的浅灰和黄，
+ * 压在使用者自己定的页面色上可能看不清。轨道收成一圈 1px 的细线，
+ * 弧是系统"选中"色、照旧是原来的线宽——细对粗，不靠两种系统色分得开
+ */
+const trackClass =
+  "stroke-line forced-colors:stroke-[CanvasText] forced-colors:stroke-1";
+const arcClass = "stroke-action forced-colors:stroke-[Highlight]";
+
 /**
  * 进度环：细圆环轨道 + 从 12 点方向顺时针的黄弧。用在紧凑的位置，或者围住一个头像、图标。
  * 取色与 `Progress` 相同；需要名称时传 `aria-label`。
@@ -53,13 +62,16 @@ export function ProgressRing({
       <>
         <circle
           {...circle}
-          className="origin-center animate-spin stroke-action motion-reduce:hidden"
+          className={cn(
+            "origin-center animate-spin motion-reduce:hidden",
+            arcClass,
+          )}
           strokeDasharray={`${circumference / 4} ${circumference}`}
         />
         {/* 减少动态效果时换成一圈虚线：静止的一段弧会被看成"进度 25%" */}
         <circle
           {...circle}
-          className="hidden stroke-action motion-reduce:block"
+          className={cn("hidden motion-reduce:block", arcClass)}
           strokeDasharray={`${stroke} ${stroke * 2}`}
         />
       </>
@@ -68,7 +80,10 @@ export function ProgressRing({
     arc = (
       <circle
         {...circle}
-        className="stroke-action transition-[stroke-dashoffset] duration-(--duration-base) ease-standard"
+        className={cn(
+          "transition-[stroke-dashoffset] duration-(--duration-base) ease-standard",
+          arcClass,
+        )}
         strokeDasharray={circumference}
         strokeDashoffset={circumference * (1 - ratio)}
       />
@@ -114,7 +129,7 @@ export function ProgressRing({
         aria-hidden="true"
         className="absolute inset-0 -rotate-90"
       >
-        <circle {...circle} className="stroke-line" />
+        <circle {...circle} className={trackClass} />
         {arc}
       </svg>
       {center}

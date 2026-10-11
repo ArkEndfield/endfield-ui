@@ -74,6 +74,35 @@ describe("Progress", () => {
     expect(screen.getByText("3 / 6")).toBeInTheDocument();
   });
 
+  it("高对比模式：轨道是一圈线，填充是系统的「选中」色", () => {
+    const { rerender } = render(<Progress value={40} aria-label="进度" />);
+    const outline = [
+      "forced-colors:outline",
+      "forced-colors:-outline-offset-1",
+      "forced-colors:outline-[CanvasText]",
+    ];
+    expect(screen.getByRole("progressbar")).toHaveClass(...outline);
+    expect(screen.getByRole("progressbar").firstElementChild).toHaveClass(
+      "forced-colors:bg-[Highlight]",
+    );
+
+    // 不确定进度：往返的那一块也是「选中」色
+    rerender(<Progress aria-label="进度" />);
+    expect(screen.getByRole("progressbar").firstElementChild).toHaveClass(
+      "forced-colors:bg-[Highlight]",
+    );
+
+    // 分段：完成的段是实心的，没完成的段各自一圈线；外面那一层不画
+    rerender(<Progress segments={4} value={1} aria-label="步骤" />);
+    const bar = screen.getByRole("progressbar");
+    expect(bar.className).not.toContain("forced-colors:");
+    const [done, pending] = bar.firstElementChild!.children;
+    expect(done).toHaveClass("forced-colors:bg-[Highlight]");
+    expect(done).not.toHaveClass("forced-colors:outline");
+    expect(pending).toHaveClass(...outline);
+    expect(pending).not.toHaveClass("forced-colors:bg-[Highlight]");
+  });
+
   it("className 给外层，不给轨道", () => {
     const { container } = render(
       <Progress value={40} className="w-40" aria-label="进度" />,

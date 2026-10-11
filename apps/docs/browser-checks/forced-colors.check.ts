@@ -157,7 +157,8 @@ async function differs(
   );
 }
 
-type ColorProperty = "backgroundColor" | "color" | "outlineColor";
+// stroke 是 SVG 的：上面写的颜色系统不换，要自己写成系统色
+type ColorProperty = "backgroundColor" | "color" | "outlineColor" | "stroke";
 
 /**
  * 等这个元素（或它的伪元素）上声明的颜色是这个系统色关键字。作者写的普通颜色在计算样式里
@@ -883,4 +884,149 @@ test("滑块：轨道是一圈线，走过的一段是实心的「选中」色�
   );
   // 数值是一个 <output>，系统不会自己把它换成灰字色
   await declares(page, within(disabled, "output"), "color", "GrayText");
+});
+
+test("进度条：轨道是一圈线，填充是实心的「选中」色；分段进度、加载页的进度条也是", async () => {
+  const { page } = storybook;
+  // 五根：0%、8%、50%、92%、100%。轨道高 8px：最上面一行是那圈线，中间是空的
+  await open(page, "控件-progress-进度--values");
+  const bar = `${ROOT} [role=progressbar]`;
+  await shows(
+    page,
+    await at(page, bar, "center", 0, 0),
+    "CanvasText",
+    "0% 的那一根：轨道上沿应该有一条线",
+  );
+  await differs(
+    page,
+    await at(page, bar, "center", "center", 0),
+    "CanvasText",
+    "0% 的那一根：轨道应该是空心的",
+  );
+  await shows(
+    page,
+    await at(page, bar, 10, "center", 2),
+    "Highlight",
+    "50% 的那一根：左边应该是实心的「选中」色",
+  );
+  await differs(
+    page,
+    await at(page, bar, -10, "center", 2),
+    "Highlight",
+    "50% 的那一根：右边还没到，不该是「选中」色",
+  );
+  await shows(
+    page,
+    await at(page, bar, -10, 0, 2),
+    "CanvasText",
+    "50% 的那一根：没到的那一段轨道上沿应该有一条线",
+  );
+  await shows(
+    page,
+    await at(page, bar, -10, "center", 4),
+    "Highlight",
+    "100% 的那一根：整条都应该填上",
+  );
+  await declares(page, bar, "outlineColor", "CanvasText");
+  await declares(page, `${bar} > span`, "backgroundColor", "Highlight");
+
+  // 六段完成了三段
+  await open(page, "控件-progress-进度--segmented");
+  const done = `${bar} [data-done]`;
+  const pending = `${bar} > span > span:not([data-done])`;
+  await shows(
+    page,
+    await at(page, done, "center", "center"),
+    "Highlight",
+    "完成的段应该是实心的「选中」色",
+  );
+  await shows(
+    page,
+    await at(page, pending, "center", 0),
+    "CanvasText",
+    "没完成的段上沿应该有一条线",
+  );
+  await differs(
+    page,
+    await at(page, pending, "center", "center"),
+    "CanvasText",
+    "没完成的段应该是空心的",
+  );
+  await differs(
+    page,
+    await at(page, pending, "center", "center"),
+    "Highlight",
+    "没完成的段不该是「选中」色",
+  );
+
+  // 加载页：固定的近黑底在高对比模式下也被换掉，进度条照样要看得见（64%）
+  await open(page, "控件-loader-加载页--playground");
+  await shows(
+    page,
+    await at(page, bar, 10, "center"),
+    "Highlight",
+    "加载页的进度条：走过的一段应该是「选中」色",
+  );
+  await differs(
+    page,
+    await at(page, bar, -10, "center"),
+    "Highlight",
+    "加载页的进度条：没到的那一段不该是「选中」色",
+  );
+  await shows(
+    page,
+    await at(page, bar, -10, 0),
+    "CanvasText",
+    "加载页的进度条：轨道上沿应该有一条线",
+  );
+});
+
+test("进度环：轨道是一圈细线，弧是「选中」色", async () => {
+  const { page } = storybook;
+  // 第一行四个 48px 的环：0、25、64、100。弧从 12 点方向顺时针走
+  await open(page, "控件-progress-进度--ring");
+  const ring = `${ROOT} [role=progressbar]`;
+  // 环的中线离圆心 22px。一点半方向（右上 45°）：从左上角往右 39.5、往下 8.5；
+  // 七点半方向（左下）反过来
+  const upperRight = (nth: number) => at(page, ring, 39.5, 8.5, nth);
+  const lowerLeft = (nth: number) => at(page, ring, 8.5, 39.5, nth);
+
+  await shows(
+    page,
+    await upperRight(1),
+    "Highlight",
+    "25% 的环：右上那一段应该是「选中」色的弧",
+  );
+  await differs(
+    page,
+    await lowerLeft(1),
+    "Highlight",
+    "25% 的环：左下还没到，不该是「选中」色",
+  );
+  await differs(page, await upperRight(0), "Highlight", "0% 的环：不该有弧");
+  await shows(
+    page,
+    await lowerLeft(3),
+    "Highlight",
+    "100% 的环：左下也应该是「选中」色",
+  );
+
+  // 轨道只有 1px，取不准一个像素：核对声明的颜色和线宽
+  const track = `${ring} circle:first-child`;
+  const arc = `${ring} circle:nth-child(2)`;
+  await declares(page, track, "stroke", "CanvasText");
+  await declares(page, arc, "stroke", "Highlight");
+  await page.waitEqual(
+    () =>
+      page.evaluate(
+        (trackCss, arcCss) => [
+          getComputedStyle(document.querySelector(trackCss)!).strokeWidth,
+          getComputedStyle(document.querySelector(arcCss)!).strokeWidth,
+        ],
+        track,
+        arc,
+      ),
+    ["1px", "4px"],
+    "轨道应该收成 1px 的细线，弧照旧是原来的线宽",
+  );
 });

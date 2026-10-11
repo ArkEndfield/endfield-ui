@@ -45,6 +45,18 @@ describe("Loader", () => {
     expect(bar().firstElementChild).toHaveClass("animate-indeterminate");
   });
 
+  it("高对比模式：进度条的轨道是一圈线，填充是系统的「选中」色", () => {
+    const { rerender } = render(<Loader value={64} />);
+    expect(bar()).toHaveClass(
+      "forced-colors:outline",
+      "forced-colors:-outline-offset-1",
+      "forced-colors:outline-[CanvasText]",
+    );
+    expect(bar().firstElementChild).toHaveClass("forced-colors:bg-[Highlight]");
+    rerender(<Loader />);
+    expect(bar().firstElementChild).toHaveClass("forced-colors:bg-[Highlight]");
+  });
+
   it("整页模式：锁住页面滚动、收走焦点、拦住 Tab", () => {
     const { container } = render(
       <>

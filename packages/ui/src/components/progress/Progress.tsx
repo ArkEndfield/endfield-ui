@@ -29,7 +29,14 @@ const trackSize: Record<ProgressSize, string> = {
  * 填充是纯色，不描边：亮色界面上一圈墨色的框显得重。
  * 亮色下它对浅灰轨道只有 1.3:1，确切数值靠 showValue 或旁边的文字给出。
  */
-const fillClass = "bg-action";
+const fillClass = "bg-action forced-colors:bg-[Highlight]";
+
+/*
+ * 高对比模式下底色都被系统换掉，轨道和填充就一起没了：轨道剩一圈 1px 的线（空心），
+ * 填充是系统"选中"色的实心条——空心对实心，不靠两种系统色分得开
+ */
+const trackClass =
+  "bg-line forced-colors:outline forced-colors:-outline-offset-1 forced-colors:outline-[CanvasText]";
 
 /**
  * 进度：灰轨 + 黄填充。表示"完成了多少"；表示"数量有多少"用图表，那是蓝色的事。
@@ -63,7 +70,7 @@ export function Progress({
           <span
             key={index}
             data-done={index < done ? "" : undefined}
-            className={cn("flex-1", index < done ? fillClass : "bg-line")}
+            className={cn("flex-1", index < done ? fillClass : trackClass)}
           />
         ))}
       </span>
@@ -117,7 +124,7 @@ export function Progress({
         className={cn(
           "relative min-w-0 flex-1",
           trackSize[size],
-          !segmented && "bg-line",
+          !segmented && trackClass,
         )}
       >
         {bar}

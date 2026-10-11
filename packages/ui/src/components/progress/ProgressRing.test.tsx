@@ -72,6 +72,28 @@ describe("ProgressRing", () => {
     expect(ring.textContent).toBe("");
   });
 
+  it("高对比模式：SVG 上的颜色系统不换，自己写成系统色；轨道收成细线，弧是「选中」色", () => {
+    const { container, rerender } = render(
+      <ProgressRing value={40} aria-label="进度" />,
+    );
+    const [track, arc] = container.querySelectorAll("circle");
+    expect(track).toHaveClass(
+      "forced-colors:stroke-[CanvasText]",
+      "forced-colors:stroke-1",
+    );
+    expect(arc).toHaveClass("forced-colors:stroke-[Highlight]");
+    // 细对粗：弧照旧是原来的线宽
+    expect(arc).not.toHaveClass("forced-colors:stroke-1");
+
+    // 不确定进度的两种画法（旋转的弧、减少动态效果时的一圈虚线）也一样
+    rerender(<ProgressRing aria-label="加载中" />);
+    const arcs = [...container.querySelectorAll("circle")].slice(1);
+    expect(arcs).toHaveLength(2);
+    for (const each of arcs) {
+      expect(each).toHaveClass("forced-colors:stroke-[Highlight]");
+    }
+  });
+
   it("尺寸写成宽高，线宽默认取直径的 9%", () => {
     const { container } = render(
       <ProgressRing value={50} size={72} aria-label="进度" />,

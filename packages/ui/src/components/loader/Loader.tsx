@@ -107,13 +107,14 @@ export function Loader({
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={indeterminate ? undefined : current}
-          className="relative h-1.5 overflow-hidden rounded-sm bg-neutral-800"
+          // 高对比模式下底色都被系统换掉：轨道剩一圈线，填充用系统的"选中"色（同 Progress）
+          className="relative h-1.5 overflow-hidden rounded-sm bg-neutral-800 forced-colors:outline forced-colors:-outline-offset-1 forced-colors:outline-[CanvasText]"
         >
           {indeterminate ? (
-            <span className="absolute inset-y-0 left-0 w-2/5 animate-indeterminate bg-action motion-reduce:translate-x-3/4" />
+            <span className="absolute inset-y-0 left-0 w-2/5 animate-indeterminate bg-action motion-reduce:translate-x-3/4 forced-colors:bg-[Highlight]" />
           ) : (
             <span
-              className="absolute inset-0 origin-left bg-action transition-transform duration-(--duration-base) ease-standard"
+              className="absolute inset-0 origin-left bg-action transition-transform duration-(--duration-base) ease-standard forced-colors:bg-[Highlight]"
               style={{ transform: `scaleX(${current / 100})` }}
             />
           )}
