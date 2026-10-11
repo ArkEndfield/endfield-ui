@@ -107,7 +107,14 @@ async function pixel(page: Page, { x, y }: Point): Promise<string> {
   return data;
 }
 
-/** 系统色画出来是什么样：这个浏览器开着的时候不会变，量一次记住 */
+/**
+ * 系统色画出来是什么样：这个浏览器开着的时候不会变，量一次记住。
+ *
+ * 量的是它画在页面底色上的样子，所以拿去比的那一点，底下也得只有页面底色。
+ * Windows 以外的 Chromium 把 Highlight 按白底折算成了半透明的（模拟的亮色那套配色里，
+ * `#37006e` 成了 `rgba(5, 0, 73, 0.8)`：画在白底上看着差不多，压着别的东西就透出来）。
+ * 本机是 Windows，量不出这件事；CI 是 Linux
+ */
 const palette = new Map<SystemColor, string>();
 async function painted(page: Page, keyword: SystemColor): Promise<string> {
   const known = palette.get(keyword);
@@ -1043,11 +1050,26 @@ test("进度环：轨道是一圈细线，弧是「选中」色", async () => {
   // 第一行四个 48px 的环：0、25、64、100。弧从 12 点方向顺时针走
   await open(page, "控件-progress-进度--ring");
   const ring = `${ROOT} [role=progressbar]`;
+  const track = `${ring} circle:first-child`;
+  const arc = `${ring} circle:nth-child(2)`;
   // 环的中线离圆心 22px。一点半方向（右上 45°）：从左上角往右 39.5、往下 8.5；
   // 七点半方向（左下）反过来
   const upperRight = (nth: number) => at(page, ring, 39.5, 8.5, nth);
   const lowerLeft = (nth: number) => at(page, ring, 8.5, 39.5, nth);
 
+  // 弧压在轨道上，而「选中」色不一定是不透明的（见 painted）：轨道从弧底下透出来，
+  // 取到的就不是参照的那个颜色。量弧的这几点时先把轨道藏起来，弧底下只剩页面
+  const showTrack = (shown: boolean) =>
+    page.evaluate(
+      (css, visibility) => {
+        for (const circle of document.querySelectorAll<SVGElement>(css)) {
+          circle.style.visibility = visibility;
+        }
+      },
+      track,
+      shown ? "" : "hidden",
+    );
+  await showTrack(false);
   await shows(
     page,
     await upperRight(1),
@@ -1067,10 +1089,9 @@ test("进度环：轨道是一圈细线，弧是「选中」色", async () => {
     "Highlight",
     "100% 的环：左下也应该是「选中」色",
   );
+  await showTrack(true);
 
   // 轨道只有 1px，取不准一个像素：核对声明的颜色和线宽
-  const track = `${ring} circle:first-child`;
-  const arc = `${ring} circle:nth-child(2)`;
   await declares(page, track, "stroke", "CanvasText");
   await declares(page, arc, "stroke", "Highlight");
   await page.waitEqual(
