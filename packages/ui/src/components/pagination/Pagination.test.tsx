@@ -15,6 +15,25 @@ describe("Pagination", () => {
     expect(nav).toHaveTextContent("/ 12");
   });
 
+  it("高对比模式：条补一圈线，两端的方钮各有自己的一圈", () => {
+    render(<Pagination pageCount={12} />);
+    // 线画在内边距里，不占地方
+    expect(screen.getByRole("navigation", { name: "分页" })).toHaveClass(
+      "forced-colors:outline",
+      "forced-colors:-outline-offset-1",
+      "forced-colors:outline-[ButtonText]",
+    );
+    // 第一页：上一页到头而禁用
+    expect(prev()).toHaveClass(
+      "forced-colors:border",
+      "forced-colors:border-[GrayText]",
+    );
+    expect(next()).toHaveClass(
+      "forced-colors:border",
+      "forced-colors:border-[ButtonText]",
+    );
+  });
+
   it("读屏听到的是一句完整的话，看得见的页码对它隐藏", () => {
     render(<Pagination pageCount={12} defaultPage={3} />);
     const status = screen.getByText("第 3 页，共 12 页");

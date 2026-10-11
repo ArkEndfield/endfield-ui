@@ -1962,3 +1962,44 @@ test("工具栏：带子有一圈线，分隔线看得见；禁用的钮是灰�
   await declares(page, separator, "backgroundColor", "ButtonText");
   await declares(page, separator, "backgroundColor", "GrayText", { nth: 1 });
 });
+
+test("分页条：条有一圈线，两端的方钮各有一圈；到头而禁用的是灰字色的线，翻过去就变回来", async () => {
+  const { page } = storybook;
+  // 第 1 页，共 12 页：上一页到头
+  await open(page, "控件-pagination-分页条--playground");
+  const bar = `${ROOT} nav`;
+  const prev = `${bar} > button:first-child`;
+  const next = `${bar} > button:last-child`;
+  // 页码在条的正中，离上沿还远：上沿正中是线，往里 2px 是留白
+  await shows(
+    page,
+    await at(page, bar, "center", 0),
+    "ButtonText",
+    "条应该有一圈线",
+  );
+  await differs(
+    page,
+    await at(page, bar, "center", 2),
+    "ButtonText",
+    "条应该是空心的",
+  );
+  await declares(page, bar, "outlineColor", "ButtonText");
+
+  // 方钮比条小一圈，箭头在正中
+  const edge = (selector: string) => at(page, selector, "center", 0);
+  await shows(
+    page,
+    await edge(prev),
+    "GrayText",
+    "第一页：上一页的钮应该是灰字色的线",
+  );
+  await shows(page, await edge(next), "ButtonText", "下一页的钮应该有一圈线");
+
+  await page.click(next);
+  await shows(
+    page,
+    await edge(prev),
+    "ButtonText",
+    "翻到第二页：上一页的线应该变回来",
+  );
+});

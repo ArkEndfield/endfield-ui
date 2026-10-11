@@ -116,6 +116,8 @@ export function Pagination({
       data-size={size}
       className={cn(
         "@container hatch flex items-center justify-between gap-2 bg-surface-muted px-1 text-ink",
+        // 高对比模式下条底和斜纹都不画，看不出这是一整条：补一圈线，画在内边距里，不占地方
+        "forced-colors:outline forced-colors:-outline-offset-1 forced-colors:outline-[ButtonText]",
         barSize[size],
         className,
       )}
