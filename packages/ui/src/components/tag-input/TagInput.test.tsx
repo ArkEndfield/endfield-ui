@@ -140,6 +140,13 @@ describe("TagInput", () => {
     const [first, second] = document.querySelectorAll("[data-tag]");
     expect(first).toHaveAttribute("data-flash");
     expect(second).not.toHaveAttribute("data-flash");
+    // 高对比模式下反转的底色闪不出来：跟着 data-flash 另画一圈环
+    for (const chip of [first, second]) {
+      expect(chip).toHaveClass(
+        "forced-colors:data-flash:outline-2",
+        "forced-colors:data-flash:outline-[Highlight]",
+      );
+    }
     expect(screen.getByText("已经有北岭了")).toHaveClass("sr-only");
 
     act(() => {

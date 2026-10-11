@@ -254,7 +254,7 @@
 | 外框 | 输入框的外框：两种变体、各状态的边线颜色都一样。三档尺寸是**最小**高度（32 / 40 / 56px），小块多了换行、外框长高 |
 | 小块 | 直角，`surface-muted` 底、`ink` 字，高 20 / 24 / 32px；右端一个删除叉（`ink-secondary`，悬停 `ink` + `line` 底）。和组合框多选是同一份画法，高对比模式下那一圈线也是 |
 | 计数 | 传了 `max` 才有：右端一个 `3 / 8`，`font-tech`、等宽、`text-xs`、`ink-secondary`；满了变成 `ink`。小块换了行它贴着最后一行（和多行文本的计数同一个位置） |
-| 重复时 | 已有的那个小块闪一下：填充反转（`surface-inverse` 底、`ink-inverse` 字）400ms。不用黄色——这不是"选中" |
+| 重复时 | 已有的那个小块闪一下：填充反转（`surface-inverse` 底、`ink-inverse` 字）400ms。不用黄色——这不是"选中"。高对比模式下底色被系统换掉、反转闪不出来，这 400ms 改成在小块外面套一圈 2px 的 `Highlight` 环（推断，见 [色彩](../foundations/color.md#高对比模式)） |
 
 已实现为 `<TagInput value onValueChange placeholder name max maxLength validate separators commitOnBlur onReject variant size invalid disabled readOnly>`：
 

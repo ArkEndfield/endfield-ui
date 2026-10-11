@@ -1522,3 +1522,55 @@ test("只读的输入框：占位的那条透明边线不显形，能填的照�
   );
   await declares(page, slot, "borderBottomColor", "Canvas");
 });
+
+test("标签输入：打了重复的词，已有的那个小块闪的时候外面套一圈「选中」色的环，闪完就没了", async () => {
+  const { page } = storybook;
+  // 两个小块：滤芯、电池
+  await open(page, "控件-taginput-标签输入--limit");
+  const chip = `${ROOT} [data-tag]`;
+  // 环画在小块外面，2px 宽：左缘再往外 1px 落在环上。小块横向的位置是定死的，所以取左边
+  const ring = async (nth: number) => {
+    const edge = await at(page, chip, 0, "center", nth);
+    return { x: edge.x - 1, y: edge.y };
+  };
+  await differs(page, await ring(0), "Highlight", "没闪的时候小块外面不该有环");
+
+  // 那一闪只有 400ms，要量的不止一样，来不及：把收场的那个定时器扣住，量完再放。
+  // 认的是控件里的那个时长（FLASH_MS）；交回去的编号是 0，清它等于什么都没清
+  await page.evaluate(() => {
+    const original = window.setTimeout;
+    const held: TimerHandler[] = [];
+    const hold = (handler: TimerHandler, delay?: number, ...rest: unknown[]) =>
+      delay === 400
+        ? (held.push(handler), 0)
+        : original(handler, delay, ...rest);
+    window.setTimeout = hold as typeof window.setTimeout;
+    Object.assign(window, {
+      releaseFlash() {
+        window.setTimeout = original;
+        for (const handler of held.splice(0)) {
+          if (typeof handler === "function") handler();
+        }
+      },
+    });
+  });
+
+  await page.key("Tab");
+  await page.type("滤芯");
+  await page.key("Enter");
+  await page.waitVisible(`${chip}[data-flash]`, "重复的那个小块应该闪一下");
+  await shows(
+    page,
+    await ring(0),
+    "Highlight",
+    "闪着的小块外面应该有一圈「选中」色的环：反转的底色被系统换掉了，只剩它",
+  );
+  await differs(page, await ring(1), "Highlight", "另一个小块不该有环");
+  await declares(page, `${chip}[data-flash]`, "outlineColor", "Highlight");
+
+  await page.evaluate(() =>
+    (window as unknown as { releaseFlash: () => void }).releaseFlash(),
+  );
+  await page.waitGone(`${chip}[data-flash]`, "放开之后那一闪应该收场");
+  await differs(page, await ring(0), "Highlight", "闪完环应该没了");
+});

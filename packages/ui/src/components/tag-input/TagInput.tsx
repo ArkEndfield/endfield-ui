@@ -408,6 +408,9 @@ export function TagInput({
                 "transition-[color,background-color,translate,opacity] duration-(--duration-fast) ease-standard",
                 // 重复时闪一下：填充反转。不用黄色——这不是"选中"
                 "data-flash:bg-surface-inverse data-flash:text-ink-inverse",
+                // 高对比模式下底色被系统换掉，反转闪不出来：闪的时候套一圈系统"选中"色的环，
+                // 画在那一圈线的外面（小块之间有 4px，放得下）
+                "forced-colors:data-flash:outline-2 forced-colors:data-flash:outline-[Highlight]",
                 flipLeaving,
                 added.has(tag) && fadeInFast,
                 // 高对比模式：这是个 <span>，系统不知道它禁用了，字和那一圈线都写明灰字色
