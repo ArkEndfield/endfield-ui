@@ -242,8 +242,8 @@ export function Schedule({
             <div
               aria-hidden="true"
               className={cn(
-                decor,
-                "absolute inset-y-0 right-0 z-2",
+                // 不用 decor：它在高对比模式下整个去掉，而"今天在哪"是信息
+                "pointer-events-none absolute inset-y-0 right-0 z-2 select-none print:hidden",
                 AFTER_RAIL,
                 dayColumns,
               )}
@@ -251,7 +251,7 @@ export function Schedule({
               <span
                 data-today=""
                 style={{ gridColumn: todayColumn }}
-                className="row-start-1 border-l-2 border-accent-ink"
+                className="row-start-1 border-l-2 border-accent-ink forced-colors:border-[Highlight]"
               />
             </div>
           )}
@@ -412,6 +412,8 @@ export function ScheduleItem({
         // 条目自己是一个容器：窄到放不下类型标签时把它收掉
         "@container relative isolate flex min-w-0 overflow-clip text-sm",
         "has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-focus",
+        // 高对比模式下底色都被系统换掉，没垫图的条目就只剩名称，看不出从哪天到哪天：补一圈线
+        "forced-colors:border forced-colors:border-[CanvasText]",
         banner
           ? "items-start justify-between gap-2 bg-surface-muted p-2"
           : // 系统类条目在两个主题下都是炭灰底：control 系列本来就不随主题变

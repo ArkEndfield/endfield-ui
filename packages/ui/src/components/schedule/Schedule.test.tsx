@@ -148,6 +148,25 @@ describe("Schedule", () => {
     expect(container.querySelector("[data-today]")).toBeNull();
   });
 
+  it("高对比模式：条目有一圈线；今天的竖线不跟着装饰一起去掉，用系统的「选中」色", () => {
+    const { container } = render(<October today="2026-10-09" />);
+    // 没了底色，条目的起止就靠这一圈线：活动、系统两种都要
+    for (const name of [/管廊北段测绘/, /每日签到/]) {
+      expect(item(name)).toHaveClass(
+        "forced-colors:border",
+        "forced-colors:border-[CanvasText]",
+      );
+    }
+    const line = container.querySelector("[data-today]")!;
+    expect(line).toHaveClass("forced-colors:border-[Highlight]");
+    // 引线和空档的斜纹是装饰，高对比模式下整个去掉；"今天在哪"是信息，留着
+    expect(line.parentElement).not.toHaveClass("forced-colors:hidden");
+    expect(line.parentElement).toHaveClass(
+      "pointer-events-none",
+      "print:hidden",
+    );
+  });
+
   it("两种条目：活动有名称块和类型标签，系统类是炭灰底不带标签", () => {
     render(<October />);
     const banner = item(/管廊北段测绘/);

@@ -159,7 +159,12 @@ async function differs(
 
 // stroke 是 SVG 的：上面写的颜色系统不换，要自己写成系统色
 type ColorProperty =
-  "backgroundColor" | "color" | "outlineColor" | "borderTopColor" | "stroke";
+  | "backgroundColor"
+  | "color"
+  | "outlineColor"
+  | "borderTopColor"
+  | "borderLeftColor"
+  | "stroke";
 
 /**
  * 等这个元素（或它的伪元素）上声明的颜色是这个系统色关键字。作者写的普通颜色在计算样式里
@@ -1290,4 +1295,48 @@ test("步进器：两端的按钮和中间连成三格；到头而禁用的那�
     "GrayText",
     "已在上限：增加的按钮应该是灰字色的线",
   );
+});
+
+test("排期：条目有一圈线，看得出从哪天到哪天；今天的竖线还在", async () => {
+  const { page } = storybook;
+  // 三条轨：测绘（垫着图）、补给（没垫图，平时全靠底色成形）、系统。今天是 10 月 9 日
+  await open(page, "控件-schedule-排期--playground");
+  const items = (track: string) => `${ROOT} section[aria-label="${track}"] li`;
+  // 取上边那条线：条目横向的位置是按天数分出来的，带小数，左右两条线取不准
+  const top = (track: string, nth = 0) =>
+    at(page, items(track), "center", 0, nth);
+
+  for (const nth of [0, 1]) {
+    await shows(
+      page,
+      await top("补给", nth),
+      "CanvasText",
+      `没垫图的第 ${nth + 1} 个条目上沿应该有一条线`,
+    );
+  }
+  // 左下角往里 4px：名称块在上面，这儿是留白
+  await differs(
+    page,
+    await at(page, items("补给"), 4, -4),
+    "CanvasText",
+    "条目里面应该是空的，不是实心的",
+  );
+  await shows(
+    page,
+    await top("测绘"),
+    "CanvasText",
+    "垫着图的条目上沿也应该有一条线",
+  );
+  await declares(page, items("补给"), "borderTopColor", "CanvasText");
+  await declares(page, items("系统"), "borderTopColor", "CanvasText");
+
+  // 今天的竖线 2px 宽，贴着那一天的左缘：往里 1px 落在线上
+  const today = `${ROOT} [data-today]`;
+  await shows(
+    page,
+    await at(page, today, 1, 4),
+    "Highlight",
+    "今天的竖线应该看得见，是「选中」色",
+  );
+  await declares(page, today, "borderLeftColor", "Highlight");
 });
