@@ -61,6 +61,20 @@ describe("Sparkline", () => {
     expect(line).toHaveClass("stroke-alert");
   });
 
+  it("高对比模式：SVG 上的颜色系统不换，面积和折线自己写成页面的字色，四种色调都一样", () => {
+    const { container, rerender } = render(<Sparkline data={[1, 3, 2]} />);
+    for (const tone of ["info", "danger", "accent", "neutral"] as const) {
+      rerender(<Sparkline data={[1, 3, 2]} tone={tone} />);
+      expect(container.querySelector("path")).toHaveClass(
+        "forced-colors:fill-[CanvasText]",
+      );
+      rerender(<Sparkline data={[1, 3, 2]} variant="line" tone={tone} />);
+      expect(container.querySelector("path")).toHaveClass(
+        "forced-colors:stroke-[CanvasText]",
+      );
+    }
+  });
+
   it("数据不够时只留一个空的图，不报错", () => {
     const { container } = render(<Sparkline data={[5]} />);
     expect(container.querySelector("svg")).toBeInTheDocument();

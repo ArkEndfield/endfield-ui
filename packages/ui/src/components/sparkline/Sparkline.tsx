@@ -62,7 +62,13 @@ export function sparklinePath(
   return { line, area: `${line}L${SIZE} ${SIZE}L0 ${SIZE}Z` };
 }
 
-/* data 与 alert 是不随主题变的角色色：白底和深色行带上都认得出 */
+/*
+ * data 与 alert 是不随主题变的角色色：白底和深色行带上都认得出。
+ * 高对比模式：SVG 上写的颜色系统不换，压在使用者自己定的页面色上可能看不清——
+ * 四种色调都换成页面的字色（色调说的事本来就要靠旁边的数字）
+ */
+const areaForced = "forced-colors:fill-[CanvasText]";
+const lineForced = "forced-colors:stroke-[CanvasText]";
 const areaClass: Record<SparklineTone, string> = {
   info: "fill-data/75",
   danger: "fill-alert/75",
@@ -123,7 +129,7 @@ export function Sparkline({
     >
       {path &&
         (variant === "area" ? (
-          <path d={path.area} className={areaClass[tone]} />
+          <path d={path.area} className={cn(areaClass[tone], areaForced)} />
         ) : (
           <path
             d={path.line}
@@ -132,7 +138,7 @@ export function Sparkline({
             strokeLinejoin="miter"
             // 图被横向拉伸了，线宽不跟着变
             vectorEffect="non-scaling-stroke"
-            className={lineClass[tone]}
+            className={cn(lineClass[tone], lineForced)}
           />
         ))}
     </svg>

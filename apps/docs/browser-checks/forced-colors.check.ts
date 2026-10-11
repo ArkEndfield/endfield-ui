@@ -157,13 +157,14 @@ async function differs(
   );
 }
 
-// stroke 是 SVG 的：上面写的颜色系统不换，要自己写成系统色
+// fill、stroke 是 SVG 的：上面写的颜色系统不换，要自己写成系统色
 type ColorProperty =
   | "backgroundColor"
   | "color"
   | "outlineColor"
   | "borderTopColor"
   | "borderLeftColor"
+  | "fill"
   | "stroke";
 
 /**
@@ -1339,4 +1340,24 @@ test("排期：条目有一圈线，看得出从哪天到哪天；今天的竖�
     "今天的竖线应该看得见，是「选中」色",
   );
   await declares(page, today, "borderLeftColor", "Highlight");
+});
+
+test("小型面积图：面积和折线都是页面的字色，四种色调一样", async () => {
+  const { page } = storybook;
+  // 四行：info、danger、accent、neutral；每行一张面积、一张折线
+  await open(page, "控件-sparkline-小型面积图--variants");
+  const area = `${ROOT} svg[data-variant=area]`;
+  const line = `${ROOT} svg[data-variant=line]`;
+  for (const nth of [0, 1, 2, 3]) {
+    // 面积一直填到底边：右下角往里几个像素一定在里面
+    await shows(
+      page,
+      await at(page, area, -4, -3, nth),
+      "CanvasText",
+      `第 ${nth + 1} 种色调的面积应该是页面的字色`,
+    );
+    await declares(page, `${area} path`, "fill", "CanvasText", { nth });
+    // 折线只有 1.5px，取不准一个像素：核对声明
+    await declares(page, `${line} path`, "stroke", "CanvasText", { nth });
+  }
 });
