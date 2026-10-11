@@ -138,6 +138,14 @@ describe("SegmentedControl", () => {
     );
   });
 
+  it("高对比模式：没选中的禁用段写明灰字色——<label> 上的禁用字色系统会当普通字换掉", () => {
+    render(<Example disabled />);
+    const label = segment("12 小时").closest("label");
+    expect(label).toHaveClass("forced-colors:text-[GrayText]");
+    // 没选中：字不压在系统色上，不用拦着系统
+    expect(label).not.toHaveClass("forced-colors:forced-color-adjust-none");
+  });
+
   it("ref 给轨道，不顶掉它自己量位置用的那一个", () => {
     const rect = (left: number, width: number) => ({
       left,

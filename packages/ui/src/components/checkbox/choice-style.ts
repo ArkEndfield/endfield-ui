@@ -4,7 +4,7 @@
  */
 
 export const choiceLabel =
-  "group inline-flex min-h-10 items-start gap-2 py-2 text-base text-ink has-disabled:cursor-not-allowed has-disabled:text-ink-disabled";
+  "group inline-flex min-h-10 items-start gap-2 py-2 text-base text-ink has-disabled:cursor-not-allowed has-disabled:text-ink-disabled forced-colors:has-disabled:text-[GrayText]";
 
 /** 控件的定位盒：高度等于一行文字，标签换行时控件仍然对齐第一行 */
 export const choiceControl = "flex h-[1lh] shrink-0 items-center";

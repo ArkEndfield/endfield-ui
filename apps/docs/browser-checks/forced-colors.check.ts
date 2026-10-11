@@ -169,28 +169,37 @@ const declares = (
   selector: string,
   property: ColorProperty,
   keyword: SystemColor,
-  { pseudo, nth = 0 }: { pseudo?: string; nth?: number } = {},
+  options: { pseudo?: string; nth?: number } = {},
 ) =>
   page.waitFor(
-    () =>
-      page.evaluate(
-        (css, name, color, pseudoElement, index) => {
-          const element = document.querySelectorAll(css)[index];
-          if (!element) return false;
-          const probe = document.createElement("i");
-          probe.style.color = color;
-          document.body.append(probe);
-          const expected = getComputedStyle(probe).color;
-          probe.remove();
-          return getComputedStyle(element, pseudoElement)[name] === expected;
-        },
-        selector,
-        property,
-        keyword,
-        pseudo ?? null,
-        nth,
-      ),
-    `${selector}${pseudo ?? ""} 的 ${property} 应该写的是 ${keyword}`,
+    () => declared(page, selector, property, keyword, options),
+    `${selector}${options.pseudo ?? ""} 的 ${property} 应该写的是 ${keyword}`,
+  );
+
+/** 这个元素上声明的颜色现在是不是这个系统色关键字。问一次，不等 */
+const declared = (
+  page: Page,
+  selector: string,
+  property: ColorProperty,
+  keyword: SystemColor,
+  { pseudo, nth = 0 }: { pseudo?: string; nth?: number } = {},
+) =>
+  page.evaluate(
+    (css, name, color, pseudoElement, index) => {
+      const element = document.querySelectorAll(css)[index];
+      if (!element) return false;
+      const probe = document.createElement("i");
+      probe.style.color = color;
+      document.body.append(probe);
+      const expected = getComputedStyle(probe).color;
+      probe.remove();
+      return getComputedStyle(element, pseudoElement)[name] === expected;
+    },
+    selector,
+    property,
+    keyword,
+    pseudo ?? null,
+    nth,
   );
 
 /**
@@ -1065,5 +1074,46 @@ test("时间线：已过的节点是实心的，当前的是「选中」色，�
     await at(page, `${rail("past")} > span:last-child`, 1, "center"),
     "CanvasText",
     "节点之间的轴应该看得见",
+  );
+});
+
+test("禁用项的文字：复选、单选、开关的标签和分段选择里禁用的段都是灰字色", async () => {
+  const { page } = storybook;
+  // 字的颜色取不准一个像素（字宽每台机器不一样），所以核对的是声明：
+  // <label> 上写的普通颜色会被系统换成页面的字色，只有写明的系统色留得住
+  for (const [id, kind] of [
+    ["控件-choice-选择控件--checkbox-states", "input[type=checkbox]"],
+    ["控件-choice-选择控件--radio-states", "input[type=radio]"],
+    ["控件-choice-选择控件--switch-states", "input[role=switch]"],
+  ] as const) {
+    await open(page, id);
+    await declares(
+      page,
+      `${ROOT} label:has(${kind}:disabled)`,
+      "color",
+      "GrayText",
+    );
+    assert.equal(
+      await declared(
+        page,
+        `${ROOT} label:has(${kind}:enabled)`,
+        "color",
+        "GrayText",
+      ),
+      false,
+      `${id}：没禁用的那一项，文字不该是灰字色`,
+    );
+  }
+
+  // 第二组整组禁用（选着第二段），第三组只有第三段禁用
+  await open(page, "控件-segmentedcontrol-分段选择--states");
+  const segment = (group: number, nth: number) =>
+    `${ROOT} [role=radiogroup]:nth-child(${group}) label:nth-child(${nth})`;
+  await declares(page, segment(2, 1), "color", "GrayText");
+  await declares(page, segment(3, 3), "color", "GrayText");
+  assert.equal(
+    await declared(page, segment(3, 2), "color", "GrayText"),
+    false,
+    "没禁用也没选中的那一段，文字不该是灰字色",
   );
 });

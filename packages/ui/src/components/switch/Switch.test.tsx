@@ -81,6 +81,13 @@ describe("Switch", () => {
     );
   });
 
+  it("高对比模式：禁用时文字标签写明灰字色", () => {
+    render(<Switch disabled>自动同步</Switch>);
+    expect(screen.getByRole("switch").closest("label")).toHaveClass(
+      "forced-colors:has-disabled:text-[GrayText]",
+    );
+  });
+
   describe("双标签", () => {
     it("两个值都写在轨道上，但只是给眼睛看的", () => {
       render(<Switch aria-label="三维视图" offLabel="2D" onLabel="3D" />);

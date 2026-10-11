@@ -197,6 +197,13 @@ describe("Radio", () => {
     );
   });
 
+  it("高对比模式：禁用时文字标签写明灰字色", () => {
+    render(<Example />);
+    expect(
+      screen.getByRole("radio", { name: "标准" }).closest("label"),
+    ).toHaveClass("forced-colors:has-disabled:text-[GrayText]");
+  });
+
   it("放进菱形方案的容器里，语义与方向键不变", async () => {
     render(
       <div data-choice="diamond">

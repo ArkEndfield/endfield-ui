@@ -113,6 +113,14 @@ describe("Checkbox", () => {
     }
   });
 
+  it("高对比模式：禁用时文字标签写明灰字色——<label> 上的禁用字色系统会当普通字换掉", () => {
+    render(<Checkbox disabled>接收站内信</Checkbox>);
+    expect(screen.getByRole("checkbox").closest("label")).toHaveClass(
+      "has-disabled:text-ink-disabled",
+      "forced-colors:has-disabled:text-[GrayText]",
+    );
+  });
+
   it("放进菱形方案的容器里，语义与行为不变", async () => {
     render(
       <div data-choice="diamond">

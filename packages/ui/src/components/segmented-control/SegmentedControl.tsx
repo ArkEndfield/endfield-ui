@@ -214,7 +214,8 @@ export function Segment({
               "forced-colors:forced-color-adjust-none forced-colors:has-focus-visible:outline-[Highlight]",
             ]
           : disabled
-            ? "text-ink-disabled"
+            ? // 高对比模式下 <label> 的字色一律被换成页面的字色：禁用的写明灰字色
+              "text-ink-disabled forced-colors:text-[GrayText]"
             : "text-ink-secondary hover:bg-ink/5 hover:text-ink",
         className,
       )}
