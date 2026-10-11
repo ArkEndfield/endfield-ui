@@ -66,6 +66,19 @@ export function controlBox({
   );
 }
 
-/** 框里真正的 `<input>` / `<textarea>`：没有自己的底和边，焦点环画在外框上 */
+/**
+ * 框里真正的 `<input>` / `<textarea>`：没有自己的底和边，焦点环画在外框上。
+ *
+ * 高对比模式下禁用的字色要自己写明：平时的 `ink-disabled` 写在外框上，系统换掉之后
+ * 只有它自己认得的禁用控件才是灰字色——`<textarea>`、写了 `type` 的 `<input>` 认得，
+ * 没写 `type` 的 `<input>`（输入框、组合框都是）不认，字和没禁用的一个颜色
+ */
 export const controlElement =
-  "min-w-0 flex-1 bg-transparent outline-none placeholder:text-ink-tertiary disabled:cursor-not-allowed disabled:placeholder:text-ink-disabled";
+  "min-w-0 flex-1 bg-transparent outline-none placeholder:text-ink-tertiary disabled:cursor-not-allowed disabled:placeholder:text-ink-disabled forced-colors:disabled:text-[GrayText]";
+
+/**
+ * 框里跟着禁用变浅、但自己不是控件的字（计数）：`ink-disabled` 写在 `<span>` 上，
+ * 高对比模式下系统当普通字换掉，写明灰字色
+ */
+export const controlDisabledText =
+  "text-ink-disabled forced-colors:text-[GrayText]";

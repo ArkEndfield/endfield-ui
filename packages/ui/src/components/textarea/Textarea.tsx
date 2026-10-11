@@ -3,6 +3,7 @@ import { cn } from "../../lib/cn";
 import { useFieldControl } from "../field/Field";
 import {
   controlBox,
+  controlDisabledText,
   controlElement,
   type ControlVariant,
 } from "../input/control-box";
@@ -88,7 +89,7 @@ export function Textarea({
           data-count=""
           className={cn(
             "pointer-events-none self-end px-3 pb-1.5 font-tech text-xs tabular-nums",
-            disabled ? "text-ink-disabled" : "text-ink-secondary",
+            disabled ? controlDisabledText : "text-ink-secondary",
           )}
         >
           {maxLength !== undefined ? `${length} / ${maxLength}` : length}

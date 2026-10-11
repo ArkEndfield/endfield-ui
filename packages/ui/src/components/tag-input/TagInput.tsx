@@ -22,6 +22,7 @@ import { fadeInFast, flipBox, flipLeaving } from "../../lib/motion";
 import { useFieldControl } from "../field/Field";
 import {
   controlBox,
+  controlDisabledText,
   controlElement,
   controlIconSize,
   type ControlSize,
@@ -504,7 +505,7 @@ export function TagInput({
               className={cn(
                 "font-tech text-xs tabular-nums",
                 disabled
-                  ? "text-ink-disabled"
+                  ? controlDisabledText
                   : full
                     ? "text-ink"
                     : "text-ink-secondary",

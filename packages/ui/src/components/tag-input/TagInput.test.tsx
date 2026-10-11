@@ -537,6 +537,19 @@ describe("TagInput", () => {
     expect(chip()).toHaveClass("forced-colors:border-[ButtonText]");
   });
 
+  it("高对比模式：禁用时框里的字和计数都写明灰字色", () => {
+    const { rerender } = render(
+      <Example disabled max={4} defaultValue={["北岭"]} />,
+    );
+    const count = () => document.querySelector("[data-count]");
+    expect(input()).toHaveClass("forced-colors:disabled:text-[GrayText]");
+    // 计数是个 <span>，系统不知道它禁用了
+    expect(count()).toHaveClass("forced-colors:text-[GrayText]");
+
+    rerender(<Example max={4} defaultValue={["北岭"]} />);
+    expect(count()).not.toHaveClass("forced-colors:text-[GrayText]");
+  });
+
   it("禁用和只读：小块上没有叉，加不了也删不了", async () => {
     const user = userEvent.setup();
     const onValueChange = vi.fn();

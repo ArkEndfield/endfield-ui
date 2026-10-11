@@ -63,6 +63,15 @@ describe("Input", () => {
     expect(input).toHaveValue("SEVENTH");
   });
 
+  it("高对比模式：禁用时框里的字写明灰字色", () => {
+    // 没写 type 的 <input> 禁用了，系统不替它换成灰字色。写成 disabled: 的变体：
+    // 没禁用时它不生效，所以两种状态是同一个类
+    render(<Input aria-label="代号" disabled defaultValue="SEVENTH" />);
+    expect(screen.getByRole("textbox")).toHaveClass(
+      "forced-colors:disabled:text-[GrayText]",
+    );
+  });
+
   it("默认是凹陷底 + 底边线，outline 换成四边描边", () => {
     const { rerender } = render(<Input aria-label="代号" />);
     let box = screen.getByRole("textbox").parentElement;

@@ -156,6 +156,21 @@ describe("Combobox", () => {
     expect(screen.getByRole("status")).toHaveTextContent("null");
   });
 
+  it("高对比模式：禁用时框里的字写明灰字色", () => {
+    render(
+      <Combobox
+        items={stations}
+        aria-label="站点"
+        defaultValue="n12"
+        disabled
+      />,
+    );
+    // 基元给的 <input> 没写 type，系统不替它换成灰字色
+    expect(screen.getByRole("combobox")).toHaveClass(
+      "forced-colors:disabled:text-[GrayText]",
+    );
+  });
+
   it("高对比模式：移到的那一项画一圈系统「选中」色的环；当前项是左缘的竖条", async () => {
     const user = userEvent.setup();
     render(<Combobox items={stations} aria-label="站点" defaultValue="n12" />);

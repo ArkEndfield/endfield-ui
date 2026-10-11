@@ -1423,3 +1423,44 @@ test("小型面积图：面积和折线都是页面的字色，四种色调一�
     await declares(page, `${line} path`, "stroke", "CanvasText", { nth });
   }
 });
+
+test("禁用的输入框：框里的字是灰字色，没禁用的和只读的不是；计数也跟着", async () => {
+  const { page } = storybook;
+  // 字的颜色取不准一个像素，核对的是声明。没写 type 的 <input> 禁用了，系统不替它换成灰字色
+  // （写了 type 的、<textarea> 它会换）：没写明的话，计算样式里是页面的字色，和探针对不上
+  // 五个字段：默认、已填写、错误、禁用、只读
+  await open(page, "控件-input-输入框--states");
+  await declares(page, `${ROOT} input:disabled`, "color", "GrayText");
+  for (const [selector, name] of [
+    [`${ROOT} input[value]:enabled:not([readonly])`, "已填写"],
+    [`${ROOT} input[readonly]`, "只读"],
+  ] as const) {
+    assert.equal(
+      await declared(page, selector, "color", "GrayText"),
+      false,
+      `${name}的输入框没有禁用，字不该是灰字色`,
+    );
+  }
+
+  // 三个字段：错误、禁用、禁用的多选。组合框的 <input> 是基元给的，同样没写 type
+  await open(page, "控件-combobox-组合框--states");
+  const combobox = `${ROOT} input[role=combobox]`;
+  await declares(page, `${combobox}:disabled`, "color", "GrayText");
+  assert.equal(
+    await declared(page, `${combobox}:enabled`, "color", "GrayText"),
+    false,
+    "没禁用的组合框，字不该是灰字色",
+  );
+
+  // 三个字段：带计数的、错误、禁用（带计数）。计数是个 <span>，系统不知道它禁用了
+  await open(page, "控件-input-输入框--multiline");
+  const count = (state: string) =>
+    `${ROOT} div:has(> textarea:${state}) > [data-count]`;
+  await declares(page, `${ROOT} textarea:disabled`, "color", "GrayText");
+  await declares(page, count("disabled"), "color", "GrayText");
+  assert.equal(
+    await declared(page, count("enabled"), "color", "GrayText"),
+    false,
+    "没禁用的多行文本，计数不该是灰字色",
+  );
+});

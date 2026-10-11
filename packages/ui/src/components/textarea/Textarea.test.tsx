@@ -54,6 +54,21 @@ describe("Textarea", () => {
     expect(count).toHaveTextContent("3");
   });
 
+  it("高对比模式：禁用时字数写明灰字色", () => {
+    const { container, rerender } = render(
+      <Textarea aria-label="备注" showCount disabled />,
+    );
+    const count = () => container.querySelector("[data-count]");
+    // 字数是个 <span>，系统不知道它禁用了
+    expect(count()).toHaveClass("forced-colors:text-[GrayText]");
+    expect(screen.getByRole("textbox")).toHaveClass(
+      "forced-colors:disabled:text-[GrayText]",
+    );
+
+    rerender(<Textarea aria-label="备注" showCount />);
+    expect(count()).not.toHaveClass("forced-colors:text-[GrayText]");
+  });
+
   it("invalid 输出 aria-invalid", () => {
     render(<Textarea aria-label="备注" invalid />);
     expect(screen.getByRole("textbox")).toHaveAttribute("aria-invalid", "true");
