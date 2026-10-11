@@ -157,6 +157,8 @@ export function TabList({ className, onKeyDown, ref, ...props }: TabListProps) {
           // 墨底提到各个胶囊的轮廓线之上：滑过去的时候是一块干净的实心胶囊，
           // 不被相邻胶囊的轮廓切开。胶囊里的字另提一层，留在它上面
           "after:z-0 after:rounded-full after:bg-surface-inverse",
+          // 高对比模式下底色被系统换掉，这一块成了盖住选中胶囊轮廓的一片页面色：改用系统的"选中"色
+          "forced-colors:after:bg-[Highlight]",
         ],
         // 楔形坐在一条墨线上：亮色页面上黄色对白底的明度差很小，靠这条线托住
         variant === "wedge" && "border-b-2 border-ink",
@@ -229,7 +231,10 @@ export function Tab({
           capsuleSize[size],
           selected
             ? // 这一栏量到了位置，底就由栏上滑动的那一块来画
-              [capsuleState.selected, "in-data-indicator:bg-transparent"]
+              [
+                capsuleState.selected,
+                "in-data-indicator:bg-transparent forced-colors:in-data-indicator:bg-transparent",
+              ]
             : disabled
               ? capsuleState.disabled
               : capsuleState.rest,
@@ -256,7 +261,10 @@ export function Tab({
           focusRingInset,
           wedgeSize[size],
           selected
-            ? "text-on-action before:bg-action"
+            ? // 高对比模式下黄底被系统换掉：楔形改用系统的"选中"色，字用配它的字色；
+              // 这一个的颜色不让系统再改，不然它会在字后面垫一块页面色。
+              // 画在里面的焦点环也用那个字色，再往里收 2px：贴着边的话它和页面一个颜色
+              "text-on-action before:bg-action forced-colors:forced-color-adjust-none forced-colors:text-[HighlightText] forced-colors:before:bg-[Highlight] forced-colors:focus-visible:-outline-offset-4 forced-colors:focus-visible:outline-[HighlightText]"
             : disabled
               ? "cursor-not-allowed text-ink-disabled"
               : "text-ink hover:before:bg-ink/5",

@@ -258,6 +258,8 @@ export function Toc({
           indicator,
           // 3px 宽，比当前项上下各短 4px；长度跟着那一项的高度走
           "after:top-1 after:h-[calc(var(--indicator-h)-0.5rem)] after:w-[3px] after:translate-y-(--indicator-y) after:bg-ink",
+          // 高对比模式下底色被系统换掉，粗条就没了：改用系统的"选中"色
+          "forced-colors:after:bg-[Highlight]",
         )}
       >
         <TocContext value={context}>{children}</TocContext>
@@ -332,7 +334,7 @@ export function TocItem({
           current
             ? // 不加粗：加粗会让折行变掉，整列目录跟着跳。靠的是引线上的这一段粗条——
               // 列表量到了位置就由列表上滑动的那一段来画，这里的让出来
-              "text-ink before:absolute before:inset-y-1 before:left-0 before:w-[3px] before:bg-ink before:content-[''] in-data-indicator:before:hidden"
+              "text-ink before:absolute before:inset-y-1 before:left-0 before:w-[3px] before:bg-ink before:content-[''] in-data-indicator:before:hidden forced-colors:before:bg-[Highlight]"
             : "text-ink-secondary hover:text-ink",
         )}
       >

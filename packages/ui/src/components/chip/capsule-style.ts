@@ -13,10 +13,25 @@ export const capsuleSize: Record<CapsuleSize, string> = {
   md: "h-8 px-4 text-sm",
 };
 
+/*
+ * 高对比模式下底色被系统换掉、透明的边线也显了形，选中的和没选的就成了一个样子：
+ * 选中的改用系统的"选中"色（禁用的是灰字色），连边线、焦点环一起写明，
+ * 并且不让系统再改这一颗的颜色——不然它会在字后面垫一块页面色，把"选中"色盖掉。
+ */
+const forcedSelected =
+  "forced-colors:forced-color-adjust-none forced-colors:focus-visible:outline-[Highlight]";
+
 export const capsuleState = {
-  selected: "border-transparent bg-surface-inverse text-ink-inverse",
+  selected: [
+    "border-transparent bg-surface-inverse text-ink-inverse",
+    "forced-colors:border-[Highlight] forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]",
+    forcedSelected,
+  ].join(" "),
   rest: "border-line-strong text-ink hover:bg-ink/5",
   disabled: "cursor-not-allowed border-line text-ink-disabled",
-  selectedDisabled:
+  selectedDisabled: [
     "cursor-not-allowed border-transparent bg-disabled text-on-disabled",
-} as const;
+    "forced-colors:border-[GrayText] forced-colors:bg-[GrayText] forced-colors:text-[Canvas]",
+    forcedSelected,
+  ].join(" "),
+};

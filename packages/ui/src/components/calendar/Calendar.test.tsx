@@ -77,6 +77,23 @@ describe("Calendar", () => {
     );
   });
 
+  it("高对比模式：选中的那一格改用系统的「选中」色；今天的短线用页面的字色", () => {
+    render(<October defaultValue="2026-10-15" />);
+    expect(day("2026-10-15")).toHaveClass(
+      "forced-colors:bg-[Highlight]",
+      "forced-colors:text-[HighlightText]",
+      "forced-colors:forced-color-adjust-none",
+      // 画在里面的焦点环：换成"选中"色上面的字色，再往里收，不贴着边
+      "forced-colors:focus-visible:-outline-offset-4",
+      "forced-colors:focus-visible:outline-[HighlightText]",
+    );
+    expect(day("2026-10-09")).toHaveClass(
+      "forced-colors:after:bg-[CanvasText]",
+    );
+    expect(day("2026-10-09")).not.toHaveClass("forced-colors:bg-[Highlight]");
+    expect(day("2026-10-16").className).not.toContain("forced-colors:");
+  });
+
   it("整个网格只占一个 Tab 停靠点：选中的那一天，没选时是今天", () => {
     const { rerender } = render(<October />);
     expect(tabStops()).toEqual([day("2026-10-09")]);
@@ -668,6 +685,27 @@ describe("Calendar · 选一段", () => {
     await user.click(screen.getByRole("button", { name: "下个月" }));
     await user.click(screen.getByRole("button", { name: "重渲染" }));
     expect(title()).toHaveTextContent("2026年11月");
+  });
+
+  it("高对比模式：两端是系统「选中」色的块，中间是上下两条线；压在块上的今天短线跟着换", () => {
+    render(<OctoberRange defaultValue={["2026-10-09", "2026-10-12"]} />);
+    for (const end of ["2026-10-09", "2026-10-12"]) {
+      expect(day(end)).toHaveClass(
+        "forced-colors:bg-[Highlight]",
+        "forced-colors:text-[HighlightText]",
+      );
+    }
+    expect(day("2026-10-09")).toHaveClass(
+      "forced-colors:after:bg-[HighlightText]",
+    );
+    for (const between of ["2026-10-10", "2026-10-11"]) {
+      expect(day(between)).toHaveClass(
+        "forced-colors:border-y-2",
+        "forced-colors:border-[Highlight]",
+      );
+      expect(day(between)).not.toHaveClass("forced-colors:bg-[Highlight]");
+    }
+    expect(day("2026-10-13").className).not.toContain("forced-colors:");
   });
 
   it("今天压在两端的块上时，短线换成反转的强调色", () => {

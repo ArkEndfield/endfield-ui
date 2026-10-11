@@ -261,6 +261,38 @@ describe("Tabs", () => {
     );
   });
 
+  it("高对比模式：capsule 滑动的底和选中的胶囊改用系统的「选中」色；wedge 的楔形也是", () => {
+    const { unmount } = render(variants("capsule"));
+    expect(screen.getByRole("tablist")).toHaveClass(
+      "forced-colors:after:bg-[Highlight]",
+    );
+    expect(screen.getByRole("tab", { name: "消耗品与补给" })).toHaveClass(
+      "forced-colors:border-[Highlight]",
+      "forced-colors:bg-[Highlight]",
+      "forced-colors:text-[HighlightText]",
+      // 量到了位置，照样让给页签栏上的那一块
+      "forced-colors:in-data-indicator:bg-transparent",
+      "forced-colors:forced-color-adjust-none",
+    );
+    expect(screen.getByRole("tab", { name: "全部" }).className).not.toContain(
+      "forced-colors:",
+    );
+    unmount();
+
+    render(variants("wedge"));
+    expect(screen.getByRole("tab", { name: "消耗品与补给" })).toHaveClass(
+      "forced-colors:before:bg-[Highlight]",
+      "forced-colors:text-[HighlightText]",
+      "forced-colors:forced-color-adjust-none",
+      // 画在里面的焦点环：换成"选中"色上面的字色，再往里收，不贴着边
+      "forced-colors:focus-visible:-outline-offset-4",
+      "forced-colors:focus-visible:outline-[HighlightText]",
+    );
+    expect(screen.getByRole("tab", { name: "全部" }).className).not.toContain(
+      "forced-colors:",
+    );
+  });
+
   it("capsule：量得到时写下选中那一个的位置和宽度，换一个跟着换；ref 照样给页签栏", async () => {
     const spy = layout();
     const ref = { current: null as HTMLDivElement | null };

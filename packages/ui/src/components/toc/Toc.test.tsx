@@ -173,6 +173,21 @@ describe("Toc", () => {
     );
   });
 
+  it("高对比模式：粗条改用系统的「选中」色", () => {
+    render(<Page />);
+    scrollTo(900);
+    expect(screen.getByRole("list")).toHaveClass(
+      "forced-colors:after:bg-[Highlight]",
+    );
+    // 量不到位置时当前项自己画的那一段也是
+    expect(screen.getByRole("link", { name: "日常作业" })).toHaveClass(
+      "forced-colors:before:bg-[Highlight]",
+    );
+    expect(
+      screen.getByRole("link", { name: "最新情报" }).className,
+    ).not.toContain("forced-colors:");
+  });
+
   it("粗条：量得到时写下当前项在列表里的位置和高度；一项都不亮是 off", () => {
     vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
       function (this: HTMLElement) {

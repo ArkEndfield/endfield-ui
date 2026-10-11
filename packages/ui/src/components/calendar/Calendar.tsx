@@ -434,10 +434,17 @@ export function Calendar({
                         "transition-colors duration-(--duration-fast) ease-standard",
                         focusRingInset,
                         endpoint
-                          ? "bg-surface-inverse font-bold text-ink-inverse"
+                          ? // 高对比模式下底色被系统换掉：实心块改用系统的"选中"色。
+                            // 这一格的颜色不让系统再改，不然它会在数字后面垫一块页面色。
+                            // 画在里面的焦点环换成它上面的字色，再往里收 2px——贴着边的话，
+                            // 环和页面一个颜色，看上去只是块小了一圈
+                            "bg-surface-inverse font-bold text-ink-inverse forced-colors:forced-color-adjust-none forced-colors:bg-[Highlight] forced-colors:text-[HighlightText] forced-colors:focus-visible:-outline-offset-4 forced-colors:focus-visible:outline-[HighlightText]"
                           : [
-                              // 一段的中间是连着的浅带；还没定结束日时是更浅的预览
-                              between ? "bg-ink/10" : previewing && "bg-ink/5",
+                              // 一段的中间是连着的浅带；还没定结束日时是更浅的预览。
+                              // 高对比模式下浅带没了，换成上下两条系统"选中"色的线——格子之间没有间距，连起来还是一条带子
+                              between
+                                ? "bg-ink/10 forced-colors:border-y-2 forced-colors:border-[Highlight]"
+                                : previewing && "bg-ink/5",
                               disabled
                                 ? "cursor-not-allowed text-ink-disabled line-through"
                                 : [
@@ -450,10 +457,11 @@ export function Calendar({
                         // 今天：数字下面一条短线，不只是换个字色
                         isToday &&
                           "after:absolute after:bottom-1.5 after:left-1/2 after:h-0.5 after:w-3 after:-translate-x-1/2 after:content-['']",
+                        // 高对比模式下这条线也是底色画的：换成所在那块底上的系统字色
                         isToday &&
                           (endpoint
-                            ? "after:bg-accent-ink-inverse"
-                            : "after:bg-accent-ink"),
+                            ? "after:bg-accent-ink-inverse forced-colors:after:bg-[HighlightText]"
+                            : "after:bg-accent-ink forced-colors:after:bg-[CanvasText]"),
                       )}
                     >
                       {dateParts(date).day}

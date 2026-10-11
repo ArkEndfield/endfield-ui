@@ -135,6 +135,9 @@ export function SegmentedControl({
           indicator,
           indicatorBox,
           "after:bg-surface-inverse has-[[data-selected][data-disabled]]:after:bg-disabled",
+          // 高对比模式下底色都被系统换掉，墨块就没了：改用系统的"选中"色（禁用的是灰字色）。
+          // 压在它上面的那一段自己写明字色，见 Segment
+          "forced-colors:after:bg-[Highlight] forced-colors:has-[[data-selected][data-disabled]]:after:bg-[GrayText]",
           track[variant],
           controlSize[size],
           // 和输入框一样靠边线说状态
@@ -202,10 +205,13 @@ export function Segment({
         checked
           ? [
               disabled
-                ? "bg-disabled text-on-disabled"
-                : "bg-surface-inverse text-ink-inverse",
+                ? "bg-disabled text-on-disabled forced-colors:bg-[GrayText] forced-colors:text-[Canvas]"
+                : "bg-surface-inverse text-ink-inverse forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]",
               // 轨道量到了位置，底就由轨道上滑动的那一块来画
-              "in-data-indicator:bg-transparent",
+              "in-data-indicator:bg-transparent forced-colors:in-data-indicator:bg-transparent",
+              // 高对比模式：这一段的颜色全由上面的系统色说了算，不让系统再改——
+              // 不然它会在字后面垫一块页面色，把"选中"色盖掉。焦点环跟着写明
+              "forced-colors:forced-color-adjust-none forced-colors:has-focus-visible:outline-[Highlight]",
             ]
           : disabled
             ? "text-ink-disabled"

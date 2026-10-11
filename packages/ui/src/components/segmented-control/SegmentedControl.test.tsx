@@ -109,6 +109,35 @@ describe("SegmentedControl", () => {
     );
   });
 
+  it("高对比模式：墨块和选中的那一段改用系统的「选中」色，禁用的用灰字色", () => {
+    const { unmount } = render(<Example />);
+    expect(screen.getByRole("radiogroup")).toHaveClass(
+      "forced-colors:after:bg-[Highlight]",
+      "forced-colors:has-[[data-selected][data-disabled]]:after:bg-[GrayText]",
+    );
+    const selected = segment("24 小时").closest("label");
+    expect(selected).toHaveClass(
+      "forced-colors:bg-[Highlight]",
+      "forced-colors:text-[HighlightText]",
+      // 量到了位置，照样让给轨道上的那一块
+      "forced-colors:in-data-indicator:bg-transparent",
+      // 字压在系统色上：这一段的颜色不让系统再改，焦点环自己写明
+      "forced-colors:forced-color-adjust-none",
+      "forced-colors:has-focus-visible:outline-[Highlight]",
+    );
+    expect(segment("12 小时").closest("label")!.className).not.toContain(
+      "forced-colors:",
+    );
+    unmount();
+
+    render(<Example disabled />);
+    expect(segment("24 小时").closest("label")).toHaveClass(
+      "forced-colors:bg-[GrayText]",
+      "forced-colors:text-[Canvas]",
+      "forced-colors:forced-color-adjust-none",
+    );
+  });
+
   it("ref 给轨道，不顶掉它自己量位置用的那一个", () => {
     const rect = (left: number, width: number) => ({
       left,

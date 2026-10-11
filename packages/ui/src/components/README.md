@@ -123,6 +123,7 @@ components/
 - 随主题翻转的颜色一律用语义令牌（`surface`、`ink`、`action`…）。只有"有意不随主题变"的填充才直接用 `neutral-*`，并在旁边写一句注释说明原因。
 - 压在反转块（`surface-inverse`）上的强调记号用 `accent-ink-inverse`，压在页面表面上的用 `accent-ink`，都不直接用 `action`：它在浅色底上看不见。
 - 悬停底用 `hover:bg-ink/5`，不用 `surface-sunken`——后者在暗色主题下是纯黑。
+- **只靠底色或阴影说"选中 / 当前"的地方，要另写一份高对比模式（`forced-colors:`）下的画法。** 系统会把作者写的底色都换成页面色、阴影不画：填充反转的块改成 `forced-colors:bg-[Highlight]` 加 `forced-colors:text-[HighlightText]`，底色画的记号改成 `forced-colors:bg-[Highlight]`。系统色关键字只写在 `forced-colors:` 变体里，是"只用令牌"的例外。字压在 `Highlight` 上的那个元素还要加 `forced-colors:forced-color-adjust-none`（不然浏览器会在字后面垫一块页面色），并把它的边线、焦点环一起写成系统色。对应关系和理由见 [色彩](../../../../docs/design/foundations/color.md#高对比模式)。
 - 组件 API 用语义命名（`variant="action"`、`tone="danger"`），不把颜色名写进属性（不要 `yellow`）。
 - **能当链接用的控件，`href` 之外同时收 `render`**（路由库的链接组件）。链接形态里的那个 `<a>` 换成 [`LinkElement`](link-element/LinkElement.tsx)，判断写成 `href !== undefined || render !== undefined`；转给 Base UI 部件的（菜单项）用 [`defined()`](../lib/defined.ts) 去掉没有值的属性，免得把那个元素自己的地址盖掉。
 - 变体写成 `Record<Variant, string>`，用 [`cn()`](../lib/cn.ts) 合并，使用方传入的 `className` 排在最后、可以覆盖内置类。
