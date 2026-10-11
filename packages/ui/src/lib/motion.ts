@@ -66,3 +66,20 @@ export const indicatorBox = [
   "after:h-(--indicator-h) after:w-(--indicator-w)",
   "after:translate-x-(--indicator-x) after:translate-y-(--indicator-y)",
 ].join(" ");
+
+/**
+ * 补位（`useFlip`）：一排里有一项走了，其余的从旧位置滑到新位置。
+ *
+ * `flipBox` 给那一排——走的那一项以它为参照钉在原处，并且压在别的项下面。
+ * `flipLeaving` 给会走的每一项：带上 `data-leaving` 之后脱离排版（位置由钩子给）、
+ * 原地淡出、点不到。
+ *
+ * 过渡由用的地方自己写：各项的 `translate`（滑回原位）、走的那一项的 `opacity`，
+ * 都是 200ms——这几项多半本来就带着换色的过渡，得写进同一份清单里。
+ */
+export const flipBox = "relative isolate";
+
+export const flipLeaving = [
+  "data-leaving:pointer-events-none data-leaving:absolute data-leaving:-z-1",
+  "data-leaving:opacity-0",
+].join(" ");
