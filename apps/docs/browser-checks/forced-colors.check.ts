@@ -1878,12 +1878,24 @@ test("图标按钮：没激活的有一圈线，禁用的是灰字色的线；�
 
   // 三个都是激活的：线跟着块走；点一下取消，剩下一圈线
   await open(page, "控件-iconbutton-图标按钮--pressed");
+  // 线压在块自己的底色上，而「选中」色不一定是不透明的（见 painted）：两层叠在一起，
+  // 取到的比参照的深。量线的这一点时先让底色只垫到线的里沿，线底下只剩页面
+  const underEdge = (shown: boolean) =>
+    page.evaluate(
+      (css, clip) => {
+        document.querySelector<HTMLElement>(css)!.style.backgroundClip = clip;
+      },
+      button,
+      shown ? "" : "padding-box",
+    );
+  await underEdge(false);
   await shows(
     page,
     await edge(0),
     "Highlight",
     "激活的图标按钮连边线都是「选中」色",
   );
+  await underEdge(true);
   await declares(page, button, "borderTopColor", "Highlight");
   await page.click(button);
   await shows(page, await edge(0), "ButtonText", "取消激活之后应该剩一圈线");
