@@ -45,6 +45,24 @@ describe("Timeline", () => {
     expect(screen.getByText("已归档")).toBeInTheDocument();
   });
 
+  it("高对比模式：已过的节点和轴用页面的字色，当前的节点用系统的「选中」色，未到的不用另画", () => {
+    renderTimeline();
+    const [past, current, upcoming] = screen
+      .getAllByRole("listitem")
+      .map((item) => {
+        const rail = item.firstElementChild!;
+        return {
+          node: rail.firstElementChild!.firstElementChild!,
+          axis: rail.lastElementChild!,
+        };
+      });
+    expect(past!.node).toHaveClass("forced-colors:bg-[CanvasText]");
+    expect(current!.node).toHaveClass("forced-colors:bg-[Highlight]");
+    // 未到的是描边画的空心菱形：边线系统自己会换，不用另写
+    expect(upcoming!.node.className).not.toContain("forced-colors:");
+    expect(past!.axis).toHaveClass("forced-colors:bg-[CanvasText]");
+  });
+
   it("节点与轴线是装饰，对读屏隐藏", () => {
     renderTimeline();
     const first = screen.getAllByRole("listitem")[0]!;

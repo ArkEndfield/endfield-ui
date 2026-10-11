@@ -25,9 +25,10 @@ export type TimelineItemProps = Omit<ComponentProps<"li">, "title"> & {
 };
 
 const nodeClass: Record<TimelineStatus, string> = {
-  past: "bg-ink",
+  // 高对比模式下底色都被系统换掉，实心的菱形就没了：换成页面的字色
+  past: "bg-ink forced-colors:bg-[CanvasText]",
   // 描一圈最细的线（1px），颜色跟着文字走：亮色下是墨色，暗色下是近白
-  current: "border border-ink bg-action",
+  current: "border border-ink bg-action forced-colors:bg-[Highlight]",
   upcoming: "border-2 border-ink-tertiary",
 };
 
@@ -66,7 +67,7 @@ export function TimelineItem({
           <span className={cn("size-[11px] rotate-45", nodeClass[status])} />
         </span>
         {/* 轴只画在节点之间，不从节点后面穿过，空心菱形才是空的 */}
-        <span className="w-0.5 flex-1 bg-line-strong group-last/item:hidden" />
+        <span className="w-0.5 flex-1 bg-line-strong group-last/item:hidden forced-colors:bg-[CanvasText]" />
       </span>
       <div className="min-w-0 flex-1 pb-6 group-last/item:pb-0">
         {hasDate && (

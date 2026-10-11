@@ -1030,3 +1030,40 @@ test("进度环：轨道是一圈细线，弧是「选中」色", async () => {
     "轨道应该收成 1px 的细线，弧照旧是原来的线宽",
   );
 });
+
+test("时间线：已过的节点是实心的，当前的是「选中」色，未到的是空心的；轴看得见", async () => {
+  const { page } = storybook;
+  // 五项：两项已过、一项当前、两项未到
+  await open(page, "控件-timeline-时间线--schedule");
+  const rail = (status: string) => `${ROOT} li[data-status=${status}] > span`;
+  // 菱形的正中：实心的在这儿有颜色，空心的没有
+  const node = (status: string) =>
+    at(page, `${rail(status)} > span:first-child > span`, "center", "center");
+
+  await shows(page, await node("past"), "CanvasText", "已过的节点应该是实心的");
+  await shows(
+    page,
+    await node("current"),
+    "Highlight",
+    "当前的节点应该是「选中」色",
+  );
+  await differs(
+    page,
+    await node("upcoming"),
+    "CanvasText",
+    "未到的节点应该是空心的",
+  );
+  await differs(
+    page,
+    await node("upcoming"),
+    "Highlight",
+    "未到的节点不该是「选中」色",
+  );
+  // 轴是节点下面那条 2px 的竖线
+  await shows(
+    page,
+    await at(page, `${rail("past")} > span:last-child`, 1, "center"),
+    "CanvasText",
+    "节点之间的轴应该看得见",
+  );
+});
