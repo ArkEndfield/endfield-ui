@@ -203,6 +203,41 @@ describe("Slider", () => {
     );
   });
 
+  it("高对比模式：轨道是一圈线，走过的一段是系统的「选中」色，滑块是按钮的字色；禁用的写明灰字色", () => {
+    const { container } = render(
+      <Slider
+        aria-label="音量"
+        defaultValue={40}
+        showValue
+        marks={[{ value: 50, label: "50" }]}
+      />,
+    );
+    const thumb = container.querySelector("[data-index]")!;
+    const track = thumb.parentElement!;
+    // 空心的轨道对实心的一段：不靠两种系统色分得开
+    expect(track).toHaveClass(
+      "forced-colors:outline",
+      "forced-colors:-outline-offset-1",
+      "forced-colors:outline-[ButtonText]",
+      "forced-colors:data-disabled:outline-[GrayText]",
+    );
+    expect(track.firstElementChild).toHaveClass(
+      "forced-colors:bg-[Highlight]",
+      "forced-colors:data-disabled:bg-[GrayText]",
+    );
+    expect(thumb).toHaveClass(
+      "forced-colors:bg-[ButtonText]",
+      "forced-colors:data-disabled:bg-[GrayText]",
+    );
+    expect(screen.getByText("50", { selector: "span" })).toHaveClass(
+      "forced-colors:before:bg-[ButtonText]",
+    );
+    // 数值是一个 <output>：系统不知道它禁用了，灰字色要自己写
+    expect(container.querySelector("output")).toHaveClass(
+      "forced-colors:data-disabled:text-[GrayText]",
+    );
+  });
+
   it("两档尺寸", () => {
     const { container, rerender } = render(
       <Slider aria-label="音量" defaultValue={40} />,

@@ -89,8 +89,20 @@ const thumb = [
   // 菱形方案：滑块是一个 14px 的菱形，按住时中间亮一个小方块
   "choice-diamond:size-3.5 choice-diamond:rotate-45 choice-diamond:after:inset-1 choice-diamond:after:w-auto choice-diamond:after:translate-x-0",
   "data-disabled:bg-ink-disabled",
+  // 高对比模式下底色都被系统换掉，滑块就没了：它是控件自己的一块，用按钮的字色
+  "forced-colors:bg-[ButtonText] forced-colors:data-disabled:bg-[GrayText]",
   focusRingWithin,
 ].join(" ");
+
+/*
+ * 高对比模式：轨道、走过的一段、滑块都是底色画的，整个控件会不见。
+ * 轨道剩一圈 1px 的线（空心），走过的一段是系统"选中"色的实心条——
+ * 空心对实心，不靠两种系统色分得开。禁用时都是灰字色
+ */
+const trackForced =
+  "forced-colors:outline forced-colors:-outline-offset-1 forced-colors:outline-[ButtonText] forced-colors:data-disabled:outline-[GrayText]";
+const indicatorForced =
+  "forced-colors:bg-[Highlight] forced-colors:data-disabled:bg-[GrayText]";
 
 /**
  * 滑块：在一个范围里拖着选一个数。要的是确切的数时用 `Stepper`。
@@ -167,9 +179,14 @@ export function Slider(props: SliderProps) {
             controlSize[size],
           )}
         >
-          <BaseSlider.Track className="h-1 w-full bg-line">
+          <BaseSlider.Track className={cn("h-1 w-full bg-line", trackForced)}>
             {/* 走过的一段跟着滑块头走：范围滑块两头都会动 */}
-            <BaseSlider.Indicator className="bg-ink transition-[inset-inline-start,width] duration-(--duration-fast) ease-standard data-disabled:bg-ink-disabled data-dragging:transition-none" />
+            <BaseSlider.Indicator
+              className={cn(
+                "bg-ink transition-[inset-inline-start,width] duration-(--duration-fast) ease-standard data-disabled:bg-ink-disabled data-dragging:transition-none",
+                indicatorForced,
+              )}
+            />
             {(range ? [0, 1] : [0]).map((index) => (
               <BaseSlider.Thumb
                 key={index}
@@ -191,7 +208,7 @@ export function Slider(props: SliderProps) {
                 key={mark.value}
                 style={{ left: markLeft((mark.value - min) / (max - min)) }}
                 className={cn(
-                  "absolute top-0 flex flex-col gap-0.5 whitespace-nowrap text-ink-secondary before:h-1.5 before:w-px before:bg-line-strong before:content-['']",
+                  "absolute top-0 flex flex-col gap-0.5 whitespace-nowrap text-ink-secondary before:h-1.5 before:w-px before:bg-line-strong before:content-[''] forced-colors:before:bg-[ButtonText]",
                   // 两端的标注朝里排，不伸到控件外面去；短线仍然对着滑块的中心
                   mark.value <= min
                     ? "items-start"
@@ -211,7 +228,7 @@ export function Slider(props: SliderProps) {
         <BaseSlider.Value
           style={{ minWidth: valueWidth }}
           className={cn(
-            "flex shrink-0 items-center justify-end font-tech text-sm font-bold tabular-nums data-disabled:text-ink-disabled",
+            "flex shrink-0 items-center justify-end font-tech text-sm font-bold tabular-nums data-disabled:text-ink-disabled forced-colors:data-disabled:text-[GrayText]",
             controlSize[size],
           )}
         >

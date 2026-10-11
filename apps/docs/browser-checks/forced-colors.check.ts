@@ -1,4 +1,5 @@
-// 高对比模式（forced-colors）：系统把作者写的底色都换成页面色之后，"选中 / 当前"还分不分得出来。
+// 高对比模式（forced-colors）：系统把作者写的底色都换成页面色之后，"选中 / 当前"还分不分得出来，
+// 全靠底色画的部件（滑块、进度条这些）还看不看得见。
 // 计算样式读不到被系统换过之后的颜色，所以两头都核对：声明的是不是系统色关键字（和探针比），
 // 画出来的那一点是不是真的是它（截 1×1 的图，和探针画出来的那一点比）。
 // 只比"是同一个颜色 / 不是同一个颜色"，不比色值：系统色是使用者自己定的，每台机器不一样
@@ -802,4 +803,84 @@ test("头像的选中环、数据行的收藏圆、进度短横：都看得见",
     "CanvasText",
     "其余的短横应该看得见",
   );
+});
+
+test("滑块：轨道是一圈线，走过的一段是实心的「选中」色，滑块看得见；按到头整条填上；禁用的是灰字色", async () => {
+  const { page } = storybook;
+  await open(page, "控件-slider-滑块--playground");
+  const thumb = "[data-index]";
+  const track = "div:has(> [data-index])";
+  const passed = `${track} > div:not([data-index])`;
+  const within = (scope: string, part: string) => `${scope} ${part}`;
+
+  // 轨道高 4px：最上面一行是那圈线，中间是空的。取在滑块右边还没走到的那一段
+  const ahead = (dy: Offset) => at(page, within(ROOT, track), -20, dy);
+  await shows(
+    page,
+    await ahead(0),
+    "ButtonText",
+    "没走到的那一段轨道上沿应该有一条线",
+  );
+  await differs(
+    page,
+    await ahead("center"),
+    "ButtonText",
+    "没走到的那一段轨道应该是空心的",
+  );
+  await differs(
+    page,
+    await ahead("center"),
+    "Highlight",
+    "没走到的那一段不该是「选中」色",
+  );
+  await shows(
+    page,
+    await at(page, within(ROOT, passed), 10, "center"),
+    "Highlight",
+    "走过的一段应该是实心的「选中」色",
+  );
+  // 滑块 12 × 20：按住时才亮的那条细线在正中，取在左上
+  await shows(
+    page,
+    await at(page, within(ROOT, thumb), 3, 3),
+    "ButtonText",
+    "滑块应该看得见",
+  );
+  await declares(page, within(ROOT, track), "outlineColor", "ButtonText");
+  await declares(page, within(ROOT, passed), "backgroundColor", "Highlight");
+  await declares(page, within(ROOT, thumb), "backgroundColor", "ButtonText");
+
+  await page.key("Tab");
+  await page.waitFocused("input:音量", "Tab 应该停在滑块上");
+  await page.key("End");
+  await shows(
+    page,
+    await ahead("center"),
+    "Highlight",
+    "按 End 到头之后，整条轨道都应该填上",
+  );
+
+  // 第三个是禁用的
+  await open(page, "控件-slider-滑块--states");
+  const disabled = `${ROOT} [role=group][data-disabled]`;
+  await shows(
+    page,
+    await at(page, within(disabled, thumb), 3, 3),
+    "GrayText",
+    "禁用的滑块应该是灰字色",
+  );
+  await shows(
+    page,
+    await at(page, within(disabled, passed), 10, "center"),
+    "GrayText",
+    "禁用时走过的一段应该是灰字色",
+  );
+  await shows(
+    page,
+    await at(page, within(disabled, track), -20, 0),
+    "GrayText",
+    "禁用时轨道的线应该是灰字色",
+  );
+  // 数值是一个 <output>，系统不会自己把它换成灰字色
+  await declares(page, within(disabled, "output"), "color", "GrayText");
 });
