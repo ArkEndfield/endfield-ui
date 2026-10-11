@@ -3,7 +3,11 @@ import { Fragment, useId, type ComponentProps } from "react";
 import { cn } from "../../lib/cn";
 import { focusRing } from "../../lib/focus-ring";
 import { useFieldContext, useFieldControl } from "../field/Field";
-import type { ControlSize, ControlVariant } from "../input/control-box";
+import {
+  readOnlyFrame,
+  type ControlSize,
+  type ControlVariant,
+} from "../input/control-box";
 
 export type OtpInputType = "numeric" | "alphanumeric";
 export type OtpInputSize = ControlSize;
@@ -141,6 +145,7 @@ export function OtpInput({
       ? // 只读：没有边线、底变透明。边线留透明的，尺寸不跳
         "border-transparent bg-transparent"
       : slotFill[variant],
+    readOnly && !disabled && !invalid && readOnlyFrame,
     disabled
       ? "cursor-not-allowed border-line"
       : invalid

@@ -72,6 +72,28 @@ describe("Input", () => {
     );
   });
 
+  it("高对比模式：只读时占位的透明边线写成页面色，不让系统显形", () => {
+    const box = () => screen.getByRole("textbox").parentElement;
+    const { rerender } = render(<Input aria-label="代号" readOnly />);
+    expect(box()).toHaveClass(
+      "border-transparent",
+      "forced-colors:border-[Canvas]",
+    );
+
+    rerender(<Input aria-label="代号" readOnly variant="outline" />);
+    expect(box()).toHaveClass("forced-colors:border-[Canvas]");
+
+    // 能填的那条线要留着；只读又报错、只读又禁用时，边线是错误 / 禁用的颜色，也留着
+    for (const props of [
+      {},
+      { readOnly: true, invalid: true },
+      { readOnly: true, disabled: true },
+    ]) {
+      rerender(<Input aria-label="代号" {...props} />);
+      expect(box()).not.toHaveClass("forced-colors:border-[Canvas]");
+    }
+  });
+
   it("默认是凹陷底 + 底边线，outline 换成四边描边", () => {
     const { rerender } = render(<Input aria-label="代号" />);
     let box = screen.getByRole("textbox").parentElement;

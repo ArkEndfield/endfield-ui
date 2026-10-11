@@ -225,6 +225,22 @@ describe("OtpInput", () => {
     for (const slot of slots()) expect(slot).toHaveAttribute("readonly");
   });
 
+  it("高对比模式：只读时每格占位的透明边线写成页面色，不让系统显形", () => {
+    const { rerender } = render(<Code length={3} readOnly />);
+    for (const slot of slots()) {
+      expect(slot).toHaveClass(
+        "border-transparent",
+        "forced-colors:border-[Canvas]",
+      );
+    }
+
+    // 能填的那条线要留着
+    rerender(<Code length={3} />);
+    for (const slot of slots()) {
+      expect(slot).not.toHaveClass("forced-colors:border-[Canvas]");
+    }
+  });
+
   it("size 和 variant 写在分组上，className 也给它", () => {
     render(<Code size="lg" variant="outline" className="justify-center" />);
     const group = screen.getByRole("group");

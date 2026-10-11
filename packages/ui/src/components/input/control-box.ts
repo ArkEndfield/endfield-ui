@@ -41,6 +41,12 @@ const fill: Record<ControlVariant, string> = {
   outline: "bg-surface",
 };
 
+/**
+ * 只读时留着占位的那条透明边线，高对比模式下写成页面色：系统会把透明的边线也换成字色
+ * 显出来，而底色本来就都没了——只读的就和能填的一个样。输入框和验证码输入共用
+ */
+export const readOnlyFrame = "forced-colors:border-[Canvas]";
+
 export function controlBox({
   variant = "sunken",
   invalid,
@@ -56,6 +62,8 @@ export function controlBox({
       ? // 只读：没有边线、底变透明。边线留透明的，尺寸不跳
         "border-transparent bg-transparent"
       : fill[variant],
+    // 只在透明的那条线真的作数时：禁用、错误各有自己的边线颜色，排在后面盖掉它
+    readOnly && !disabled && !invalid && readOnlyFrame,
     disabled
       ? "cursor-not-allowed border-line text-ink-disabled"
       : invalid

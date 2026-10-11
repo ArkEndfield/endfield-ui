@@ -43,7 +43,12 @@ type Point = { x: number; y: number };
 /** 从元素的左上角往里多少像素；负数是从右下角往里；`center` 是正中 */
 type Offset = number | "center";
 type SystemColor =
-  "Highlight" | "HighlightText" | "CanvasText" | "ButtonText" | "GrayText";
+  | "Highlight"
+  | "HighlightText"
+  | "Canvas"
+  | "CanvasText"
+  | "ButtonText"
+  | "GrayText";
 
 /**
  * 第 `nth` 个匹配的元素里的一点（页面坐标）。取点要避开字：字的宽度每台机器不一样，
@@ -211,6 +216,7 @@ type ColorProperty =
   | "color"
   | "outlineColor"
   | "borderTopColor"
+  | "borderBottomColor"
   | "borderLeftColor"
   | "fill"
   | "stroke";
@@ -1463,4 +1469,56 @@ test("禁用的输入框：框里的字是灰字色，没禁用的和只读的�
     false,
     "没禁用的多行文本，计数不该是灰字色",
   );
+});
+
+test("只读的输入框：占位的那条透明边线不显形，能填的照旧有线；标签输入、验证码输入也是", async () => {
+  const { page } = storybook;
+  // 底边线 2px：从下沿往里 1px 一定落在线上——纵向的位置跟着上面那行字的高度走、带小数，也落得上。
+  // 取在正中：字在线的上面，碰不到
+  const bottom = (selector: string) => at(page, selector, "center", -1);
+  const box = (state: string) =>
+    `${ROOT} div[data-variant]:has(> input${state})`;
+
+  // 五个字段：默认、已填写、错误、禁用、只读
+  await open(page, "控件-input-输入框--states");
+  await shows(
+    page,
+    await bottom(box("[value]:enabled:not([readonly])")),
+    "CanvasText",
+    "能填的输入框底下应该有一条线",
+  );
+  await shows(
+    page,
+    await bottom(box("[readonly]")),
+    "Canvas",
+    "只读的输入框底下不该有线：系统把占位的透明边线显了形",
+  );
+  await declares(page, box("[readonly]"), "borderBottomColor", "Canvas");
+
+  // 四边描边的那一种，只读时四边都是占位的。取左边那条线的正中
+  await open(page, "控件-input-输入框--outline");
+  await shows(
+    page,
+    await at(page, box("[readonly]"), 0, "center"),
+    "Canvas",
+    "四边描边的只读输入框不该有那一圈线",
+  );
+  await declares(page, box("[readonly]"), "borderLeftColor", "Canvas");
+
+  // 四个框：空的、错误、禁用、只读
+  await open(page, "控件-taginput-标签输入--states");
+  const tags = `${ROOT} div[data-variant]:nth-child(4)`;
+  await shows(page, await bottom(tags), "Canvas", "只读的标签输入底下不该有线");
+  await declares(page, tags, "borderBottomColor", "Canvas");
+
+  // 三个字段：错误、禁用、只读。每一格是一个 <input>，线在它自己身上
+  await open(page, "控件-otpinput-验证码输入--states");
+  const slot = `${ROOT} input[readonly]`;
+  await shows(
+    page,
+    await bottom(slot),
+    "Canvas",
+    "只读的验证码输入，格子底下不该有线",
+  );
+  await declares(page, slot, "borderBottomColor", "Canvas");
 });
