@@ -20,6 +20,7 @@ import {
 } from "../../hooks/useScrollPosition";
 import { cn } from "../../lib/cn";
 import { focusRingInset } from "../../lib/focus-ring";
+import { dropEmptyStyle } from "../../lib/inline-style";
 import { mergeRefs } from "../../lib/merge-refs";
 import { indicator } from "../../lib/motion";
 import { LinkElement, type LinkRender } from "../link-element/LinkElement";
@@ -77,8 +78,7 @@ function smoothOnce(scrollers: readonly HTMLElement[]) {
     for (const source of sources) source.removeEventListener("scroll", wait);
     scrollers.forEach((scroller, index) => {
       scroller.style.setProperty("scroll-behavior", before[index]!);
-      // 原来没有内联样式的，不留一个空的 style 属性在上面
-      if (scroller.style.length === 0) scroller.removeAttribute("style");
+      dropEmptyStyle(scroller);
     });
   };
   function wait() {

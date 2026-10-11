@@ -7,6 +7,7 @@
 | `cn.ts` | `cn()`：合并类名（`clsx` + `tailwind-merge`）。里面登记了 [theme.css](../styles/theme.css) 的自定义令牌名，否则 `text-micro` 会被当成颜色、与 `text-ink` 互相覆盖 |
 | `focus-ring.ts` | `focusRing`、`focusRingInset`、`focusRingWithin`：全库统一的焦点环类名 |
 | `merge-refs.ts` | `mergeRefs()`：组件自己要用节点、同时还得把它交给使用方时，把几个 ref 合成一个 |
+| `inline-style.ts` | `dropEmptyStyle()`：往元素上临时写过内联样式、又都撤掉之后，把空下来的 `style` 属性拿掉。浏览器是懒着同步这个属性的，直接删会落空、回头又冒出一个空的 |
 | `defined.ts` | `defined()`：去掉值是 `undefined` 的属性。把控件的属性合并到使用方给的元素上（`render`）之前用，免得把那个元素自己写的盖掉 |
 | `decor.ts` | `decor`：装饰层共用的类 |
 | `motion.ts` | 几处共用的动效类名。`enterFromSide`：浮层面板进场的方向位移——按基元给的 `data-side`，起点往触发元素那一侧偏 `--motion-shift`；`collapse` / `collapseEnter` / `collapseInner`：按高度收放；`fadeInFast`：小件的淡入；`indicator` / `indicatorBox`：画在容器 `::after` 上的选中指示，位置来自 `useIndicator`；`flipBox` / `flipLeaving`：补位（`useFlip`）的那一排，和里面走的那一项。见 [动效](../../../../docs/design/foundations/motion.md#补的几条约定) |

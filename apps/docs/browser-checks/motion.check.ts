@@ -2649,10 +2649,6 @@ test("页内目录：点一项，这一次跳转滚得平滑——点的那一�
             scroller.style.scrollBehavior,
             document.documentElement.style.scrollBehavior,
           ],
-          attributes: [
-            scroller.getAttribute("style"),
-            document.documentElement.getAttribute("style"),
-          ],
           scrolled: Math.round(scroller.scrollTop),
           current:
             [...document.querySelectorAll(links)].find((link) =>
@@ -2661,6 +2657,18 @@ test("页内目录：点一项，这一次跳转滚得平滑——点的那一�
         };
       },
       { scroller: SCROLLER, links: LINKS },
+    );
+  /**
+   * 两处身上有没有 style 属性。只在最后问一次：浏览器是懒着把内联样式同步成属性的，
+   * 中途问了它就同步了——使用方不会去问，问了反而测不到"撤完留下一个空的"
+   */
+  const attributes = () =>
+    page.evaluate(
+      (css) => [
+        document.querySelector(css)!.getAttribute("style"),
+        document.documentElement.getAttribute("style"),
+      ],
+      SCROLLER,
     );
   const stopped = async (message: string) => {
     await page.waitFor(async () => (await state()).scrolled > 0, message);
@@ -2676,6 +2684,7 @@ test("页内目录：点一项，这一次跳转滚得平滑——点的那一�
     await page.story("控件-toc-页内目录--playground");
     const before = await state();
     assert.deepEqual(before.inline, ["", ""]);
+    assert.deepEqual(await attributes(), [null, null]);
 
     const picked = await pick(3);
     assert.deepEqual(
@@ -2687,9 +2696,9 @@ test("页内目录：点一项，这一次跳转滚得平滑——点的那一�
 
     const after = await stopped("正文应该滚过去了");
     assert.deepEqual(
-      after.attributes,
-      before.attributes,
-      "撤掉之后不该多留一个 style 属性",
+      await attributes(),
+      [null, null],
+      "撤掉之后不该留下一个空的 style 属性",
     );
     assert.equal(after.current, "本月排期", "点的那一项是当前项");
     smooth = after;

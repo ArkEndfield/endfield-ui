@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, type RefObject } from "react";
+import { dropEmptyStyle } from "../lib/inline-style";
 
 /** 一排里超过这么多项就不补位：一项一项量、一项一项起过渡，多了不划算，也看不清谁去了哪 */
 export const FLIP_LIMIT = 50;
@@ -21,7 +22,7 @@ function flight(node: Element): [number, number] {
 /** 把写上去的内联样式撤干净：原来没有 style 属性的，不留一个空的在上面 */
 function unset(node: HTMLElement, names: readonly string[]) {
   for (const name of names) node.style.removeProperty(name);
-  if (node.style.length === 0) node.removeAttribute("style");
+  dropEmptyStyle(node);
 }
 
 const PIN = ["left", "top", "width", "height"] as const;
