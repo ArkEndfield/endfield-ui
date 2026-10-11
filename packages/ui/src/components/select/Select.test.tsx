@@ -195,6 +195,17 @@ describe("Select", () => {
     );
   });
 
+  it("高对比模式：已选项是左缘一条系统「选中」色的竖条", async () => {
+    const user = userEvent.setup();
+    render(<Select items={regions} aria-label="地区" defaultValue="valley" />);
+    await user.click(screen.getByRole("combobox"));
+    const current = await screen.findByRole("option", { name: "四号谷地" });
+    expect(current).toHaveClass("forced-colors:before:bg-[Highlight]");
+    expect(
+      screen.getByRole("option", { name: "北岭" }).className,
+    ).not.toContain("forced-colors:");
+  });
+
   it("触发器在局部主题里时，面板带上同一个主题", async () => {
     const user = userEvent.setup();
     render(

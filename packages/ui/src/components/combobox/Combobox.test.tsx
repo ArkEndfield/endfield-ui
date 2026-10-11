@@ -156,6 +156,24 @@ describe("Combobox", () => {
     expect(screen.getByRole("status")).toHaveTextContent("null");
   });
 
+  it("高对比模式：移到的那一项画一圈系统「选中」色的环；当前项是左缘的竖条", async () => {
+    const user = userEvent.setup();
+    render(<Combobox items={stations} aria-label="站点" defaultValue="n12" />);
+    await user.click(screen.getByRole("combobox"));
+    const current = await screen.findByRole("option", { name: "北区十二号站" });
+    const other = screen.getByRole("option", { name: "北区七号站" });
+    // 焦点一直在输入框里，选项上没有真的焦点环：环是跟着 data-highlighted 画的
+    for (const option of [current, other]) {
+      expect(option).toHaveClass(
+        "forced-colors:data-highlighted:outline-2",
+        "forced-colors:data-highlighted:-outline-offset-2",
+        "forced-colors:data-highlighted:outline-[Highlight]",
+      );
+    }
+    expect(current).toHaveClass("forced-colors:before:bg-[Highlight]");
+    expect(other).not.toHaveClass("forced-colors:before:bg-[Highlight]");
+  });
+
   it("带 name 时选中的值随表单提交", () => {
     render(
       <form data-testid="form">

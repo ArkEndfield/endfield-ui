@@ -50,6 +50,10 @@ const pressedClass: Record<IconButtonVariant, string> = {
   inverse: "bg-surface-inverse text-accent-ink-inverse",
 };
 
+/* 高对比模式下底色都被系统换掉，激活的和没激活的就成了一个样子：激活的改用系统的"选中"色 */
+const pressedForced =
+  "forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]";
+
 const disabledClass: Record<IconButtonVariant, string> = {
   plain: "cursor-not-allowed bg-surface-sunken text-ink-disabled",
   floating:
@@ -84,7 +88,7 @@ export function IconButton({
         disabled
           ? disabledClass[variant]
           : pressed
-            ? pressedClass[variant]
+            ? [pressedClass[variant], pressedForced]
             : enabledClass[variant],
         className,
       )}

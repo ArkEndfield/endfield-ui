@@ -151,6 +151,13 @@ const currentHighlighted: Record<MenuVariant, string> = {
   strong: "data-highlighted:bg-action-pressed",
 };
 
+/*
+ * 高对比模式下底色都被系统换掉，"移到了哪一项"就看不见了：给被移到的那一项画一圈
+ * 系统"选中"色的环，和菜单、下拉选择里键盘走到的那一项同一个样子（那边是真的焦点环）
+ */
+const highlightedForced =
+  "forced-colors:data-highlighted:outline-2 forced-colors:data-highlighted:-outline-offset-2 forced-colors:data-highlighted:outline-[Highlight]";
+
 const iconButton =
   "flex shrink-0 items-center justify-center self-stretch text-ink-secondary hover:text-ink disabled:cursor-not-allowed disabled:text-ink-disabled disabled:hover:text-ink-disabled";
 
@@ -240,6 +247,7 @@ export function Combobox(props: ComboboxProps) {
                   currentHighlighted[panelVariant],
                 ]
               : menuItemHover,
+          highlightedForced,
         )
       }
       render={

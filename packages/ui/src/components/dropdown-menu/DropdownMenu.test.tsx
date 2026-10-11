@@ -209,6 +209,52 @@ describe("DropdownMenu", () => {
     );
   });
 
+  it("高对比模式：两种面板的当前项都是左缘一条系统「选中」色的竖条", async () => {
+    for (const variant of ["plain", "strong"] as const) {
+      const { unmount } = render(
+        <DropdownMenu
+          defaultOpen
+          variant={variant}
+          trigger={<button type="button">语言</button>}
+        >
+          <DropdownMenuRadioGroup defaultValue="zh">
+            <DropdownMenuRadioItem value="zh">简体中文</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="en">English</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </DropdownMenu>,
+      );
+      const current = await screen.findByRole("menuitemradio", {
+        name: "简体中文",
+      });
+      expect(current).toHaveClass("forced-colors:before:bg-[Highlight]");
+      expect(
+        screen.getByRole("menuitemradio", { name: "English" }).className,
+      ).not.toContain("forced-colors:");
+      unmount();
+    }
+    // strong 平时没有这一条，只在高对比模式下画
+    render(
+      <DropdownMenu
+        defaultOpen
+        variant="strong"
+        trigger={<button type="button">语言</button>}
+      >
+        <DropdownMenuRadioGroup defaultValue="zh">
+          <DropdownMenuRadioItem value="zh">简体中文</DropdownMenuRadioItem>
+        </DropdownMenuRadioGroup>
+      </DropdownMenu>,
+    );
+    const strong = await screen.findByRole("menuitemradio", {
+      name: "简体中文",
+    });
+    expect(strong).toHaveClass(
+      "forced-colors:before:absolute",
+      "forced-colors:before:w-[3px]",
+      "forced-colors:before:content-['']",
+    );
+    expect(strong).not.toHaveClass("before:w-[3px]");
+  });
+
   it("高对比模式：复选项行首的小方格，已选时改用系统的「选中」色", async () => {
     render(
       <DropdownMenu defaultOpen trigger={<button type="button">视图</button>}>

@@ -135,6 +135,11 @@ const itemBase = [
   "data-popup-open:bg-surface-inverse data-popup-open:text-ink-inverse",
   "data-disabled:cursor-not-allowed data-disabled:bg-transparent data-disabled:text-ink-disabled",
   "data-disabled:data-pressed:bg-disabled data-disabled:data-pressed:text-on-disabled",
+  // 高对比模式下底色都被系统换掉，按下的和没按的就成了一个样子：按下的改用系统的"选中"色（禁用的是灰字色）。
+  // 这一个的颜色不让系统再改（不然它会在字后面垫一块页面色），焦点环跟着写明
+  "forced-colors:data-pressed:forced-color-adjust-none forced-colors:data-pressed:outline-[Highlight]",
+  "forced-colors:data-pressed:bg-[Highlight] forced-colors:data-pressed:text-[HighlightText]",
+  "forced-colors:data-disabled:data-pressed:bg-[GrayText] forced-colors:data-disabled:data-pressed:text-[Canvas]",
   // 焦点环压在旁边的钮上面
   "focus-visible:z-1",
   focusRing,
@@ -146,6 +151,8 @@ const itemIcon = [
   "group-data-pressed/item:text-accent-ink-inverse",
   "group-data-popup-open/item:text-accent-ink-inverse",
   "group-data-disabled/item:group-data-pressed/item:text-on-disabled",
+  "forced-colors:group-data-pressed/item:text-[HighlightText]",
+  "forced-colors:group-data-disabled/item:group-data-pressed/item:text-[Canvas]",
 ].join(" ");
 
 function useItemClass(iconOnly: boolean, className: string | undefined) {

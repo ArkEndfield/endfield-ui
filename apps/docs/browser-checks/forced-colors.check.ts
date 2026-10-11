@@ -627,3 +627,121 @@ test("开关：关着看得见轨道和旋钮，开着是「选中」色的实�
   );
   await declares(page, `${ROOT} [data-value=on]`, "color", "HighlightText");
 });
+
+test("工具栏的开关钮、图标按钮：按下的是系统的「选中」色", async () => {
+  const { page } = storybook;
+  await open(page, "控件-toolbar-工具栏--toggles");
+  // 前两个是一组只按一个的：标准（按着）、紧凑
+  const item = `${ROOT} [role=toolbar] button`;
+  const corner = (nth: number) => at(page, item, 3, 3, nth);
+  await shows(
+    page,
+    await corner(0),
+    "Highlight",
+    "按下的开关钮应该画成「选中」色",
+  );
+  await differs(page, await corner(1), "Highlight", "没按的不该是「选中」色");
+  await declares(page, item, "color", "HighlightText");
+  await unadjusted(page, item);
+
+  await page.click("text=紧凑");
+  await shows(
+    page,
+    await corner(1),
+    "Highlight",
+    "按下第二个：它应该变成「选中」色",
+  );
+  await differs(page, await corner(0), "Highlight", "第一个应该弹起来了");
+
+  // 三种变体都按着
+  await open(page, "控件-iconbutton-图标按钮--pressed");
+  const button = `${ROOT} button`;
+  for (const nth of [0, 1, 2]) {
+    await shows(
+      page,
+      await at(page, button, 3, 3, nth),
+      "Highlight",
+      `第 ${nth + 1} 个图标按钮是激活的，应该画成「选中」色`,
+    );
+  }
+  await declares(page, button, "color", "HighlightText");
+  await page.click(button);
+  await page.waitFor(
+    () =>
+      page.evaluate(
+        (css) =>
+          document.querySelector(css)!.getAttribute("aria-pressed") === "false",
+        button,
+      ),
+    "点一下应该取消激活",
+  );
+  await differs(
+    page,
+    await at(page, button, 3, 3),
+    "Highlight",
+    "取消激活之后不该还是「选中」色",
+  );
+});
+
+test("下拉选择：已选项左缘有一条「选中」色的竖条；组合框：移到的那一项有一圈环", async () => {
+  const { page } = storybook;
+  await open(page, "控件-select-下拉选择--open");
+  const option = "[role=listbox] [role=option]";
+  await page.waitVisible(option);
+  await page.waitFocused(/^option:/, "面板打开后焦点应该在已选的那一项上");
+  // 把焦点挪开：已选项上只剩竖条，没有焦点环
+  await page.key("ArrowDown");
+  const selected = `${option}[aria-selected=true]`;
+  await page.waitFor(
+    () =>
+      page.evaluate(
+        (css) => !document.querySelector(css)!.matches(":focus"),
+        selected,
+      ),
+    "按 ↓ 之后焦点应该离开已选的那一项",
+  );
+  await shows(
+    page,
+    await at(page, selected, 1, "center"),
+    "Highlight",
+    "已选项的左缘应该有一条「选中」色的竖条",
+  );
+  await differs(
+    page,
+    await at(page, selected, -1, "center"),
+    "Highlight",
+    "焦点挪开之后，已选项的右缘不该有东西",
+  );
+  await declares(page, selected, "backgroundColor", "Highlight", {
+    pseudo: "::before",
+  });
+
+  await open(page, "控件-combobox-组合框--open");
+  await page.waitVisible(option);
+  // 焦点一直在输入框里：选项上的环是跟着"移到了哪一项"画的
+  await page.evaluate(() =>
+    document.querySelector<HTMLElement>("[role=combobox]")!.focus(),
+  );
+  await page.waitFocused(/^combobox:/);
+  await page.key("ArrowDown");
+  const moved = `${option}[data-highlighted]`;
+  await page.waitVisible(moved, "按 ↓ 之后应该移到某一项上");
+  await declares(page, moved, "outlineColor", "Highlight");
+  await shows(
+    page,
+    await at(page, moved, "center", 1),
+    "Highlight",
+    "移到的那一项上沿应该有一圈「选中」色的环",
+  );
+  await differs(
+    page,
+    await at(
+      page,
+      `${option}:not([data-highlighted], [aria-selected=true])`,
+      "center",
+      1,
+    ),
+    "Highlight",
+    "没移到的项不该有环",
+  );
+});

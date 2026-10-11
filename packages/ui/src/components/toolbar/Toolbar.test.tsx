@@ -152,6 +152,28 @@ describe("Toolbar", () => {
     expect(rule).toHaveAttribute("aria-pressed", "false");
   });
 
+  it("高对比模式：按下的开关钮改用系统的「选中」色，图标跟着换字色", () => {
+    render(<Tools />);
+    // 类是跟着 data-pressed 走的，按没按下都带着
+    const rule = screen.getByRole("button", { name: "每五行加重" });
+    expect(rule).toHaveClass(
+      "forced-colors:data-pressed:bg-[Highlight]",
+      "forced-colors:data-pressed:text-[HighlightText]",
+      // 字压在系统色上：按下的这一个不让系统再改颜色，焦点环自己写明
+      "forced-colors:data-pressed:forced-color-adjust-none",
+      "forced-colors:data-pressed:outline-[Highlight]",
+      "forced-colors:data-disabled:data-pressed:bg-[GrayText]",
+      "forced-colors:data-disabled:data-pressed:text-[Canvas]",
+    );
+    expect(within(rule).getByTestId("dot").parentElement).toHaveClass(
+      "forced-colors:group-data-pressed/item:text-[HighlightText]",
+      "forced-colors:group-data-disabled/item:group-data-pressed/item:text-[Canvas]",
+    );
+    expect(screen.getByRole("button", { name: "标准" })).toHaveAttribute(
+      "data-pressed",
+    );
+  });
+
   it("开关钮：受控时只报告", async () => {
     const user = userEvent.setup();
     const onPressedChange = vi.fn();

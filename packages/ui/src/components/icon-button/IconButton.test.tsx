@@ -31,6 +31,29 @@ describe("IconButton", () => {
     expect(screen.getByRole("button")).toHaveAttribute("aria-pressed", "true");
   });
 
+  it("高对比模式：激活的改用系统的「选中」色，四种变体都是", () => {
+    for (const variant of ["plain", "floating", "accent", "inverse"] as const) {
+      const { rerender, unmount } = render(
+        <IconButton aria-label="静音" variant={variant} pressed>
+          <Close />
+        </IconButton>,
+      );
+      expect(screen.getByRole("button")).toHaveClass(
+        "forced-colors:bg-[Highlight]",
+        "forced-colors:text-[HighlightText]",
+      );
+      rerender(
+        <IconButton aria-label="静音" variant={variant} pressed={false}>
+          <Close />
+        </IconButton>,
+      );
+      expect(screen.getByRole("button").className).not.toContain(
+        "forced-colors:",
+      );
+      unmount();
+    }
+  });
+
   it("不是开关时不输出 aria-pressed", () => {
     render(
       <IconButton aria-label="关闭">

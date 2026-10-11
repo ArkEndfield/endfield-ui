@@ -42,11 +42,17 @@ export const menuItem = [
 /** 不是当前项的选项才有悬停底：当前项的底不能被悬停盖掉 */
 export const menuItemHover = "data-highlighted:bg-ink/5";
 
-/** 当前项（下拉选择的已选项、单选菜单项的选中项） */
+/**
+ * 当前项（下拉选择的已选项、单选菜单项的选中项）。
+ *
+ * 高对比模式下底色都被系统换掉：两种面板的当前项都是左缘一条系统"选中"色的竖条
+ * （`strong` 平时没有这一条，只在这时候画）
+ */
 export const menuItemCurrent: Record<MenuVariant, string> = {
   plain:
-    "bg-surface-muted font-medium before:absolute before:inset-y-0 before:left-0 before:w-[3px] before:bg-ink before:content-['']",
-  strong: "bg-action font-medium text-on-action",
+    "bg-surface-muted font-medium before:absolute before:inset-y-0 before:left-0 before:w-[3px] before:bg-ink before:content-[''] forced-colors:before:bg-[Highlight]",
+  strong:
+    "bg-action font-medium text-on-action forced-colors:before:absolute forced-colors:before:inset-y-0 forced-colors:before:left-0 forced-colors:before:w-[3px] forced-colors:before:bg-[Highlight] forced-colors:before:content-['']",
 };
 
 export const menuGroupLabel = "px-3 pt-2 pb-1 text-xs text-ink-tertiary";
