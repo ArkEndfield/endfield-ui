@@ -48,6 +48,18 @@ const barVariant: Record<ToolbarVariant, string> = {
   outline: "border border-line-strong bg-surface p-px",
 };
 
+/*
+ * 高对比模式下凹陷的底被系统换成页面色，带子就没了：补一圈线。里面没按下的钮平时就是透明的，
+ * 靠带子围着，所以补的是带子，不是每个钮。线画在内边距里，不占地方；描边的那种本来就有线，
+ * 只把颜色写明。整条禁用时是灰字色
+ */
+const barForced: Record<ToolbarVariant, string> = {
+  sunken:
+    "forced-colors:outline forced-colors:-outline-offset-1 forced-colors:outline-[ButtonText] forced-colors:data-disabled:outline-[GrayText]",
+  outline:
+    "forced-colors:border-[ButtonText] forced-colors:data-disabled:border-[GrayText]",
+};
+
 /**
  * 工具栏：一排作用于同一个对象的小工具，收在一条带子里。整条只占一个 Tab 停靠点，
  * 方向键在各项之间走。里面放 `ToolbarButton`、`ToolbarToggle`、`ToolbarToggleGroup`、
@@ -98,6 +110,7 @@ export function Toolbar({
           // 放不下就换行，不出横向滚动条
           orientation === "vertical" ? "flex-col" : "flex-wrap items-center",
           barVariant[variant],
+          barForced[variant],
           className,
         )}
       />
@@ -140,6 +153,8 @@ const itemBase = [
   "forced-colors:data-pressed:forced-color-adjust-none forced-colors:data-pressed:outline-[Highlight]",
   "forced-colors:data-pressed:bg-[Highlight] forced-colors:data-pressed:text-[HighlightText]",
   "forced-colors:data-disabled:data-pressed:bg-[GrayText] forced-colors:data-disabled:data-pressed:text-[Canvas]",
+  // 禁用的钮还走得到，所以不是真的 disabled：系统不会替它把字换灰，自己写明
+  "forced-colors:data-disabled:text-[GrayText]",
   // 焦点环压在旁边的钮上面
   "focus-visible:z-1",
   focusRing,
@@ -387,6 +402,8 @@ export function ToolbarSeparator({
       {...props}
       className={cn(
         "shrink-0 self-center bg-line-strong",
+        // 高对比模式下这条线是底色画的，会不见：用控件的字色；所在的那一条（或那一组）禁用时跟着灰
+        "forced-colors:bg-[ButtonText] forced-colors:in-data-disabled:bg-[GrayText]",
         "data-[orientation=vertical]:mx-1 data-[orientation=vertical]:h-4 data-[orientation=vertical]:w-px",
         "data-[orientation=horizontal]:my-1 data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-4",
         className,

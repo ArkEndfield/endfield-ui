@@ -1900,3 +1900,65 @@ test("图标按钮：没激活的有一圈线，禁用的是灰字色的线；�
     "32px 那一档的点击区应该还是 40 × 40px",
   );
 });
+
+test("工具栏：带子有一圈线，分隔线看得见；禁用的钮是灰字色，指针停上去也是；整条禁用时线跟着灰", async () => {
+  const { page } = storybook;
+  await open(page, "控件-toolbar-工具栏--playground");
+  const bar = `${ROOT} [role=toolbar]`;
+  const separator = `${bar} [role=separator]`;
+  // 线画在 2px 的内边距里：最上面那一行是线，往里 1px 是线和钮之间的缝
+  await shows(
+    page,
+    await at(page, bar, "center", 0),
+    "ButtonText",
+    "带子应该有一圈线",
+  );
+  await differs(
+    page,
+    await at(page, bar, "center", 1),
+    "ButtonText",
+    "带子的线只有 1px，和里面的钮隔着一条缝",
+  );
+  await declares(page, bar, "outlineColor", "ButtonText");
+  // 横排时分隔线是竖的，横向的位置跟着字宽走，取不准：核对声明
+  await declares(page, separator, "backgroundColor", "ButtonText");
+
+  // 竖排时它是横的，纵向的位置是整数
+  await open(page, "控件-toolbar-工具栏--vertical");
+  await shows(
+    page,
+    await at(page, separator, "center", 0),
+    "ButtonText",
+    "分隔线应该看得见",
+  );
+
+  // 描边的那种本来就有线：只把颜色写明
+  await open(page, "控件-toolbar-工具栏--outline");
+  await declares(page, bar, "borderTopColor", "ButtonText");
+
+  // 三条：禁用一个钮、禁用一组、整条禁用
+  await open(page, "控件-toolbar-工具栏--states");
+  // 禁用的钮还走得到，不是真的 disabled：系统不会替它把字换灰
+  const off = `${bar} [data-disabled]:not([data-pressed])`;
+  await declares(page, off, "color", "GrayText");
+  // 悬停那一档的字色带着状态，优先级和它一样高：指针停在上面也得是灰的
+  await page.moveTo(off);
+  await hovering(page, off);
+  await page.settled();
+  await page.pause(300);
+  assert.ok(
+    await declared(page, off, "color", "GrayText"),
+    "指针停在禁用的钮上：字色不该变回去",
+  );
+
+  await shows(
+    page,
+    await at(page, bar, "center", 0, 2),
+    "GrayText",
+    "整条禁用：带子的线应该是灰字色",
+  );
+  await declares(page, bar, "outlineColor", "GrayText", { nth: 2 });
+  // 这一页有两条分隔线：第二条在整条禁用的那一条里
+  await declares(page, separator, "backgroundColor", "ButtonText");
+  await declares(page, separator, "backgroundColor", "GrayText", { nth: 1 });
+});

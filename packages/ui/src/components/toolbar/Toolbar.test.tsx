@@ -174,6 +174,40 @@ describe("Toolbar", () => {
     );
   });
 
+  it("高对比模式：带子补一圈线，分隔线用控件的字色；没按下的钮不另画框", () => {
+    const { rerender } = render(<Tools />);
+    const toolbar = screen.getByRole("toolbar");
+    // 线画在内边距里，不占地方；整条禁用时是灰字色
+    expect(toolbar).toHaveClass(
+      "forced-colors:outline",
+      "forced-colors:-outline-offset-1",
+      "forced-colors:outline-[ButtonText]",
+      "forced-colors:data-disabled:outline-[GrayText]",
+    );
+    expect(within(toolbar).getByRole("separator")).toHaveClass(
+      "forced-colors:bg-[ButtonText]",
+      "forced-colors:in-data-disabled:bg-[GrayText]",
+    );
+    expect(
+      screen.getByRole("button", { name: "打印" }).className,
+    ).not.toContain("forced-colors:border");
+
+    // 描边的那种本来就有线，只把颜色写明
+    rerender(<Tools variant="outline" />);
+    expect(toolbar).toHaveClass(
+      "forced-colors:border-[ButtonText]",
+      "forced-colors:data-disabled:border-[GrayText]",
+    );
+    expect(toolbar).not.toHaveClass("forced-colors:outline");
+  });
+
+  it("高对比模式：禁用的钮不是真的 disabled，灰字色要自己写", () => {
+    render(<Tools />);
+    const disabled = screen.getByRole("button", { name: "导出" });
+    expect(disabled).not.toBeDisabled();
+    expect(disabled).toHaveClass("forced-colors:data-disabled:text-[GrayText]");
+  });
+
   it("开关钮：受控时只报告", async () => {
     const user = userEvent.setup();
     const onPressedChange = vi.fn();
