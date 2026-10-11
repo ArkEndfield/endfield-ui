@@ -196,6 +196,18 @@ describe("DatePicker", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
+  it("高对比模式：日历图标的颜色写明系统色，禁用时是灰字色", () => {
+    // 颜色写在 <svg> 自己身上，系统不替它换
+    const icon = () => trigger().querySelector("svg:last-child");
+    const { rerender } = render(<Picker />);
+    expect(icon()).toHaveClass("forced-colors:text-[ButtonText]");
+    expect(icon()).not.toHaveClass("forced-colors:text-[GrayText]");
+
+    rerender(<Picker disabled />);
+    expect(icon()).toHaveClass("forced-colors:text-[GrayText]");
+    expect(icon()).not.toHaveClass("forced-colors:text-[ButtonText]");
+  });
+
   it("两种外框、三档尺寸写在外框上", () => {
     const { rerender } = render(<Picker />);
     const box = () => trigger().parentElement!;

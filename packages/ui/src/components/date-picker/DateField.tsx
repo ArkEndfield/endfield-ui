@@ -123,7 +123,11 @@ export function DateField({
             size={iconSize}
             className={cn(
               "shrink-0",
-              disabled ? "text-ink-disabled" : "text-ink-secondary",
+              // 高对比模式：写在 <svg> 自己身上的颜色系统不换（它只替图标换继承来的字色），
+              // 主题里的灰会原样压在使用者定的页面色上。写明系统色，和按钮里的字一起走
+              disabled
+                ? "text-ink-disabled forced-colors:text-[GrayText]"
+                : "text-ink-secondary forced-colors:text-[ButtonText]",
             )}
           />
         </BasePopover.Trigger>

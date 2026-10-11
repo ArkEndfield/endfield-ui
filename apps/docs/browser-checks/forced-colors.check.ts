@@ -1671,3 +1671,25 @@ test("步骤条：已完成是实心块，当前是「选中」色的块，未�
   await open(page, "控件-steps-步骤条--invalid");
   await shows(page, await corner(2), "Canvas", "有误的节点照旧是空心框");
 });
+
+test("日期选择：外框里的日历图标是按钮的字色，禁用的是灰字色", async () => {
+  const { page } = storybook;
+  // 图标的线不到 2px，取不准一个像素：核对声明。颜色写在 <svg> 自己身上，系统不替它换，
+  // 没写明的话计算样式里还是主题的那个灰，和探针对不上
+  const icon = (state: string) =>
+    `${ROOT} div[data-variant] > button:${state} > svg:last-child`;
+  // 都是三个字段：错误、必填、禁用
+  for (const id of [
+    "控件-datepicker-日期选择--states",
+    "控件-daterangepicker-日期范围--states",
+  ]) {
+    await open(page, id);
+    await declares(page, icon("disabled"), "color", "GrayText");
+    await declares(page, icon("enabled"), "color", "ButtonText");
+    assert.equal(
+      await declared(page, icon("enabled"), "color", "GrayText"),
+      false,
+      `${id}：没禁用的日历图标不该是灰字色`,
+    );
+  }
+});
