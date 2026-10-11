@@ -28,10 +28,12 @@ export function MenuCheck({ checked, disabled = false }: MenuCheckProps) {
             ? [
                 "border-ink-disabled bg-surface-sunken text-ink-disabled",
                 // 菱形方案里"已选"只靠实心表达，禁用了也要保持实心
-                checked && "choice-diamond:bg-ink-disabled",
+                checked &&
+                  "choice-diamond:bg-ink-disabled forced-colors:choice-diamond:bg-[GrayText]",
               ]
             : checked
-              ? "border-surface-inverse bg-surface-inverse text-accent-ink-inverse"
+              ? // 高对比模式下反转块没了：和复选框一样改用系统的"选中"色
+                "border-surface-inverse bg-surface-inverse text-accent-ink-inverse forced-colors:border-[Highlight] forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]"
               : "border-line-strong bg-surface-sunken",
         )}
       >

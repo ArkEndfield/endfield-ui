@@ -209,6 +209,28 @@ describe("DropdownMenu", () => {
     );
   });
 
+  it("高对比模式：复选项行首的小方格，已选时改用系统的「选中」色", async () => {
+    render(
+      <DropdownMenu defaultOpen trigger={<button type="button">视图</button>}>
+        <DropdownMenuCheckboxItem defaultChecked>
+          缩略图
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem>紧凑行距</DropdownMenuCheckboxItem>
+      </DropdownMenu>,
+    );
+    const box = (name: string) =>
+      screen
+        .getByRole("menuitemcheckbox", { name })
+        .querySelector("[aria-hidden=true] > span")!;
+    await screen.findByRole("menu");
+    expect(box("缩略图")).toHaveClass(
+      "forced-colors:border-[Highlight]",
+      "forced-colors:bg-[Highlight]",
+      "forced-colors:text-[HighlightText]",
+    );
+    expect(box("紧凑行距").className).not.toContain("forced-colors:");
+  });
+
   it("触发按钮在局部主题里时，面板带上同一个主题", async () => {
     const user = userEvent.setup();
     render(

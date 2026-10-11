@@ -486,3 +486,144 @@ test("页内目录：当前项的粗条是系统的「选中」色", async () =>
     pseudo: "::after",
   });
 });
+
+test("复选与单选：已选的是「选中」色的块，圆点看得见；菱形方案的已选是实心的", async () => {
+  const { page } = storybook;
+  await open(page, "控件-choice-选择控件--checkbox-states");
+  const on = `${ROOT} input[type=checkbox]:checked:enabled`;
+  const off = `${ROOT} input[type=checkbox]:not(:checked, :indeterminate):enabled`;
+  // 方格 20px、描边 2px：往里 4px 是底，对勾还没到这儿
+  await shows(
+    page,
+    await at(page, on, 4, 4),
+    "Highlight",
+    "已选的方格应该是「选中」色的块",
+  );
+  await shows(
+    page,
+    await at(page, `${ROOT} input[type=checkbox]:indeterminate:enabled`, 4, 4),
+    "Highlight",
+    "半选的方格应该是「选中」色的块",
+  );
+  await differs(
+    page,
+    await at(page, off, 4, 4),
+    "Highlight",
+    "没选的方格不该是实心的",
+  );
+
+  await open(page, "控件-choice-选择控件--radio-states");
+  const checked = `${ROOT} input[type=radio]:checked:enabled`;
+  // 圆 20px，圆点 8px 在正中：顶边往里 4px 是底，正中是圆点
+  await shows(
+    page,
+    await at(page, checked, "center", 4),
+    "Highlight",
+    "选中的圆应该是「选中」色的",
+  );
+  await shows(
+    page,
+    await at(page, checked, "center", "center"),
+    "HighlightText",
+    "选中的圆正中应该有一个看得见的圆点",
+  );
+  await differs(
+    page,
+    await at(
+      page,
+      `${ROOT} input[type=radio]:not(:checked):enabled`,
+      "center",
+      4,
+    ),
+    "Highlight",
+    "没选的圆不该是实心的",
+  );
+
+  // 菱形方案没有对勾和圆点，"已选"只靠实心
+  await open(page, "控件-choice-选择控件--diamond");
+  await shows(
+    page,
+    await at(page, on, "center", "center"),
+    "Highlight",
+    "菱形方案里已选的应该是「选中」色的实心菱形",
+  );
+  await differs(
+    page,
+    await at(page, off, "center", "center"),
+    "Highlight",
+    "菱形方案里没选的应该是空心的",
+  );
+});
+
+test("开关：关着看得见轨道和旋钮，开着是「选中」色的实心轨道；双标签开关看得出旋钮在哪边", async () => {
+  const { page } = storybook;
+  await open(page, "控件-choice-选择控件--switch-states");
+  const off = `${ROOT} input[role=switch]:not(:checked):enabled`;
+  const on = `${ROOT} input[role=switch]:checked:enabled`;
+  // 轨道 52 × 28，旋钮 20px：关的时候旋钮在左边，开了到右边
+  await shows(
+    page,
+    await at(page, off, "center", 1),
+    "ButtonText",
+    "关着的开关应该有一圈看得见的边线",
+  );
+  await shows(
+    page,
+    await at(page, off, 14, "center"),
+    "ButtonText",
+    "关着的开关左边应该有一个看得见的旋钮",
+  );
+  await differs(
+    page,
+    await at(page, off, -10, "center"),
+    "Highlight",
+    "关着的开关轨道不该是实心的",
+  );
+  await shows(
+    page,
+    await at(page, on, 10, "center"),
+    "Highlight",
+    "开着的开关轨道应该是「选中」色的",
+  );
+  await shows(
+    page,
+    await at(page, on, -14, "center"),
+    "HighlightText",
+    "开着的开关右边应该有一个看得见的旋钮",
+  );
+
+  await open(page, "控件-choice-选择控件--dual-label-switch");
+  const dual = `${ROOT} input[role=switch]`;
+  // 旋钮盖住半条轨道：两头各往里 7px，在字的外侧
+  await shows(
+    page,
+    await at(page, dual, 7, "center"),
+    "Highlight",
+    "关的时候旋钮应该在左边那个值下面",
+  );
+  await differs(
+    page,
+    await at(page, dual, -7, "center"),
+    "Highlight",
+    "关的时候右边那个值下面不该有旋钮",
+  );
+  // 旋钮上的值、轨道上的值各用各的字色；都不让系统再改颜色
+  await declares(page, `${ROOT} [data-value=off]`, "color", "HighlightText");
+  await declares(page, `${ROOT} [data-value=on]`, "color", "CanvasText");
+  await unadjusted(page, `${ROOT} [data-value=off]`);
+
+  await page.click(dual);
+  await shows(
+    page,
+    await at(page, dual, -7, "center"),
+    "Highlight",
+    "开了之后旋钮应该换到右边",
+  );
+  await differs(
+    page,
+    await at(page, dual, 7, "center"),
+    "Highlight",
+    "开了之后左边不该还有旋钮",
+  );
+  await declares(page, `${ROOT} [data-value=on]`, "color", "HighlightText");
+});

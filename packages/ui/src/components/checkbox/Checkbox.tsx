@@ -69,6 +69,7 @@ export function Checkbox({
               // 半选只属于复选框：一组单选都没选时也会命中 :indeterminate，
               // 所以这两个类不能放进与单选共用的 choiceBox
               "indeterminate:border-surface-inverse indeterminate:bg-surface-inverse",
+              "forced-colors:indeterminate:border-[Highlight] forced-colors:indeterminate:bg-[Highlight]",
               focusRing,
             )}
           />

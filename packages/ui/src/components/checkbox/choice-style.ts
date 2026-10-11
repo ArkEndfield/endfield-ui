@@ -17,9 +17,14 @@ export const choiceControl = "flex h-[1lh] shrink-0 items-center";
  * 祖先上有 data-choice="diamond" 时换成菱形（方案 B）：方格缩到 14px 并转 45°，
  * 对角线正好还是 20px；未选是空心菱形，已选是实心的，不再画对勾和圆点——
  * 所以禁用的"已选"也要保持实心，否则和"未选"分不出来。
+ *
+ * 高对比模式下底色都被系统换掉，反转块就没了：已选的改用系统的"选中"色，
+ * 记号用它上面的字色；禁用的用灰字色（菱形仍然是实心的）。
  */
-export const choiceBox =
-  "peer size-5 shrink-0 appearance-none border-2 choice-diamond:size-3.5 choice-diamond:rotate-45 choice-diamond:checked:disabled:bg-ink-disabled border-line-strong bg-surface-sunken transition-colors duration-(--duration-fast) ease-standard group-hover:border-ink-secondary checked:border-surface-inverse checked:bg-surface-inverse aria-invalid:border-danger disabled:cursor-not-allowed disabled:border-ink-disabled disabled:bg-surface-sunken";
+export const choiceBox = [
+  "peer size-5 shrink-0 appearance-none border-2 choice-diamond:size-3.5 choice-diamond:rotate-45 choice-diamond:checked:disabled:bg-ink-disabled border-line-strong bg-surface-sunken transition-colors duration-(--duration-fast) ease-standard group-hover:border-ink-secondary checked:border-surface-inverse checked:bg-surface-inverse aria-invalid:border-danger disabled:cursor-not-allowed disabled:border-ink-disabled disabled:bg-surface-sunken",
+  "forced-colors:checked:border-[Highlight] forced-colors:checked:bg-[Highlight] forced-colors:disabled:border-[GrayText] forced-colors:disabled:bg-[Canvas] forced-colors:choice-diamond:checked:disabled:bg-[GrayText]",
+].join(" ");
 
 /** 方格 / 圆的定位盒：菱形比它小一圈，所以居中 */
 export const choiceFrame =
@@ -30,4 +35,4 @@ export const choiceFrame =
  * 淡入淡出，和方格换底色的那一下同时走——底色有过渡而记号硬切，看起来是两件事
  */
 export const choiceMark =
-  "pointer-events-none absolute inset-0 m-auto text-accent-ink-inverse opacity-0 transition-opacity duration-(--duration-fast) ease-standard peer-disabled:text-ink-disabled";
+  "pointer-events-none absolute inset-0 m-auto text-accent-ink-inverse opacity-0 transition-opacity duration-(--duration-fast) ease-standard peer-disabled:text-ink-disabled forced-colors:text-[HighlightText] forced-colors:peer-disabled:text-[GrayText]";

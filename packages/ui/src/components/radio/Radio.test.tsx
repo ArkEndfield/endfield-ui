@@ -182,6 +182,21 @@ describe("Radio", () => {
     );
   });
 
+  it("高对比模式：选中的圆改用系统的「选中」色，圆点用它上面的字色", () => {
+    render(<Example />);
+    const standard = screen.getByRole("radio", { name: "标准" });
+    expect(standard).toHaveClass(
+      "forced-colors:checked:border-[Highlight]",
+      "forced-colors:checked:bg-[Highlight]",
+      "forced-colors:disabled:border-[GrayText]",
+      "forced-colors:disabled:bg-[Canvas]",
+    );
+    expect(standard.nextElementSibling).toHaveClass(
+      "forced-colors:bg-[HighlightText]",
+      "forced-colors:peer-disabled:bg-[GrayText]",
+    );
+  });
+
   it("放进菱形方案的容器里，语义与方向键不变", async () => {
     render(
       <div data-choice="diamond">

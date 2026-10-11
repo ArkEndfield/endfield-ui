@@ -172,6 +172,8 @@ export function Radio({
             className={cn(
               choiceMark,
               "size-2 rounded-full bg-accent-ink-inverse peer-checked:opacity-100 peer-disabled:bg-ink-disabled choice-diamond:hidden",
+              // 高对比模式：圆点也是底色画的，换成"选中"色上面的字色
+              "forced-colors:bg-[HighlightText] forced-colors:peer-disabled:bg-[GrayText]",
             )}
           />
         </span>

@@ -62,6 +62,25 @@ describe("Switch", () => {
     ).toBeInTheDocument();
   });
 
+  it("高对比模式：关是一圈边线，开是系统「选中」色的实心轨道，旋钮跟着换色", () => {
+    render(<Switch>自动同步</Switch>);
+    const control = screen.getByRole("switch");
+    expect(control).toHaveClass(
+      "forced-colors:border-2",
+      "forced-colors:border-[ButtonText]",
+      "forced-colors:checked:border-[Highlight]",
+      "forced-colors:checked:bg-[Highlight]",
+      "forced-colors:disabled:border-[GrayText]",
+      "forced-colors:checked:disabled:bg-[GrayText]",
+    );
+    expect(control.nextElementSibling).toHaveClass(
+      "forced-colors:bg-[ButtonText]",
+      "forced-colors:peer-checked:bg-[HighlightText]",
+      "forced-colors:peer-disabled:bg-[GrayText]",
+      "forced-colors:peer-checked:peer-disabled:bg-[Canvas]",
+    );
+  });
+
   describe("双标签", () => {
     it("两个值都写在轨道上，但只是给眼睛看的", () => {
       render(<Switch aria-label="三维视图" offLabel="2D" onLabel="3D" />);
@@ -89,6 +108,31 @@ describe("Switch", () => {
       await userEvent.click(control);
       expect(control).toBeChecked();
       expect(onCheckedChange).toHaveBeenLastCalledWith(true);
+    });
+
+    it("高对比模式：旋钮是系统的「选中」色，压在它上面的那个值用配它的字色", () => {
+      render(<Switch aria-label="三维视图" offLabel="2D" onLabel="3D" />);
+      const control = screen.getByRole("switch");
+      expect(control).toHaveClass(
+        "forced-colors:border",
+        "forced-colors:border-[ButtonText]",
+        "forced-colors:disabled:border-[GrayText]",
+      );
+      expect(control.nextElementSibling).toHaveClass(
+        "forced-colors:bg-[Highlight]",
+        "forced-colors:peer-disabled:bg-[GrayText]",
+      );
+      // 两个值的颜色都写明了，不让系统再改：不然它会在字后面垫一块页面色
+      expect(screen.getByText("2D")).toHaveClass(
+        "forced-colors:forced-color-adjust-none",
+        "forced-colors:text-[HighlightText]",
+        "forced-colors:peer-checked:text-[CanvasText]",
+      );
+      expect(screen.getByText("3D")).toHaveClass(
+        "forced-colors:forced-color-adjust-none",
+        "forced-colors:text-[CanvasText]",
+        "forced-colors:peer-checked:text-[HighlightText]",
+      );
     });
 
     it("可以再带一个右侧的文字标签", () => {

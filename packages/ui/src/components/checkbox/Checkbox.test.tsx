@@ -91,6 +91,28 @@ describe("Checkbox", () => {
     }
   });
 
+  it("高对比模式：已选、半选的方格改用系统的「选中」色，记号用它上面的字色；禁用的用灰字色", () => {
+    const { container } = render(
+      <Checkbox defaultChecked>接收站内信</Checkbox>,
+    );
+    expect(screen.getByRole("checkbox")).toHaveClass(
+      "forced-colors:checked:border-[Highlight]",
+      "forced-colors:checked:bg-[Highlight]",
+      "forced-colors:indeterminate:border-[Highlight]",
+      "forced-colors:indeterminate:bg-[Highlight]",
+      "forced-colors:disabled:border-[GrayText]",
+      "forced-colors:disabled:bg-[Canvas]",
+      // 菱形方案里"已选"只靠实心表达，禁用了也要保持实心
+      "forced-colors:choice-diamond:checked:disabled:bg-[GrayText]",
+    );
+    for (const mark of container.querySelectorAll("svg")) {
+      expect(mark).toHaveClass(
+        "forced-colors:text-[HighlightText]",
+        "forced-colors:peer-disabled:text-[GrayText]",
+      );
+    }
+  });
+
   it("放进菱形方案的容器里，语义与行为不变", async () => {
     render(
       <div data-choice="diamond">
