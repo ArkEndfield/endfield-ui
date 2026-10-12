@@ -110,6 +110,7 @@ import { AnimatedDialog, RoundedButton } from "@endfield-ui/react/game";
 | `--ef-game-item-tooltip-detail` | `detail.png` | `ItemTooltipCard` 正文的底图（九宫格） |
 | `--ef-game-item-tooltip-link-icon` | `link.webp` | `ItemTooltipCard` 的详情入口 |
 
+- 开关和变量管的都是图片。`AnimatedDialog` 装饰条上那两处游戏英文名是代码画的字，不受它们管；要去掉，在自己的样式里把 `.ef-animated-dialog__title-deco`（标题带右边的大字）和 `.ef-animated-dialog__top-deco > svg:first-child`（顶条上的小字）藏掉，用 `visibility: hidden`，位置留着。
 - 换了 `ItemCard` 的背景就不再分亮暗；要分，在各自的主题容器（`[data-theme="dark"]`）上各设一次。
 - 正文底图和详情入口写 `none` 之后没有替代的画法（文字会压在深色上、入口看不见）：这两张要么换成自己的，要么用上面的总开关。
 - 名字以 `-default` 结尾的同名变量是库里的出厂值，不要改它们。
