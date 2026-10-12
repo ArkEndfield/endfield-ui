@@ -36,6 +36,7 @@
 - 其中 `banner-alert/assets/deco_common_logo_bg.png` 里是官方的「终末地 / ENDFIELD INDUSTRIES」标志；`AnimatedDialog` 的装饰条上有代码画的 `ARKNIGHTS:ENDFIELD`、`ENDFIELD` 字样。这两处涉及商标。
 - 逐张的路径、尺寸、字节数、SHA256 和来源登记在 [`packages/ui/src/game/resource-provenance.json`](packages/ui/src/game/resource-provenance.json)，随包在 `dist/game/resource-provenance.json`。发布的包里，这些图片只在 `dist/game/assets/` 一处。
 - 主入口（`@endfield-ui/react`）、主样式、令牌和母题工具类里没有它们。不引 `@endfield-ui/react/game` 和 `@endfield-ui/react/game.css`，就不会加载其中任何一张。
+- 使用方可以整类关掉这些图片（在 `<html>` 上写 `data-ef-game-images="off"`，控件退回代码画的样子），也可以经变量逐张换成自己的。
 - 权利人提出异议时，我们会拿掉被指出的图片、发补丁版本，并把受影响的旧版本在 npm 上标记为弃用。这个入口的图片不在语义化版本的承诺之内。
 
 风险和处理的完整说明、给使用方的建议，见 [docs/design/game/README.md](docs/design/game/README.md#风险与处理)。

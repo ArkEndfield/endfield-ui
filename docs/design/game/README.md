@@ -74,9 +74,45 @@ import { AnimatedDialog, RoundedButton } from "@endfield-ui/react/game";
 
 - **隔离。** 图片只放在 `packages/ui/src/game/<控件>/assets/`；发布的包里只在 `dist/game/assets/` 一处，只被 `game.css` 引用。主入口、主样式、令牌和母题工具类里没有它们。有测试守着：game 目录之外不许有图片，主库不许引 game 目录里的任何东西。
 - **登记。** 每一张都在清单里，文件的字节和清单对不上，测试就不过；要加图，先加清单。
+- **可以关，可以换。** 一个开关整类不加载官方图片，每一张也能单独换成你自己的，见下面的[换掉或关掉图片](#换掉或关掉图片)。
 - **撤下的流程。** 权利人通过 [Issue](https://github.com/icaruszezen/endfield-ui/issues) 联系即可。我们会拿掉被指出的图片，发一个补丁版本，并把受影响的旧版本在 npm 上标记为弃用。
-- **图片不在语义化版本的承诺之内。** 撤换这个入口的图片不算破坏性变更，不会为它升主版本号。控件的接口（属性、导出、类名）照常按语义化版本走；图片拿掉之后，控件退回没有图的画法，照常能用。
+- **图片不在语义化版本的承诺之内。** 撤换这个入口的图片不算破坏性变更，不会为它升主版本号。控件的接口（属性、导出、类名、下面的变量和开关）照常按语义化版本走；图片拿掉之后，控件退回没有图的画法——就是关掉开关时的样子，照常能用。
 - **高对比模式下本来就不画。** 系统的高对比模式（`forced-colors`）里，这些装饰图整个不显示。
+
+### 换掉或关掉图片
+
+**整类关掉**：在祖先元素上写 `data-ef-game-images="off"`。弹窗和悬浮卡挂在 `<body>` 下，所以写在 `<html>` 上最省事：
+
+```html
+<html data-ef-game-images="off">
+```
+
+关了之后这一类的控件不再请求任何一张官方图片，退回代码画的样子：按钮没有纹理，两种确认提示是白底，物品卡片的背景是一块跟主题的底色、稀有度是一条色带，详情卡的标题没有纹理、正文底是一段渐变、详情入口是一个画出来的箭头。预览站的"Game 实机风格 / 示例 / 关掉官方图片"就是这个样子。
+
+**单独换一张**：每张图都经一个变量引用，设了就用你的，写 `none` 就是不画。写在 `:root` 上：
+
+```css
+:root {
+  --ef-game-alert-logo: url("/brand/my-mark.svg");
+  --ef-game-button-texture: none;
+}
+```
+
+| 变量 | 默认的图 | 用在 |
+| --- | --- | --- |
+| `--ef-game-button-texture` | `pag-button-texture.png` | `RoundedIconButton` 的纹理 |
+| `--ef-game-alert-banner-left`、`--ef-game-alert-banner-right` | `alert_banner_bg_left.png`、`alert_banner_bg_right.png` | 两种确认提示顶上的横幅 |
+| `--ef-game-alert-background` | `alert_bg.png` | `BannerAlert` 右下的底图 |
+| `--ef-game-alert-logo` | `deco_common_logo_bg.png`（官方标志） | `FullWidthAlert` 左下的底图 |
+| `--ef-game-itemcard-bg-item`、`--ef-game-itemcard-bg-weapon`、`--ef-game-itemcard-bg-enemy` | 各有亮暗两张，跟着主题取 | `ItemCard` 的背景 |
+| `--ef-game-itemcard-edge-1` … `--ef-game-itemcard-edge-6` | `icon_card_rarity_1_bottom_edge.webp` … `6` | `ItemCard` 的稀有度底边 |
+| `--ef-game-item-tooltip-header` | `header.webp` | `ItemTooltipCard` 标题的纹理 |
+| `--ef-game-item-tooltip-detail` | `detail.png` | `ItemTooltipCard` 正文的底图（九宫格） |
+| `--ef-game-item-tooltip-link-icon` | `link.webp` | `ItemTooltipCard` 的详情入口 |
+
+- 换了 `ItemCard` 的背景就不再分亮暗；要分，在各自的主题容器（`[data-theme="dark"]`）上各设一次。
+- 正文底图和详情入口写 `none` 之后没有替代的画法（文字会压在深色上、入口看不见）：这两张要么换成自己的，要么用上面的总开关。
+- 名字以 `-default` 结尾的同名变量是库里的出厂值，不要改它们。
 
 ### 给使用方的建议
 

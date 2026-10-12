@@ -1,8 +1,12 @@
 .ef-alert-modal-viewport {
-  --ef-game-alert-background: url("./assets/alert_bg.png");
-  --ef-game-alert-banner-left: url("./assets/alert_banner_bg_left.png");
-  --ef-game-alert-banner-right: url("./assets/alert_banner_bg_right.png");
-  --ef-game-alert-logo: url("./assets/deco_common_logo_bg.png");
+  /*
+   * 四张图的出厂值，两种提示共用。要换图，设不带 -default 的同名变量
+   * （--ef-game-alert-logo 等，写在 :root 上就行），不要改这几个。
+   */
+  --ef-game-alert-background-default: url("./assets/alert_bg.png");
+  --ef-game-alert-banner-left-default: url("./assets/alert_banner_bg_left.png");
+  --ef-game-alert-banner-right-default: url("./assets/alert_banner_bg_right.png");
+  --ef-game-alert-logo-default: url("./assets/deco_common_logo_bg.png");
   position: fixed;
   inset: 0;
   z-index: var(--z-overlay, 300);
@@ -44,7 +48,10 @@
   padding: 1.7em 0 16px;
   border-radius: 0.2em;
   background-color: #fefefe;
-  background-image: var(--ef-game-alert-background);
+  background-image: var(
+    --ef-game-alert-background,
+    var(--ef-game-alert-background-default)
+  );
   background-repeat: no-repeat;
   background-size: 90% auto;
   background-position: bottom right;
@@ -69,14 +76,22 @@
   flex: 1;
   height: 100%;
   padding-right: 30%;
-  background: var(--ef-game-alert-banner-left) top left / contain repeat-x;
+  background: var(
+      --ef-game-alert-banner-left,
+      var(--ef-game-alert-banner-left-default)
+    )
+    top left / contain repeat-x;
 }
 .ef-banner-alert__banner > :last-child {
   display: block;
   flex-shrink: 0;
   width: calc(4.5em * 353 / 228);
   height: 4.5em;
-  background: var(--ef-game-alert-banner-right) top right / 100% 100% no-repeat;
+  background: var(
+      --ef-game-alert-banner-right,
+      var(--ef-game-alert-banner-right-default)
+    )
+    top right / 100% 100% no-repeat;
 }
 .ef-banner-alert__content {
   position: relative;
@@ -183,4 +198,18 @@
   .ef-banner-alert__banner {
     display: none;
   }
+}
+
+/* 关掉官方图片：横幅和底图都不画，剩一张白卡片 */
+.ef-banner-alert:is(
+  [data-ef-game-images="off"],
+  [data-ef-game-images="off"] *
+) {
+  background-image: none;
+}
+.ef-banner-alert__banner:is(
+  [data-ef-game-images="off"],
+  [data-ef-game-images="off"] *
+) {
+  display: none;
 }

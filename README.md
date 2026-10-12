@@ -91,7 +91,7 @@ import "@endfield-ui/react/game.css";
 import { AnimatedDialog, RoundedButton } from "@endfield-ui/react/game";
 ```
 
-> **这个入口带着 25 张官方图片**（界面纹理、卡片背景、一张官方标志），没有取得授权，MIT 许可不覆盖它们；权利人提出异议时会撤下。不引它，主入口和主样式里就没有其中任何一张。用之前请读[风险与处理](docs/design/game/README.md#风险与处理)。
+> **这个入口带着 25 张官方图片**（界面纹理、卡片背景、一张官方标志），没有取得授权，MIT 许可不覆盖它们；权利人提出异议时会撤下。不引它，主入口和主样式里就没有其中任何一张。在 `<html>` 上写 `data-ef-game-images="off"` 可以整类关掉。用之前请读[风险与处理](docs/design/game/README.md#风险与处理)。
 
 ### 在本地看
 

@@ -130,7 +130,11 @@
 }
 
 .ef-rounded-icon-button-texture {
-  background: url("./assets/pag-button-texture.png") center / cover no-repeat;
+  background: var(
+      --ef-game-button-texture,
+      url("./assets/pag-button-texture.png")
+    )
+    center / cover no-repeat;
   opacity: 0.4;
 }
 
@@ -231,4 +235,12 @@
     border-color: ButtonText;
     border-top-color: Highlight;
   }
+}
+
+/* 关掉官方图片：纹理不画，剩下底色和双边线 */
+.ef-rounded-icon-button-texture:is(
+  [data-ef-game-images="off"],
+  [data-ef-game-images="off"] *
+) {
+  display: none;
 }

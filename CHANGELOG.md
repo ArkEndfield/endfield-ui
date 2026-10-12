@@ -19,7 +19,7 @@ import { AnimatedDialog, RoundedButton } from "@endfield-ui/react/game";
 - `ItemCard`、`ItemIcon`：带稀有度、库存的物品卡片与分层图标。
 - `ItemTooltipCard`、`ItemHoverCard`、`ItemHoverCardLayer`：物品详情卡，单个控件或整片网格的悬浮预览。
 
-**这个入口带着官方图片**（20 张随包发在 `dist/game/assets`），没有取得授权，MIT 许可不覆盖它们；权利人提出异议时会撤下并发补丁版本，这些图片不在语义化版本的承诺之内。用之前请读[风险与处理](docs/design/game/README.md#风险与处理)。
+**这个入口带着官方图片**（20 张随包发在 `dist/game/assets`），没有取得授权，MIT 许可不覆盖它们；权利人提出异议时会撤下并发补丁版本，这些图片不在语义化版本的承诺之内。在 `<html>` 上写 `data-ef-game-images="off"` 可以整类关掉，每张图也能经 `--ef-game-*` 变量换成自己的。用之前请读[风险与处理](docs/design/game/README.md#风险与处理)。
 
 主入口没有变：`@endfield-ui/react` 的导出、`styles.css` 和 `tailwind.css` 里没有这一类的任何东西，不引 `/game` 的项目升级后产物不变。
 

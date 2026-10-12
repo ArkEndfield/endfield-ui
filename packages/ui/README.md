@@ -828,6 +828,7 @@ import {
 - `game.css` 用不用 Tailwind 都是这一份，**和主样式一起引**（`tailwind.css` 或 `styles.css`）。从脚本里 `import`，让打包工具去处理里面图片的相对地址。
 - 规则都在 `components` 层：你在 `className`、`classNames` 里写的工具类盖得掉默认值；和主样式谁先加载都一样。
 - 和主库的控件可以混着用：用到的 `Field` 上下文、局部主题和主入口是同一份。弹窗和确认提示的正文区是一块局部的亮色主题，暗色页面上放进去的主库控件也按亮色取值。
+- 不想加载官方图片：在 `<html>` 上写 `data-ef-game-images="off"`，整类退回代码画的样子；每张图也能经 `--ef-game-*` 变量单独换掉，变量表见[换掉或关掉图片](https://github.com/icaruszezen/endfield-ui/blob/main/docs/design/game/README.md#换掉或关掉图片)。
 - 主库里名字相近的 `Dialog`、`Select`、`Button`、`SegmentedControl`、`Switch`、`Alert`、`ItemSlot`、`HoverCard` 不因为它而变。
 
 > **这个入口带着 25 张官方图片**（界面纹理、卡片背景、一张官方标志；其中 20 张随包发在 `dist/game/assets`），没有取得授权，MIT 许可不覆盖它们。权利人提出异议时我们会撤下并发补丁版本——这些图片不在语义化版本的承诺之内。不引这个入口，你的产物里不会有其中任何一张，但 npm 包里仍然带着这些文件。用之前请读[风险与处理](https://github.com/icaruszezen/endfield-ui/blob/main/docs/design/game/README.md#风险与处理)。

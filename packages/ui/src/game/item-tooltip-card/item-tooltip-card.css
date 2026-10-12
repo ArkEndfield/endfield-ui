@@ -84,7 +84,8 @@
 .ef-item-tooltip-card__header-texture {
   position: absolute;
   inset: 0;
-  background: url("./assets/header.webp") center / 100% 100% no-repeat;
+  background: var(--ef-game-item-tooltip-header, url("./assets/header.webp"))
+    center / 100% 100% no-repeat;
   opacity: 0.78;
   pointer-events: none;
 }
@@ -100,7 +101,8 @@
   display: block;
   width: 32px;
   height: 32px;
-  background: url("./assets/link.webp") center / contain no-repeat;
+  background: var(--ef-game-item-tooltip-link-icon, url("./assets/link.webp"))
+    center / contain no-repeat;
   pointer-events: none;
 }
 
@@ -126,7 +128,10 @@
   inset: 60px 0 0;
   border: solid transparent;
   border-width: 126px 5px 0;
-  border-image-source: url("./assets/detail.png");
+  border-image-source: var(
+    --ef-game-item-tooltip-detail,
+    url("./assets/detail.png")
+  );
   border-image-slice: 222 8 14 8 fill;
   border-image-repeat: stretch;
   filter: brightness(1.1);
@@ -342,6 +347,57 @@ a.ef-item-tooltip-card__obtain-row:focus-visible {
 
   .ef-item-tooltip-card__detail-link-icon {
     background: ButtonText;
-    mask: url("./assets/link.webp") center / contain no-repeat;
+    mask: var(--ef-game-item-tooltip-link-icon, url("./assets/link.webp"))
+      center / contain no-repeat;
+  }
+}
+
+/*
+ * 关掉官方图片：标题纹理不画；正文底图换成代码画的渐变（上面透明、往下变成浅灰，
+ * 文字压在浅灰上）；详情入口换成代码画的一个箭头。
+ */
+.ef-item-tooltip-card__header-texture:is(
+  [data-ef-game-images="off"],
+  [data-ef-game-images="off"] *
+) {
+  display: none;
+}
+.ef-item-tooltip-card__detail-texture:is(
+  [data-ef-game-images="off"],
+  [data-ef-game-images="off"] *
+) {
+  border: 0;
+  border-image: none;
+  border-radius: 0 0 4px 4px;
+  background: linear-gradient(to bottom, transparent, #cdcdcb 126px);
+}
+.ef-item-tooltip-card__detail-link-icon:is(
+  [data-ef-game-images="off"],
+  [data-ef-game-images="off"] *
+) {
+  background: none;
+  border: 2px solid currentColor;
+  border-radius: 2px;
+}
+.ef-item-tooltip-card__detail-link-icon:is(
+    [data-ef-game-images="off"],
+    [data-ef-game-images="off"] *
+  )::before {
+  display: block;
+  width: 10px;
+  height: 10px;
+  margin: 9px 0 0 6px;
+  border: solid currentColor;
+  border-width: 2px 2px 0 0;
+  transform: rotate(45deg);
+  content: "";
+}
+@media (forced-colors: active) {
+  .ef-item-tooltip-card__detail-link-icon:is(
+    [data-ef-game-images="off"],
+    [data-ef-game-images="off"] *
+  ) {
+    background: none;
+    mask: none;
   }
 }

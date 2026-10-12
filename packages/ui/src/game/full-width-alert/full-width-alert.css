@@ -72,7 +72,8 @@
   left: -2em;
   width: 100%;
   height: calc(100% - 1em);
-  background: var(--ef-game-alert-logo) bottom left / contain no-repeat;
+  background: var(--ef-game-alert-logo, var(--ef-game-alert-logo-default))
+    bottom left / contain no-repeat;
 }
 
 .ef-full-width-alert-color-bar {
@@ -105,14 +106,22 @@
   flex: 1;
   height: 100%;
   padding-right: 30%;
-  background: var(--ef-game-alert-banner-left) top left / contain repeat-x;
+  background: var(
+      --ef-game-alert-banner-left,
+      var(--ef-game-alert-banner-left-default)
+    )
+    top left / contain repeat-x;
 }
 
 .ef-full-width-alert-banner-right {
   flex-shrink: 0;
   width: calc(3em * 353 / 228);
   height: 3em;
-  background: var(--ef-game-alert-banner-right) center / contain no-repeat;
+  background: var(
+      --ef-game-alert-banner-right,
+      var(--ef-game-alert-banner-right-default)
+    )
+    center / contain no-repeat;
 }
 
 .ef-full-width-alert-content {
@@ -274,4 +283,16 @@
   .ef-full-width-alert-thumb {
     background: CanvasText;
   }
+}
+
+/* 关掉官方图片：标志底图和横幅不画，顶上的三色条是代码画的，留着 */
+.ef-full-width-alert-logo:is(
+  [data-ef-game-images="off"],
+  [data-ef-game-images="off"] *
+),
+.ef-full-width-alert-banner:is(
+  [data-ef-game-images="off"],
+  [data-ef-game-images="off"] *
+) {
+  display: none;
 }

@@ -2,32 +2,38 @@
  * 物品、武器、敌人的背景各有亮暗两张，跟着最近的主题走：变量挂在主题范围上，
  * 靠继承取到最近的那一份（和 theme.css 的做法一样，反转块取相反的那一套）。
  * 这是这一类的样式里唯一不以 `.ef-` 类起头的规则，只声明 `--ef-game-*` 变量。
+ * 这里声明的是出厂值（-default）。要换图，设不带 -default 的同名变量
+ * （--ef-game-itemcard-bg-item 等），不要改这几个。
  *
  * 本库不跟系统的暗色偏好：没写 data-theme 就是亮色，这里也一样。
  */
 :root,
 [data-theme="light"] {
-  --ef-game-itemcard-bg-item: url("./assets/items_background.webp");
-  --ef-game-itemcard-bg-weapon: url("./assets/weapons_background.webp");
-  --ef-game-itemcard-bg-enemy: url("./assets/enemies_background.webp");
-  --ef-game-itemcard-x-bg-item: url("./assets/items_background_dark.webp");
-  --ef-game-itemcard-x-bg-weapon: url("./assets/weapons_background_dark.webp");
-  --ef-game-itemcard-x-bg-enemy: url("./assets/enemies_background_dark.webp");
+  --ef-game-itemcard-bg-item-default: url("./assets/items_background.webp");
+  --ef-game-itemcard-bg-weapon-default: url("./assets/weapons_background.webp");
+  --ef-game-itemcard-bg-enemy-default: url("./assets/enemies_background.webp");
+  --ef-game-itemcard-x-bg-item-default: url("./assets/items_background_dark.webp");
+  --ef-game-itemcard-x-bg-weapon-default: url("./assets/weapons_background_dark.webp");
+  --ef-game-itemcard-x-bg-enemy-default: url("./assets/enemies_background_dark.webp");
 }
 
 [data-theme="dark"] {
-  --ef-game-itemcard-bg-item: url("./assets/items_background_dark.webp");
-  --ef-game-itemcard-bg-weapon: url("./assets/weapons_background_dark.webp");
-  --ef-game-itemcard-bg-enemy: url("./assets/enemies_background_dark.webp");
-  --ef-game-itemcard-x-bg-item: url("./assets/items_background.webp");
-  --ef-game-itemcard-x-bg-weapon: url("./assets/weapons_background.webp");
-  --ef-game-itemcard-x-bg-enemy: url("./assets/enemies_background.webp");
+  --ef-game-itemcard-bg-item-default: url("./assets/items_background_dark.webp");
+  --ef-game-itemcard-bg-weapon-default: url("./assets/weapons_background_dark.webp");
+  --ef-game-itemcard-bg-enemy-default: url("./assets/enemies_background_dark.webp");
+  --ef-game-itemcard-x-bg-item-default: url("./assets/items_background.webp");
+  --ef-game-itemcard-x-bg-weapon-default: url("./assets/weapons_background.webp");
+  --ef-game-itemcard-x-bg-enemy-default: url("./assets/enemies_background.webp");
 }
 
 [data-theme="inverse"] {
-  --ef-game-itemcard-bg-item: var(--ef-game-itemcard-x-bg-item);
-  --ef-game-itemcard-bg-weapon: var(--ef-game-itemcard-x-bg-weapon);
-  --ef-game-itemcard-bg-enemy: var(--ef-game-itemcard-x-bg-enemy);
+  --ef-game-itemcard-bg-item-default: var(--ef-game-itemcard-x-bg-item-default);
+  --ef-game-itemcard-bg-weapon-default: var(
+    --ef-game-itemcard-x-bg-weapon-default
+  );
+  --ef-game-itemcard-bg-enemy-default: var(
+    --ef-game-itemcard-x-bg-enemy-default
+  );
 }
 
 .ef-item-card {
@@ -59,20 +65,31 @@
 }
 
 .ef-item-card-background {
+  /* 图没了（被换成 none，或者关掉了官方图片）也有一块跟主题的底 */
+  background-color: var(--ef-surface-muted, #e6e6e6);
   background-position: center;
   background-size: cover;
 }
 
 .ef-item-card[data-kind="item"] .ef-item-card-background {
-  background-image: var(--ef-game-itemcard-bg-item);
+  background-image: var(
+    --ef-game-itemcard-bg-item,
+    var(--ef-game-itemcard-bg-item-default)
+  );
 }
 
 .ef-item-card[data-kind="weapon"] .ef-item-card-background {
-  background-image: var(--ef-game-itemcard-bg-weapon);
+  background-image: var(
+    --ef-game-itemcard-bg-weapon,
+    var(--ef-game-itemcard-bg-weapon-default)
+  );
 }
 
 .ef-item-card[data-kind="enemy"] .ef-item-card-background {
-  background-image: var(--ef-game-itemcard-bg-enemy);
+  background-image: var(
+    --ef-game-itemcard-bg-enemy,
+    var(--ef-game-itemcard-bg-enemy-default)
+  );
 }
 
 .ef-item-card-art {
@@ -135,27 +152,45 @@
 }
 
 .ef-item-card[data-rarity="1"] .ef-item-card-edge {
-  background-image: url("./assets/icon_card_rarity_1_bottom_edge.webp");
+  background-image: var(
+    --ef-game-itemcard-edge-1,
+    url("./assets/icon_card_rarity_1_bottom_edge.webp")
+  );
 }
 
 .ef-item-card[data-rarity="2"] .ef-item-card-edge {
-  background-image: url("./assets/icon_card_rarity_2_bottom_edge.webp");
+  background-image: var(
+    --ef-game-itemcard-edge-2,
+    url("./assets/icon_card_rarity_2_bottom_edge.webp")
+  );
 }
 
 .ef-item-card[data-rarity="3"] .ef-item-card-edge {
-  background-image: url("./assets/icon_card_rarity_3_bottom_edge.webp");
+  background-image: var(
+    --ef-game-itemcard-edge-3,
+    url("./assets/icon_card_rarity_3_bottom_edge.webp")
+  );
 }
 
 .ef-item-card[data-rarity="4"] .ef-item-card-edge {
-  background-image: url("./assets/icon_card_rarity_4_bottom_edge.webp");
+  background-image: var(
+    --ef-game-itemcard-edge-4,
+    url("./assets/icon_card_rarity_4_bottom_edge.webp")
+  );
 }
 
 .ef-item-card[data-rarity="5"] .ef-item-card-edge {
-  background-image: url("./assets/icon_card_rarity_5_bottom_edge.webp");
+  background-image: var(
+    --ef-game-itemcard-edge-5,
+    url("./assets/icon_card_rarity_5_bottom_edge.webp")
+  );
 }
 
 .ef-item-card[data-rarity="6"] .ef-item-card-edge {
-  background-image: url("./assets/icon_card_rarity_6_bottom_edge.webp");
+  background-image: var(
+    --ef-game-itemcard-edge-6,
+    url("./assets/icon_card_rarity_6_bottom_edge.webp")
+  );
 }
 
 .ef-item-card-strip-content {
@@ -291,4 +326,100 @@
   .ef-item-card-link:focus-visible {
     outline-color: ButtonText;
   }
+}
+
+/*
+ * 关掉官方图片：背景只剩那块底色；稀有度改成代码画的一条色带，颜色和详情卡标题的一样。
+ * 选择器里带上 [data-kind]，是为了压过上面按种类选背景的那三条。
+ */
+.ef-item-card[data-kind]
+  .ef-item-card-background:is(
+    [data-ef-game-images="off"],
+    [data-ef-game-images="off"] *
+  ) {
+  background-image: none;
+}
+
+.ef-item-card[data-rarity="1"]
+  .ef-item-card-edge:is(
+    [data-ef-game-images="off"],
+    [data-ef-game-images="off"] *
+  ) {
+  background-image:
+    linear-gradient(to top, #9b9b9b 0 3px, transparent 3px),
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--ef-surface, #fff) 62%, transparent),
+      transparent
+    );
+}
+
+.ef-item-card[data-rarity="2"]
+  .ef-item-card-edge:is(
+    [data-ef-game-images="off"],
+    [data-ef-game-images="off"] *
+  ) {
+  background-image:
+    linear-gradient(to top, #abce42 0 3px, transparent 3px),
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--ef-surface, #fff) 62%, transparent),
+      transparent
+    );
+}
+
+.ef-item-card[data-rarity="3"]
+  .ef-item-card-edge:is(
+    [data-ef-game-images="off"],
+    [data-ef-game-images="off"] *
+  ) {
+  background-image:
+    linear-gradient(to top, #26bbfd 0 3px, transparent 3px),
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--ef-surface, #fff) 62%, transparent),
+      transparent
+    );
+}
+
+.ef-item-card[data-rarity="4"]
+  .ef-item-card-edge:is(
+    [data-ef-game-images="off"],
+    [data-ef-game-images="off"] *
+  ) {
+  background-image:
+    linear-gradient(to top, #9452fa 0 3px, transparent 3px),
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--ef-surface, #fff) 62%, transparent),
+      transparent
+    );
+}
+
+.ef-item-card[data-rarity="5"]
+  .ef-item-card-edge:is(
+    [data-ef-game-images="off"],
+    [data-ef-game-images="off"] *
+  ) {
+  background-image:
+    linear-gradient(to top, #ffbb03 0 3px, transparent 3px),
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--ef-surface, #fff) 62%, transparent),
+      transparent
+    );
+}
+
+.ef-item-card[data-rarity="6"]
+  .ef-item-card-edge:is(
+    [data-ef-game-images="off"],
+    [data-ef-game-images="off"] *
+  ) {
+  background-image:
+    linear-gradient(to top, #ff7100 0 3px, transparent 3px),
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--ef-surface, #fff) 62%, transparent),
+      transparent
+    );
 }
