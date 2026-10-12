@@ -59,7 +59,7 @@
 | 表单 | Field、Input、OtpInput、Textarea、Select / RoundedSelect、Combobox、TagInput、DatePicker / DateRangePicker / Calendar、FileUpload / FileItem、Checkbox、Radio / RadioGroup、SegmentedControl、Switch / RoundedSwitch、Stepper、Slider、FilterChip |
 | 反馈 | Alert / BannerAlert / FullWidthAlert、Toast、Progress / ProgressRing、Spinner、Skeleton、EmptyState、Loader、CompletionBanner、RecIndicator |
 | 浮层 | Tooltip、Popover、HoverCard、Dialog / AnimatedDialog、Drawer、DropdownMenu、ContextMenu、FlyoutBar |
-| 展示 | Table（行能展开）、Stat、RollingNumber、Sparkline、DataRowList / DataRow、List / ListRow、Accordion、ScrollArea、MediaCard、PlayButton / PlayMark、Carousel、ImageViewer、ItemSlot / ItemGrid、Avatar、Timeline、Schedule、Term、ResourceChip、Countdown、Marquee、ScrollHint |
+| 展示 | Table（行能展开）、Stat、RollingNumber、Sparkline、DataRowList / DataRow、List / ListRow、Accordion、ScrollArea、MediaCard、PlayButton / PlayMark、Carousel、ImageViewer、ItemSlot / ItemGrid、ItemCard / ItemIcon、Avatar、Timeline、Schedule、Term、ResourceChip、Countdown、Marquee、ScrollHint |
 | 导航 | SideRail（含二级）、TopBar、NavMenu、NavAction、PageHeader、Breadcrumb、Pagination、Navigator、AvatarSwitcher、DashIndicator、Steps、Toc、BackToTop |
 | 母题 | CornerBrackets、Viewfinder、GhostText、Hatch、Texture、RegistrationStrip、TickRing、HazardStripe |
 
@@ -76,6 +76,8 @@
 `RoundedButton`、`RoundedIconButton`、`RoundedToggle`、`RoundedSwitch` 保留同一来源的圆角外观，全部不带声音。圆形图标按钮的一张纹理随包提供，使用时不请求外链；用法与图片来源见[圆角控件](docs/design/components/rounded-controls.md)。
 
 确认提示使用 `BannerAlert` 或 `FullWidthAlert`：前者是紧凑卡片，后者横贯视口。它们复用无音效圆角按钮，四张装饰图片随包提供；原有 `Alert` 继续作为页面内提示条。用法与资源清单见[确认提示](docs/design/components/confirmation-alerts.md)。
+
+`ItemCard` 和 `ItemIcon` 来自 EndfieldWiki，提供六档稀有度、物品 / 武器 / 敌人背景、库存数量和分层图标。亮暗背景、稀有度底边及示例图片均保存在本地；用法与来源见[物品卡片](docs/design/components/item-cards.md)。
 
 [![同一组控件在亮暗两个主题下的截图，上半是默认的信号黄，下半把强调色换成了青色](docs/screenshots/takeover.png)](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-主题色接管--takeover)
 

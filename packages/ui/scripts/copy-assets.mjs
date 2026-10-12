@@ -25,3 +25,29 @@ for (const filename of [
     new URL(filename, destination),
   );
 }
+
+const itemAssets = new URL(
+  "../src/components/item-card/assets/",
+  import.meta.url,
+);
+for (const filename of [
+  "items_background.webp",
+  "items_background_dark.webp",
+  "weapons_background.webp",
+  "weapons_background_dark.webp",
+  "enemies_background.webp",
+  "enemies_background_dark.webp",
+  "icon_card_rarity_1_bottom_edge.webp",
+  "icon_card_rarity_2_bottom_edge.webp",
+  "icon_card_rarity_3_bottom_edge.webp",
+  "icon_card_rarity_4_bottom_edge.webp",
+  "icon_card_rarity_5_bottom_edge.webp",
+  "icon_card_rarity_6_bottom_edge.webp",
+  "prism.webp",
+  "crystal-shell.webp",
+  "copper-bottle.webp",
+  "copper-bottle-content.webp",
+  "gold-ticket.webp",
+]) {
+  await copyFile(new URL(filename, itemAssets), new URL(filename, destination));
+}

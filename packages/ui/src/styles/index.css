@@ -17,6 +17,8 @@
 @import "../components/rounded-switch/rounded-switch.css";
 @import "../components/banner-alert/banner-alert.css";
 @import "../components/full-width-alert/full-width-alert.css";
+@import "../components/item-icon/item-icon.css";
+@import "../components/item-card/item-card.css";
 
 /*
  * 让 Tailwind 扫到本包用到的类名。要扫整个 src，不能只扫 components：

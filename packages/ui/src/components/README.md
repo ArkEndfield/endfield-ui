@@ -41,6 +41,8 @@
 | `carousel/` | `Carousel`、`CarouselSlide`（媒体轮播） | [卡片](../../../../docs/design/components/card.md) |
 | `image-viewer/` | `ImageViewer`、`ImageViewerItem`（图片查看：缩略图点开看大图） | [卡片](../../../../docs/design/components/card.md) |
 | `item-slot/` | `ItemSlot`、`ItemGrid`（方向键导航的矩阵） | [卡片](../../../../docs/design/components/card.md) |
+| `item-card/` | `ItemCard`（稀有度卡片与库存） | [物品卡片](../../../../docs/design/components/item-cards.md) |
+| `item-icon/` | `ItemIcon`（分层物品图标） | [物品卡片](../../../../docs/design/components/item-cards.md) |
 | `table/` | `Table`、`TableHead`、`TableBody`、`TableRow`、`TableHeaderCell`、`TableCell`、`TableExpander`（行展开的钮） | [数据展示](../../../../docs/design/components/data-display.md) |
 | `timeline/` | `Timeline`、`TimelineItem` | [数据展示](../../../../docs/design/components/data-display.md) |
 | `schedule/` | `Schedule`、`ScheduleTrack`、`ScheduleItem`（排期：横向的时间轨图） | [数据展示](../../../../docs/design/components/data-display.md) |

@@ -9,11 +9,11 @@
 
 ## 素材范围
 
-- 不收录官方截图、立绘、角色图标、视频或音频；社区控件所用的背景、横幅和底图单独列在下文；
+- 不收录官方截图、角色立绘、视频或音频；社区控件引用的装饰与物品图片单独列在下文；
 - 不包含官方网站或游戏客户端使用的字体文件（含 Novecento Sans Wide、Gilroy 等商业字体）；
 - 不包含从官方网站或客户端提取的源码与样式表。
 
-文档中出现的色值、字号、时长等数据来自对**公开网页**的观察与测量，属于对事实的记录；所有官方画面一律以外部链接引用，不做转存。
+文档中出现的色值、字号、时长等数据来自对**公开网页**的观察与测量，属于对事实的记录。文档参考的官方页面使用外部链接；社区组件随包提供的图片按下文记录来源与归属。
 
 ### 圆形按钮纹理
 
@@ -33,6 +33,20 @@
 | `deco_common_logo_bg.png` | 666×577 | `deco_common_logo_bg.png` | 通栏面板的左下底图 |
 
 这些图片没有在源文件中注明单独许可，权利归原权利人，不纳入组件代码的 MIT 许可。使用方无需请求图片外链；两种提示也不包含音效或音频资源。
+
+### 物品卡片图片
+
+`ItemCard`、`ItemIcon` 的实现参考 EndfieldWiki 提交 `bbcc1813b2e4fafd90b70c97704ddf40d7d528ef` 的 `item-card.tsx`、`item-icon.tsx`。十七张图片保存在 `packages/ui/src/components/item-card/assets`，构建后复制到 `dist/assets`，运行时使用包内路径。
+
+| 本地文件 | 用途 | 原资源 |
+| --- | --- | --- |
+| `items_background.webp`、`items_background_dark.webp` | 物品亮暗背景 | `https://assets.fz.wiki/upload/dev/icon_card/items_background.png` 与 `items_background_dark.png` |
+| `weapons_background.webp`、`weapons_background_dark.webp` | 武器亮暗背景 | 同目录 `weapons_background.png` 与 `weapons_background_dark.png` |
+| `enemies_background.webp`、`enemies_background_dark.webp` | 敌人亮暗背景 | 同目录 `enemies_background.png` 与 `enemies_background_dark.png` |
+| `icon_card_rarity_1_bottom_edge.webp` 至 `icon_card_rarity_6_bottom_edge.webp` | 六档稀有度底边 | 同目录 `icon_card_rarity_1_bottom_edge.png` 至 `icon_card_rarity_6_bottom_edge.png` |
+| `prism.webp`、`crystal-shell.webp`、`copper-bottle.webp`、`copper-bottle-content.webp`、`gold-ticket.webp` | 原物品与瓶内内容示例 | EndfieldWiki 的 `samples.generated.json`，完整原 URL 见资源清单 |
+
+图片从 EndfieldMap 已保存的样本复制，保留原字节；原 URL 虽以 `.png` 结尾，文件实际编码为 WebP。完整原 URL、Wiki 来源字段、尺寸和 SHA256 记录在 `packages/ui/src/components/item-icon/resource-provenance.json`。这些素材的权利归原权利人，本库不宣称其原创，组件代码的 MIT 许可不延伸至图片。
 
 ## 使用本项目时请注意
 
