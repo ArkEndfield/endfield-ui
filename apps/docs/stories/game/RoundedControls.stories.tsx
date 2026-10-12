@@ -24,7 +24,7 @@ function SettingsControls() {
   return (
     <div className="grid gap-6">
       <RoundedToggle aria-label="显示模式" options={views} defaultValue="map" />
-      <div className="w-52 max-w-full">
+      <div className="w-full max-w-52">
         <RoundedSwitch aria-label="自动同步" defaultChecked />
       </div>
       <div className="flex flex-wrap gap-4">
@@ -62,14 +62,14 @@ function RoundedControlsPreview() {
           <ChevronLeft size={16} />
         </RoundedIconButton>
       </div>
-      <div className="w-80 max-w-full">
+      <div className="w-full max-w-80">
         <RoundedToggle
           aria-label="显示模式"
           options={views}
           defaultValue="map"
         />
       </div>
-      <div className="w-52 max-w-full">
+      <div className="w-full max-w-52">
         <RoundedSwitch aria-label="自动同步" defaultChecked />
       </div>
       <AnimatedDialog

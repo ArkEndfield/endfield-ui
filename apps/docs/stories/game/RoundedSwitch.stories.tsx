@@ -8,7 +8,7 @@ const meta = {
   args: { defaultChecked: true, "aria-label": "自动更新" },
   decorators: [
     (Story) => (
-      <div style={{ width: 200, maxWidth: "100%" }}>
+      <div className="w-full max-w-50">
         <Story />
       </div>
     ),

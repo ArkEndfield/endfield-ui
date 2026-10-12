@@ -29,7 +29,7 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <div className="w-64 max-w-full">
+      <div className="w-full max-w-64">
         <Story />
       </div>
     ),
@@ -103,7 +103,7 @@ export const Narrow: Story = {
   name: "窄容器",
   decorators: [],
   render: (args) => (
-    <div className="w-40 max-w-full">
+    <div className="w-full max-w-40">
       <RoundedSelect {...args} options={regions} />
     </div>
   ),

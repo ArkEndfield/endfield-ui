@@ -35,7 +35,7 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <div style={{ width: 320, maxWidth: "100%" }}>
+      <div className="w-full max-w-80">
         <Story />
       </div>
     ),
@@ -53,7 +53,7 @@ export const RarityLevels: Story = {
   render: () => (
     <div className="flex flex-wrap gap-6">
       {[1, 2, 3, 4, 5, 6].map((rarity) => (
-        <div key={rarity} style={{ width: 320, maxWidth: "100%" }}>
+        <div key={rarity} className="w-full max-w-80">
           <ItemTooltipCard
             item={{ ...item, rarity, obtainWays: [], noObtainWayHint: "" }}
           />
@@ -129,7 +129,7 @@ export const Narrow: Story = {
   name: "240px 窄容器",
   decorators: [
     (Story) => (
-      <div style={{ width: 240, maxWidth: "100%" }}>
+      <div className="w-full max-w-60">
         <Story />
       </div>
     ),

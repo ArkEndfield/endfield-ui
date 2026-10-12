@@ -77,7 +77,10 @@ function WithoutOfficialImages() {
           ))}
         </div>
         <div className="flex flex-wrap gap-4">
-          <div data-theme="dark" className="flex gap-4 bg-surface p-4">
+          <div
+            data-theme="dark"
+            className="flex flex-wrap gap-4 bg-surface p-4"
+          >
             <ItemCard
               kind="weapon"
               name="暗色里的卡片"
@@ -98,7 +101,7 @@ function WithoutOfficialImages() {
 
       <section className="grid gap-4">
         <h2 className="text-lg font-bold">物品详情卡</h2>
-        <div className="w-80 max-w-full">
+        <div className="w-full max-w-80">
           <ItemTooltipCard item={detail} />
         </div>
       </section>

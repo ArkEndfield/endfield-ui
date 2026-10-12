@@ -15,7 +15,9 @@ const meta = {
   argTypes: { options: { control: false } },
   decorators: [
     (Story) => (
-      <div style={{ width: 300, maxWidth: "100%" }}>
+      // @container：这个外壳的宽度不看里面的内容。各项的字不折行，不这样的话
+      // 窄的文档页里它们的整宽会把预览框撑出去，轮不到控件自己截断
+      <div className="@container w-full max-w-75">
         <Story />
       </div>
     ),
