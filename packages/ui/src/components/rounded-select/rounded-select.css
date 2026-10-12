@@ -1,0 +1,324 @@
+/* 圆角样式保留原控件的固定灰色，不随页面主题翻转。 */
+.ef-rounded-select {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  color: #373537;
+}
+
+.ef-rounded-select-trigger {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  width: 100%;
+  min-height: 32px;
+  gap: 8px;
+  padding: 4px 10px 4px 14px;
+  border: 0;
+  border-radius: 9999px;
+  background: #edebec;
+  color: inherit;
+  font: inherit;
+  line-height: 24px;
+  text-align: left;
+  cursor: default;
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 10%),
+    0 2px 4px -2px rgb(0 0 0 / 10%);
+}
+
+.ef-rounded-select-trigger:hover:not(:disabled) {
+  background: #e0e0e0;
+}
+
+.ef-rounded-select-trigger:active:not(:disabled) {
+  background: #edebec;
+}
+
+.ef-rounded-select-trigger:disabled {
+  background: rgb(237 235 236 / 40%);
+  color: #6e6d6e;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.ef-rounded-select-trigger:focus-visible {
+  outline: 2px solid var(--color-focus, #373537);
+  outline-offset: 2px;
+}
+
+.ef-rounded-select[data-invalid] .ef-rounded-select-trigger,
+.ef-rounded-select-mirror[data-invalid] {
+  outline: 2px solid var(--color-danger, #bd3636);
+  outline-offset: 1px;
+}
+
+.ef-rounded-select-value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ef-rounded-select-chevron {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  transition: transform 300ms ease;
+}
+
+.ef-rounded-select-chevron[data-popup-open] {
+  transform: rotate(180deg);
+}
+
+.ef-rounded-select-positioner {
+  z-index: var(--z-overlay, 300);
+  min-width: var(--anchor-width);
+  max-width: calc(100vw - 16px);
+  color: #373537;
+  outline: none;
+  pointer-events: none;
+}
+
+.ef-rounded-select-mirror {
+  position: absolute;
+  top: -16px;
+  left: 0;
+  width: var(--anchor-width);
+  height: var(--anchor-height);
+  pointer-events: none;
+}
+
+.ef-rounded-select-mirror[data-hovered] {
+  background: #e0e0e0;
+}
+
+.ef-rounded-select-mirror[data-pressed] {
+  background: #edebec;
+}
+
+.ef-rounded-select-positioner[data-side="top"] .ef-rounded-select-mirror {
+  top: auto;
+  bottom: -16px;
+}
+
+.ef-rounded-select-popup {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: max-content;
+  min-width: var(--anchor-width);
+  max-width: min(var(--available-width), calc(100vw - 16px));
+  max-height: min(var(--available-height), 256px);
+  overflow: hidden;
+  padding-top: 22px;
+  border-radius: 0 0 6px 6px;
+  background: #d4d2d3;
+  color: #373537;
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 10%),
+    0 2px 4px -2px rgb(0 0 0 / 10%);
+  opacity: 1;
+  transform: scaleY(1);
+  transform-origin: top;
+  transition:
+    transform 150ms ease-out,
+    opacity 150ms ease-out;
+  pointer-events: none;
+}
+
+.ef-rounded-select-popup[data-side="top"] {
+  padding-top: 0;
+  padding-bottom: 22px;
+  border-radius: 6px 6px 0 0;
+  transform-origin: bottom;
+}
+
+.ef-rounded-select-popup[data-starting-style],
+.ef-rounded-select-popup[data-ending-style] {
+  opacity: 0;
+  transform: scaleY(0);
+}
+
+.ef-rounded-select-scroll-area {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.ef-rounded-select-viewport {
+  flex: 1;
+  min-height: 0;
+  overscroll-behavior: contain;
+  outline: none;
+}
+
+.ef-rounded-select-option {
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  padding: 6px 4px;
+  font: inherit;
+  line-height: 24px;
+  text-align: left;
+  outline: none;
+  cursor: default;
+  user-select: none;
+}
+
+.ef-rounded-select-option[data-highlighted]:not([data-selected]):not(
+    [data-disabled]
+  ) {
+  background: #e0e0e0;
+}
+
+.ef-rounded-select-option[data-selected]:not([data-disabled]) {
+  background: #5f5f5f;
+  color: #fff;
+}
+
+.ef-rounded-select-option[data-selected]::before {
+  position: absolute;
+  top: 50%;
+  left: 1.5px;
+  width: 2.5px;
+  height: 18px;
+  border-radius: 9999px;
+  background: #fff;
+  transform: translateY(-50%);
+  content: "";
+}
+
+.ef-rounded-select-option[data-disabled] {
+  color: #6e6d6e;
+  cursor: not-allowed;
+}
+
+.ef-rounded-select-option:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
+
+.ef-rounded-select-option-label {
+  flex: 1;
+  min-width: 0;
+  margin-inline: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ef-rounded-select-left,
+.ef-rounded-select-right {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.ef-rounded-select-left {
+  margin-left: 4px;
+}
+
+.ef-rounded-select-right {
+  margin-right: 4px;
+}
+
+.ef-rounded-select-check {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+}
+
+.ef-rounded-select-scrollbar {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 12px;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.ef-rounded-select-scrollbar[data-hovering],
+.ef-rounded-select-scrollbar[data-scrolling],
+.ef-rounded-select-scroll-area:focus-within .ef-rounded-select-scrollbar {
+  opacity: 1;
+}
+
+.ef-rounded-select-scrollbar::before {
+  position: absolute;
+  inset-block: 0;
+  left: 50%;
+  width: 3px;
+  border-radius: 9999px;
+  background: rgb(0 0 0 / 20%);
+  transform: translateX(-50%);
+  content: "";
+}
+
+.ef-rounded-select-thumb {
+  z-index: 1;
+  width: 5px;
+  border-radius: 9999px;
+  background: #fcfefe;
+  box-shadow: 0 0 2px rgb(0 0 0 / 20%);
+  cursor: grab;
+}
+
+.ef-rounded-select-thumb:active {
+  cursor: grabbing;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ef-rounded-select-chevron,
+  .ef-rounded-select-popup,
+  .ef-rounded-select-scrollbar {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .ef-rounded-select-trigger,
+  .ef-rounded-select-popup {
+    border: 1px solid ButtonText;
+    background: Canvas;
+    color: ButtonText;
+    box-shadow: none;
+  }
+
+  .ef-rounded-select-trigger:disabled,
+  .ef-rounded-select-option[data-disabled] {
+    color: GrayText;
+  }
+
+  .ef-rounded-select-option[data-selected]:not([data-disabled]) {
+    background: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+
+  .ef-rounded-select-option[data-selected]::before {
+    background: currentColor;
+  }
+
+  .ef-rounded-select-scrollbar::before {
+    border: 1px solid ButtonText;
+    background: Canvas;
+  }
+
+  .ef-rounded-select-thumb {
+    background: ButtonText;
+  }
+}

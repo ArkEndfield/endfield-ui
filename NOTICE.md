@@ -24,4 +24,6 @@
 
 ## 引用的开源项目
 
-文档参考了若干社区开源项目的方法与结论，逐项出处与许可证见 [docs/design/references/open-source-projects.md](docs/design/references/open-source-projects.md)。这些项目的内容版权归各自作者所有；本仓库没有复制它们的代码或素材。
+文档参考了若干社区开源项目的方法与结论，逐项出处与许可证见 [docs/design/references/open-source-projects.md](docs/design/references/open-source-projects.md)。这些项目的内容版权归各自作者所有。
+
+`AnimatedDialog` 和 `RoundedSelect` 的外观来自 [EndfieldMap](https://github.com/ArkEndfield/EndfieldMap/tree/main/packages/web-components) 的组件实现，关闭处理也参考了 [EndfieldWiki](https://github.com/ArkEndfield/EndfieldWiki)。本仓库使用 Base UI 承担它们的交互行为，装饰使用 SVG 和 CSS，没有移入图片、音效或字体文件。

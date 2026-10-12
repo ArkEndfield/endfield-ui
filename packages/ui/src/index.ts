@@ -1,5 +1,6 @@
 export * from "./components/accordion";
 export * from "./components/alert";
+export * from "./components/animated-dialog";
 export * from "./components/avatar";
 export * from "./components/back-to-top";
 export * from "./components/badge";
@@ -52,6 +53,7 @@ export * from "./components/radio";
 export * from "./components/rec-indicator";
 export * from "./components/registration-strip";
 export * from "./components/rolling-number";
+export * from "./components/rounded-select";
 export * from "./components/schedule";
 export * from "./components/scroll-area";
 export * from "./components/scroll-hint";

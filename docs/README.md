@@ -67,6 +67,7 @@
 - [表单](design/components/form.md)
 - [反馈](design/components/feedback.md)
 - [浮层](design/components/overlay.md)
+- [社区变体](design/components/community-variants.md)——动画弹窗与圆角下拉
 - [数据展示](design/components/data-display.md)
 
 ### 依据

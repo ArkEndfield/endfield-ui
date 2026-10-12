@@ -64,6 +64,7 @@
 | `completion-banner/` | `CompletionBanner` | [反馈](../../../../docs/design/components/feedback.md) |
 | `tooltip/` | `Tooltip`、`TooltipProvider` | [浮层](../../../../docs/design/components/overlay.md) |
 | `dialog/` | `Dialog`、`DialogClose` | [浮层](../../../../docs/design/components/overlay.md) |
+| `animated-dialog/` | `AnimatedDialog` | [社区变体](../../../../docs/design/components/community-variants.md) |
 | `drawer/` | `Drawer` | [浮层](../../../../docs/design/components/overlay.md) |
 | `dropdown-menu/` | `DropdownMenu`、`DropdownMenuItem`、`DropdownMenuCheckboxItem`、`DropdownMenuGroup`、`DropdownMenuSeparator`、`DropdownMenuRadioGroup`、`DropdownMenuRadioItem`、`DropdownMenuSub` | [浮层](../../../../docs/design/components/overlay.md) |
 | `context-menu/` | `ContextMenu`（右键菜单；选项用 `DropdownMenuItem` 那一组） | [浮层](../../../../docs/design/components/overlay.md) |
@@ -71,6 +72,7 @@
 | `popover/` | `Popover`、`PopoverClose` | [浮层](../../../../docs/design/components/overlay.md) |
 | `hover-card/` | `HoverCard`（悬浮卡：链接悬停时预览它的去处） | [浮层](../../../../docs/design/components/overlay.md) |
 | `select/` | `Select`、`SelectItem`、`SelectGroup`、`SelectSeparator` | [表单](../../../../docs/design/components/form.md) |
+| `rounded-select/` | `RoundedSelect` | [社区变体](../../../../docs/design/components/community-variants.md) |
 | `combobox/` | `Combobox`（可搜索的下拉，含多选、分组与远程检索） | [表单](../../../../docs/design/components/form.md) |
 | `tag-input/` | `TagInput`（标签输入：自己打出来的一串短词） | [表单](../../../../docs/design/components/form.md) |
 | `file-upload/` | `FileUpload`、`FileItem`（文件上传：只管选和列，不管传） | [表单](../../../../docs/design/components/form.md) |

@@ -56,9 +56,9 @@
 | 类别 | 控件 |
 | --- | --- |
 | 基础 | Button / ButtonGroup、IconButton、Toolbar、Tag / TagPair、Badge、Kbd、SectionTitle、BracketTitle、Tabs、Panel |
-| 表单 | Field、Input、OtpInput、Textarea、Select、Combobox、TagInput、DatePicker / DateRangePicker / Calendar、FileUpload / FileItem、Checkbox、Radio / RadioGroup、SegmentedControl、Switch、Stepper、Slider、FilterChip |
+| 表单 | Field、Input、OtpInput、Textarea、Select / RoundedSelect、Combobox、TagInput、DatePicker / DateRangePicker / Calendar、FileUpload / FileItem、Checkbox、Radio / RadioGroup、SegmentedControl、Switch、Stepper、Slider、FilterChip |
 | 反馈 | Alert、Toast、Progress / ProgressRing、Spinner、Skeleton、EmptyState、Loader、CompletionBanner、RecIndicator |
-| 浮层 | Tooltip、Popover、HoverCard、Dialog、Drawer、DropdownMenu、ContextMenu、FlyoutBar |
+| 浮层 | Tooltip、Popover、HoverCard、Dialog / AnimatedDialog、Drawer、DropdownMenu、ContextMenu、FlyoutBar |
 | 展示 | Table（行能展开）、Stat、RollingNumber、Sparkline、DataRowList / DataRow、List / ListRow、Accordion、ScrollArea、MediaCard、PlayButton / PlayMark、Carousel、ImageViewer、ItemSlot / ItemGrid、Avatar、Timeline、Schedule、Term、ResourceChip、Countdown、Marquee、ScrollHint |
 | 导航 | SideRail（含二级）、TopBar、NavMenu、NavAction、PageHeader、Breadcrumb、Pagination、Navigator、AvatarSwitcher、DashIndicator、Steps、Toc、BackToTop |
 | 母题 | CornerBrackets、Viewfinder、GhostText、Hatch、Texture、RegistrationStrip、TickRing、HazardStripe |
@@ -70,6 +70,8 @@
 - **键盘、读屏和高对比模式。** 每个控件都能用键盘操作、有焦点环，状态不只靠颜色说；系统的高对比模式（`forced-colors`）下，靠底色成形的地方另有一份画法，见 [色彩](docs/design/foundations/color.md#高对比模式)。
 - **行为交给 Base UI。** 浮层和几个行为复杂的控件（组合框、滑块、工具栏、验证码输入…）的焦点、键盘、定位建立在 [Base UI](https://base-ui.com) 上，其余控件用的是原生元素。
 - **链接接得上路由。** 能当链接用的控件除了 `href` 还收一个 `render`，用来接路由库的链接组件。
+
+`AnimatedDialog` 和 `RoundedSelect` 是来自 EndfieldMap 的两种独立外观：前者保留分段入场的黄色装饰弹窗，后者保留圆角触发器和灰色下拉面板。它们使用固定配色，不随主题反转；原有 `Dialog`、`Select` 继续按本库的主题令牌绘制。用法与尺寸见[社区变体](docs/design/components/community-variants.md)。
 
 [![同一组控件在亮暗两个主题下的截图，上半是默认的信号黄，下半把强调色换成了青色](docs/screenshots/takeover.png)](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-主题色接管--takeover)
 
