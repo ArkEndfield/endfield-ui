@@ -92,14 +92,15 @@ function InContainerExample({
   const id = (name: string) => `${prefix}-${name}`;
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-start gap-8">
+    <div className="@container flex flex-col gap-3">
+      {/* 窄了放不下两栏：目录排到正文下面。flex-1 只在并排时给——竖排时它会盖掉定高，框就不滚了 */}
+      <div className="flex flex-col gap-4 @md:flex-row @md:items-start @md:gap-8">
         <div
           ref={scroller}
           tabIndex={0}
           role="region"
           aria-label="正文"
-          className="flex h-72 min-w-0 flex-1 flex-col gap-8 overflow-auto border border-line p-4 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
+          className="flex h-72 min-w-0 flex-col gap-8 overflow-auto border border-line p-4 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus @md:flex-1"
         >
           {chapters.map(([name, title, lead], index) => (
             <Section
@@ -179,34 +180,36 @@ function OwnScrollExample() {
   }));
 
   return (
-    <div className="flex items-start gap-8">
-      <div
-        ref={scroller}
-        tabIndex={0}
-        role="region"
-        aria-label="正文"
-        className="flex h-72 min-w-0 flex-1 flex-col gap-8 overflow-auto border border-line p-4 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
-      >
-        {items.map((item) => (
-          <Section
-            key={item.id}
-            id={item.id}
-            title={item.title}
-            lead={filler}
-          />
-        ))}
+    <div className="@container">
+      <div className="flex flex-col gap-4 @md:flex-row @md:items-start @md:gap-8">
+        <div
+          ref={scroller}
+          tabIndex={0}
+          role="region"
+          aria-label="正文"
+          className="flex h-72 min-w-0 flex-col gap-8 overflow-auto border border-line p-4 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus @md:flex-1"
+        >
+          {items.map((item) => (
+            <Section
+              key={item.id}
+              id={item.id}
+              title={item.title}
+              lead={filler}
+            />
+          ))}
+        </div>
+        <Toc
+          title="// 十二天"
+          target={scroller}
+          className="max-h-40 w-40 shrink-0 overflow-auto"
+        >
+          {items.map((item) => (
+            <TocItem key={item.id} href={`#${item.id}`}>
+              {item.title}
+            </TocItem>
+          ))}
+        </Toc>
       </div>
-      <Toc
-        title="// 十二天"
-        target={scroller}
-        className="max-h-40 w-40 shrink-0 overflow-auto"
-      >
-        {items.map((item) => (
-          <TocItem key={item.id} href={`#${item.id}`}>
-            {item.title}
-          </TocItem>
-        ))}
-      </Toc>
     </div>
   );
 }
@@ -243,10 +246,11 @@ export const Page: Story = {
             />
           ))}
         </div>
+        {/* 窄屏放不下这一列：收起来，由页面决定，不是目录的事 */}
         <Toc
           title="// 本页"
           offset={80}
-          className="sticky top-20 w-40 shrink-0"
+          className="sticky top-20 w-40 shrink-0 max-sm:hidden"
         >
           {chapters.map(([name, title]) => (
             <TocItem key={name} href={`#${name}`}>

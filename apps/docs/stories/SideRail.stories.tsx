@@ -44,12 +44,15 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/* 侧轨默认占满视口高。预览里把它装进一个定高的框，旁边放一块假的页面 */
+/*
+ * 侧轨默认占满视口高。预览里把它装进一个定高的框，旁边放一块假的页面。
+ * 侧轨是给宽屏用的，不收缩：框窄了就横着滚，不把旁边的页面挤成一条
+ */
 function Frame({ children }: { children: ReactNode }) {
   return (
-    <div className="flex h-[38rem] overflow-hidden border border-line">
+    <div className="flex h-[38rem] overflow-x-auto overflow-y-hidden border border-line">
       {children}
-      <main className="min-w-0 flex-1 overflow-y-auto bg-surface-sunken p-6">
+      <main className="min-w-64 flex-1 overflow-y-auto bg-surface-sunken p-6">
         <p className="font-tech text-xs text-ink-tertiary">{"// 页面内容"}</p>
         <div className="mt-4 flex flex-col gap-3">
           {[72, 56, 64, 40].map((width) => (

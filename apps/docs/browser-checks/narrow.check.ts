@@ -250,6 +250,16 @@ function stickingOut(page: Page, selector: string) {
   }, selector);
 }
 
+/** 这些元素各有多宽 */
+const widths = (page: Page, selector: string) =>
+  page.evaluate(
+    (css) =>
+      [...document.querySelectorAll(css)].map((element) =>
+        Math.round(element.getBoundingClientRect().width),
+      ),
+    selector,
+  );
+
 const NAME = ".docs-story [role=radiogroup] + [aria-live] > :first-child";
 
 test("手机上的文档页：内容页的页码不折行，标题不被旁边的按钮挤折，没有东西伸出去", async () => {
@@ -323,4 +333,47 @@ test("手机上的文档页：内容页的名字折行时，右括号跟着最�
     NAME,
   );
   assert.deepEqual(together, [true, true], "右括号不应该自己落到下一行");
+});
+
+test("手机上的文档页：统计块旁边放图，数字不被挤折", async () => {
+  const { page } = storybook;
+  await page.setSize(360, 800);
+  await page.docs("控件-sparkline-小型面积图--docs");
+  const lines = await lineCounts(page, ".docs-story [data-size] span", "1,280");
+  assert.ok(lines.length >= 2, "没有找到统计块的数字");
+  assert.deepEqual([...new Set(lines)], [1], "数字应该排在一行里");
+});
+
+test("手机上的文档页：工具条上的字不被按钮挤折", async () => {
+  const { page } = storybook;
+  // 这一条要更窄才挤得到
+  await page.setSize(320, 800);
+  await page.docs("母题-hatch-斜纹--docs");
+  const lines = await lineCounts(page, ".docs-story span", "已选 3 项");
+  assert.ok(lines.length >= 2, "没有找到工具条上的字");
+  assert.deepEqual([...new Set(lines)], [1], "“已选 3 项”应该排在一行里");
+});
+
+test("手机上的文档页：页内目录旁边的正文、侧轨旁边的页面不被挤成一条", async () => {
+  const { page } = storybook;
+  await page.setSize(360, 800);
+
+  await page.docs("控件-toc-页内目录--docs");
+  const texts = await widths(
+    page,
+    ".docs-story [role=region][aria-label=正文]",
+  );
+  assert.ok(texts.length >= 2, "没有找到正文的滚动框");
+  assert.ok(
+    texts.every((width) => width >= 160),
+    `正文的滚动框太窄了：${texts.join("、")}`,
+  );
+
+  await page.docs("控件-siderail-侧轨--docs");
+  const mains = await widths(page, ".docs-story main");
+  assert.ok(mains.length >= 2, "没有找到侧轨旁边的页面");
+  assert.ok(
+    mains.every((width) => width >= 160),
+    `侧轨旁边的页面太窄了：${mains.join("、")}`,
+  );
 });

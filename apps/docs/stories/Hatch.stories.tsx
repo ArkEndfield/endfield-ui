@@ -45,9 +45,11 @@ export const Densities: Story = {
 export const ToolbarStrip: Story = {
   name: "垫在工具条下面",
   render: () => (
-    <div className="relative flex max-w-md items-center justify-between bg-surface-muted px-3 py-2">
+    <div className="relative flex max-w-md flex-wrap items-center justify-between gap-2 bg-surface-muted px-3 py-2">
       <Hatch className="absolute inset-0" />
-      <span className="relative text-sm font-medium">已选 3 项</span>
+      <span className="relative text-sm font-medium whitespace-nowrap">
+        已选 3 项
+      </span>
       <Button size="sm" className="relative">
         批量处理
       </Button>

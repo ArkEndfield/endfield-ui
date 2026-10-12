@@ -94,7 +94,8 @@ export const BesideStat: Story = {
   name: "放在统计块旁边",
   decorators: [],
   render: () => (
-    <div className="flex items-end gap-4">
+    // 放不下时图换到数字下面：不换行的话统计块被挤窄，数字会从中间折开
+    <div className="flex flex-wrap items-end gap-4">
       <Stat label="OUTPUT" value="1,280" unit="件" delta="+6%" />
       {/* 旁边的数字才是内容，图只是帮着看趋势；尺寸由外面的盒子给 */}
       <div className="h-12 w-32">
