@@ -200,6 +200,46 @@ test("首尾相接：最后一张再点下一张回到第一张；短横跟着�
   );
 });
 
+test("计数和短横排不下：计数不折行，短横收窄，不顶到这一行外面", async () => {
+  const { page } = storybook;
+  await page.story("控件-carousel-媒体轮播--indicator");
+  const measured = await page.evaluate((css) => {
+    const count = document.querySelector<HTMLElement>(
+      `${css} [aria-hidden=true] span`,
+    )!;
+    const row = count.parentElement!;
+    const dashes = row.querySelector("[role=img]")!;
+    // 五根短横自己就有 112px：把这一行压到放不下，不靠字宽
+    row.style.width = "100px";
+    const range = document.createRange();
+    range.selectNodeContents(count);
+    const tops = new Set(
+      [...range.getClientRects()].map((rect) => Math.round(rect.top)),
+    );
+    return {
+      lines: tops.size,
+      inside:
+        dashes.getBoundingClientRect().right <=
+        row.getBoundingClientRect().right + 0.5,
+      current: [...dashes.children].map((dash) =>
+        dash.hasAttribute("data-current"),
+      ),
+      widths: [...dashes.children].map(
+        (dash) => dash.getBoundingClientRect().width,
+      ),
+    };
+  }, ROOT);
+  assert.equal(measured.lines, 1, "计数应该排在一行里");
+  assert.ok(measured.inside, "短横顶到这一行外面了");
+  // 收窄之后当前那一根仍然比别的长：不只靠颜色
+  const current = measured.widths[measured.current.indexOf(true)]!;
+  const others = measured.widths.filter((_, at) => !measured.current[at]);
+  assert.ok(
+    others.every((width) => width > 0 && width < current),
+    `当前那一根应该比别的长：${measured.widths.join("、")}`,
+  );
+});
+
 test("宽度变了：轨道重新对到当前这一张，不停在两张中间", async () => {
   const { page } = storybook;
   await page.story("控件-carousel-媒体轮播--playground");

@@ -138,7 +138,7 @@ components/
 - 每个交互组件都要有 `:focus-visible` 样式，用 [`focusRing`](../lib/focus-ring.ts)；会被滚动容器裁切的地方用 `focusRingInset`；外框自己不能聚焦、里面的控件能（输入框）时用 `focusRingWithin`。焦点环不能被 `clip-path` 裁掉（做法见 [切角与斜楔](../../../../docs/design/elements/corner-and-wedge.md)）。
 - 悬停用 Tailwind 的 `hover:`，它只在有指针的设备上生效。
 - 组件内部的响应式看**自身宽度**，用容器查询（`@container` + `@md:` 这类变体），不用视口断点（`md:`）：组件不知道自己会被放进多窄的栏里。视口断点只留给"必须和页面布局同步切换"的地方，目前只有 `SectionTitle` 的 `side` 形态。
-- 会出现英文长单词的大号文字加 `wrap-anywhere` 兜底，并确保它所在的弹性子项能收缩（`min-w-0` 或 `max-w-full`）。有意不换行的控件（按钮、标签、页签）除外。
+- 会出现英文长单词的大号文字加 `wrap-anywhere` 兜底，并确保它所在的弹性子项能收缩（`min-w-0` 或 `max-w-full`）。有意不换行的控件（按钮、标签、页签）除外。中间带空格的短读数（轮播的 `1 / 5`）不折行也不收缩（`shrink-0 whitespace-nowrap`）：同一行里让别的东西去收，不然它被挤成一竖条。
 - 装饰元素（竖条、箭头、分隔线）加 `aria-hidden`。
 - 动效遵守 `prefers-reduced-motion`：降级后内容必须停在终态。循环动画停下来的样子不能被看成一个具体的值：不确定进度的色块停在正中，进度环换成一圈虚线。
 - 用 `group` / `peer` 时给 `group` 起名字（`group/card` + `group-hover/card:`）：不起名的 `group-hover:` 会被外层任何一个 `group` 的悬停带着走，控件一旦被放进别的可悬停容器就会出错。

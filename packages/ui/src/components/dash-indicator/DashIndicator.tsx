@@ -26,7 +26,11 @@ export function DashIndicator({
       role="img"
       aria-label={`第 ${current + 1} 项，共 ${total} 项`}
       {...props}
-      className={cn("inline-flex items-center gap-1", className)}
+      className={cn(
+        // 放不下时各根等比收窄，不顶出容器：短横本来就能收，卡住的是这一层自己的最小宽度
+        "inline-flex max-w-full min-w-0 items-center gap-1",
+        className,
+      )}
     >
       {Array.from({ length: total }, (_, position) => (
         <span

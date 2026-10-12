@@ -186,7 +186,8 @@ export function Carousel({
       <div className="flex flex-col gap-1">
         {/* 看得见的计数和短横只给眼睛：同样的话下面的说明区会播报 */}
         <div aria-hidden="true" className="flex items-center gap-3">
-          <span className="font-tech text-xs text-ink-secondary tabular-nums">
+          {/* 这一行放不下时让短横去收窄：计数中间有空格，被挤了会折成一竖条 */}
+          <span className="shrink-0 font-tech text-xs whitespace-nowrap text-ink-secondary tabular-nums">
             {`${index + 1} / ${count}`}
           </span>
           {indicator && <DashIndicator count={count} index={index} />}
