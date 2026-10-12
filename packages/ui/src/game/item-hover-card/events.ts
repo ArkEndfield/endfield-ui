@@ -34,6 +34,7 @@ export function bindItemHoverEvents<A>(
     activeId = undefined;
     activeTarget = null;
     shown = false;
+    unwatch();
     select(null);
   };
   const inPanel = (node: EventTarget | null) =>
@@ -72,6 +73,7 @@ export function bindItemHoverEvents<A>(
     activeId = host.dataset.itemTooltipId;
     activeTarget = target;
     shown = false;
+    watch();
     select(null);
     openTimer = win.setTimeout(
       () => {
@@ -186,29 +188,44 @@ export function bindItemHoverEvents<A>(
       else dismiss(true);
     }
   });
-  mutation.observe(doc, {
-    subtree: true,
-    childList: true,
-    attributes: true,
-    attributeFilter: [
-      "data-item-tooltip-id",
-      "disabled",
-      "inert",
-      "aria-disabled",
-    ],
-  });
-  win.addEventListener("scroll", scroll, true);
-  win.addEventListener("resize", close);
+  /*
+   * 整棵文档的变动、滚动和窗口大小，只在有触发元素等着打开或已经打开时才看，
+   * 收起就停。页面上每个 ItemHoverCard 各有一层这样的监听：要是一直开着，
+   * 页面里任何一处 DOM 变动都要把它们挨个叫一遍。
+   */
+  let watching = false;
+  function watch() {
+    if (watching) return;
+    watching = true;
+    mutation.observe(doc, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: [
+        "data-item-tooltip-id",
+        "disabled",
+        "inert",
+        "aria-disabled",
+      ],
+    });
+    win.addEventListener("scroll", scroll, true);
+    win.addEventListener("resize", close);
+  }
+  function unwatch() {
+    if (!watching) return;
+    watching = false;
+    mutation.disconnect();
+    win.removeEventListener("scroll", scroll, true);
+    win.removeEventListener("resize", close);
+  }
   return {
     close,
     dismiss,
     dispose() {
       cancel();
-      mutation.disconnect();
+      unwatch();
       for (const [type, listener] of listeners)
         doc.removeEventListener(type, listener);
-      win.removeEventListener("scroll", scroll, true);
-      win.removeEventListener("resize", close);
     },
   };
 }

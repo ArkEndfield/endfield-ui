@@ -154,4 +154,48 @@ describe("物品网格悬浮事件", () => {
     vi.advanceTimersByTime(200);
     expect(select).toHaveBeenLastCalledWith(null);
   });
+
+  it("没有触发元素在等待或打开时，不观察文档，也不听滚动", () => {
+    // 页面上每个悬浮卡各有一层监听：一直开着的话，任何一处 DOM 变动都要把它们挨个叫一遍
+    const observe = vi.spyOn(MutationObserver.prototype, "observe");
+    const disconnect = vi.spyOn(MutationObserver.prototype, "disconnect");
+    const listen = vi.spyOn(window, "addEventListener");
+    const unlisten = vi.spyOn(window, "removeEventListener");
+    const scrolls = (spy: typeof listen | typeof unlisten) =>
+      spy.mock.calls.filter(([type]) => type === "scroll").length;
+
+    events.dispose();
+    events = bindItemHoverEvents(
+      {
+        root,
+        anchorOf: (node) => ({ host: node, id: node.dataset.itemTooltipId }),
+        openDelay: 180,
+        closeDelay: 160,
+      },
+      select,
+      () => popup,
+    );
+    expect(observe).not.toHaveBeenCalled();
+    expect(scrolls(listen)).toBe(0);
+
+    // 指针一进触发元素就开始看（它可能在等待的这 180ms 里被拿掉）
+    pointer(trigger, "pointerover");
+    expect(observe).toHaveBeenCalledTimes(1);
+    expect(scrolls(listen)).toBe(1);
+    vi.advanceTimersByTime(180);
+    expect(select).toHaveBeenLastCalledWith({ host, id: "prism" });
+    expect(observe).toHaveBeenCalledTimes(1);
+
+    // 收起就停
+    disconnect.mockClear();
+    events.close();
+    expect(disconnect).toHaveBeenCalledTimes(1);
+    expect(scrolls(unlisten)).toBe(1);
+
+    // 再进来再看
+    pointer(trigger, "pointerover");
+    expect(observe).toHaveBeenCalledTimes(2);
+
+    vi.restoreAllMocks();
+  });
 });
