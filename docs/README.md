@@ -13,6 +13,7 @@
 | 做游戏风格的界面 | [游戏界面](design/surfaces/game-ui.md) → [形状](design/foundations/shape.md) → [切角与斜楔](design/elements/corner-and-wedge.md) |
 | 做一张长图或活动页 | [宣传物料](design/surfaces/promotional.md) → [纹理](design/foundations/texture.md) |
 | 用现成的组件 | [packages/ui](../packages/ui/README.md) |
+| 用照游戏内界面复刻的那一组控件 | [Game 实机风格](design/game/README.md)——独立入口，带官方图片，先读里面的风险一节 |
 | 接着写组件 | [组件规范](design/components/README.md) → [组件约定](../packages/ui/src/components/README.md) → [theme.css](../packages/ui/src/styles/theme.css) |
 | 给控件加动效，或者想知道某处为什么这么动 | [动效](design/foundations/motion.md) → [动效补全计划](motion-plan.md)——35 步都做完了，留着的是每一步怎么定的 |
 | 核对某个数值的依据 | [官网实测数据](design/references/measurements.md) |
@@ -67,12 +68,18 @@
 - [表单](design/components/form.md)
 - [反馈](design/components/feedback.md)
 - [浮层](design/components/overlay.md)
-- [社区变体](design/components/community-variants.md)——动画弹窗与圆角下拉
-- [圆角控件](design/components/rounded-controls.md)——无音效的按钮、分段选择与文字开关
-- [确认提示](design/components/confirmation-alerts.md)——紧凑卡片、通栏面板及本地图片
-- [物品卡片](design/components/item-cards.md)——稀有度、亮暗背景、库存和分层图标
-- [物品悬浮卡](design/components/item-hover-cards.md)——详情、获取途径与网格悬浮预览
 - [数据展示](design/components/data-display.md)
+
+### Game 实机风格
+
+照游戏内界面复刻的一组控件：独立入口，带官方图片，和上面的规范是两套东西。
+
+- [总览、风险与处理](design/game/README.md)——和主库的区别、怎么引入、带了哪些官方图片、风险和我们的处理
+- [动画弹窗与圆角下拉](design/game/dialog-and-select.md)
+- [圆角控件](design/game/rounded-controls.md)——按钮、图标按钮、分段选择、文字开关
+- [确认提示](design/game/confirmation-alerts.md)——紧凑卡片与通栏面板
+- [物品卡片](design/game/item-cards.md)——稀有度、亮暗背景、库存和分层图标
+- [物品悬浮卡](design/game/item-hover-cards.md)——详情、获取途径与网格悬浮预览
 
 ### 依据
 
@@ -112,4 +119,4 @@
 - 改动任何令牌值时，同步修改 [theme.css](../packages/ui/src/styles/theme.css) 与对应文档里的表格。`pnpm check:docs` 会核对两边对不对得上，连同链接、锚点和图；文档站构建之前也会跑它。
 - 组件的实现取值与规范不一致时（多半是为了适配暗色主题），把取值和理由写回对应的组件文档。
 - 把"社区"级别的结论升级为"观察"时，注明游戏版本与观察日期。
-- 新增图解只放原创 SVG。不提交官方截图、立绘、Logo 与字体。
+- 新增图解只放原创 SVG。不提交官方截图、立绘、Logo 与字体。唯一的例外是 [Game 实机风格](design/game/README.md)：它用到的官方图片只许放在 `packages/ui/src/game` 下，并且逐张登记在那里的 `resource-provenance.json` 里。

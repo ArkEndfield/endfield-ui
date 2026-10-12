@@ -1,0 +1,234 @@
+/* 迁入样式保留原按钮的固定颜色与 em 比例，不随页面主题翻转。 */
+.ef-rounded-button {
+  display: inline-flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  min-width: 112px;
+  padding: 0.3em 0.35em;
+  border: 0;
+  border-radius: 9999px;
+  background: #2a2728;
+  color: #fefcfc;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.5;
+  cursor: default;
+  box-shadow:
+    0 0 0 0.1em #2a2728,
+    0 0 0 0.1em #81807f inset;
+}
+
+.ef-rounded-button[data-variant="default"] {
+  background: #f2f1ef;
+  color: #4d4d4d;
+  box-shadow:
+    0 0 0 0.1em #f2f1ef,
+    0 0 0 0.1em #a0a2a3 inset;
+}
+
+.ef-rounded-button[data-icon-position="left"] {
+  padding-left: 0.3em;
+}
+
+.ef-rounded-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.ef-rounded-button[data-loading] {
+  cursor: progress;
+}
+
+.ef-rounded-button:focus-visible,
+.ef-rounded-icon-button:focus-visible {
+  outline: 2px solid var(--ef-focus, #373537);
+  outline-offset: 3px;
+}
+
+.ef-rounded-button-text {
+  flex: 1;
+  text-align: center;
+}
+
+.ef-rounded-button-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1.3em;
+  height: 1.3em;
+  border-radius: 9999px;
+  background: #fefcfc;
+  color: #2a2728;
+  transition:
+    background-color 300ms ease,
+    color 300ms ease;
+  pointer-events: none;
+}
+
+.ef-rounded-button-icon svg {
+  font-size: 1.3em;
+}
+
+.ef-rounded-button[data-variant="default"] .ef-rounded-button-icon {
+  background: #4d4d4d;
+  color: #f2f1ef;
+}
+
+.ef-rounded-button[data-variant="default"] .ef-rounded-button-icon svg {
+  font-size: 1em;
+}
+
+.ef-rounded-button-spinner {
+  box-sizing: border-box;
+  width: 1em;
+  height: 1em;
+  border: 2px solid #fb0;
+  border-top-color: #fff;
+  border-radius: 9999px;
+  animation: ef-rounded-button-spin 1s linear infinite;
+}
+
+@keyframes ef-rounded-button-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ef-rounded-icon-button {
+  position: relative;
+  display: inline-flex;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: #fafafa;
+  color: #3c3c3c;
+  font: inherit;
+  cursor: default;
+  box-shadow: 0 0 10px rgb(2 2 2 / 30%);
+  transition: background-color 150ms ease;
+}
+
+.ef-rounded-icon-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ef-rounded-icon-button-texture,
+.ef-rounded-icon-button-border {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+.ef-rounded-icon-button-texture {
+  background: url("./assets/pag-button-texture.png") center / cover no-repeat;
+  opacity: 0.4;
+}
+
+.ef-rounded-icon-button-border {
+  z-index: 1;
+}
+
+.ef-rounded-icon-button-border::before,
+.ef-rounded-icon-button-border::after {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  content: "";
+}
+
+.ef-rounded-icon-button-border::before {
+  border: 1.5px solid #e6e6e6;
+}
+
+.ef-rounded-icon-button-border::after {
+  border: 1px solid #fff;
+}
+
+.ef-rounded-icon-button-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ef-rounded-button:not(:disabled):not([data-loading]):hover {
+    background: #2a2728b5;
+    box-shadow:
+      0 0 0 0.1em #2a2728b5,
+      0 0 0 0.1em #81807f inset;
+  }
+
+  .ef-rounded-button[data-variant="default"]:not(:disabled):not(
+      [data-loading]
+    ):hover {
+    background: #e8e8e8b5;
+    box-shadow:
+      0 0 0 0.1em #e8e8e8b5,
+      0 0 0 0.1em #a5a5a5 inset;
+  }
+}
+
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .ef-rounded-icon-button:not(:disabled):hover {
+    background: #fffa00;
+  }
+
+  .ef-rounded-icon-button:not(:disabled):active {
+    background: #eeea00;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ef-rounded-button-icon,
+  .ef-rounded-icon-button {
+    transition: none;
+  }
+
+  .ef-rounded-button-spinner {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .ef-rounded-button,
+  .ef-rounded-icon-button {
+    border: 1px solid ButtonText;
+    background: ButtonFace;
+    color: ButtonText;
+    box-shadow: none;
+  }
+
+  .ef-rounded-button:disabled,
+  .ef-rounded-icon-button:disabled {
+    border-color: GrayText;
+    color: GrayText;
+  }
+
+  .ef-rounded-button-icon {
+    border: 1px solid ButtonText;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  .ef-rounded-icon-button-texture,
+  .ef-rounded-icon-button-border {
+    display: none;
+  }
+
+  .ef-rounded-button-spinner {
+    border-color: ButtonText;
+    border-top-color: Highlight;
+  }
+}

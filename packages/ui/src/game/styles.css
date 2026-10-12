@@ -1,0 +1,24 @@
+/*
+ * Game 实机风格的样式入口，纯 CSS，用不用 Tailwind 都是这一份：
+ *   import "@endfield-ui/react/game.css";
+ *
+ * 全部放在 components 层：压得过 preflight（base），让得开使用方传进来的工具类（utilities）。
+ * 层的先后在这里先声明一遍，和 Tailwind 自己声明的一样——这样不管这份样式和主样式
+ * 谁先加载，顺序都不变。
+ *
+ * 这里的规则只许以 `.ef-` 开头的类起头，私有变量只许叫 `--ef-game-*`
+ * （isolation.test.ts 守着），所以引了它也不会动到主库的控件。
+ */
+@layer theme, base, components, utilities;
+
+@import "./animated-dialog/animated-dialog.css" layer(components);
+@import "./rounded-select/rounded-select.css" layer(components);
+@import "./rounded-button/rounded-button.css" layer(components);
+@import "./rounded-toggle/rounded-toggle.css" layer(components);
+@import "./rounded-switch/rounded-switch.css" layer(components);
+@import "./banner-alert/banner-alert.css" layer(components);
+@import "./full-width-alert/full-width-alert.css" layer(components);
+@import "./item-icon/item-icon.css" layer(components);
+@import "./item-card/item-card.css" layer(components);
+@import "./item-tooltip-card/item-tooltip-card.css" layer(components);
+@import "./item-hover-card/item-hover-card.css" layer(components);

@@ -32,6 +32,7 @@
     "src",
     "!src/**/*.test.*",
     "!src/test",
+    "!src/game",
     "NOTICE.md"
   ],
   "exports": {
@@ -43,11 +44,17 @@
     "./styles.css": "./dist/styles.css",
     "./theme.css": "./src/styles/theme.css",
     "./utilities.css": "./src/styles/utilities.css",
+    "./game": {
+      "types": "./dist/game.d.ts",
+      "default": "./dist/game.js"
+    },
+    "./game.css": "./dist/game/styles.css",
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "tsdown && pnpm build:css",
-    "build:css": "tailwindcss -i src/styles/index.css -o dist/styles.css --minify && node scripts/copy-assets.mjs",
+    "build": "tsdown && pnpm build:css && pnpm build:game",
+    "build:css": "tailwindcss -i src/styles/index.css -o dist/styles.css --minify",
+    "build:game": "tailwindcss -i src/game/styles.css -o dist/game/styles.css --minify && node scripts/copy-game-assets.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",

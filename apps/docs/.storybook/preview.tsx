@@ -1,6 +1,8 @@
 import type { Decorator, Preview } from "@storybook/react-vite";
 import { useEffect, type ReactNode } from "react";
 import "./preview.css";
+// Game 实机风格的样式是单独的一份，和使用方一样排在主样式后面引
+import "@endfield-ui/react/game.css";
 
 type ThemeMode = "light" | "dark" | "both";
 
@@ -98,7 +100,10 @@ const preview: Preview = {
     layout: "fullscreen",
     controls: { expanded: true },
     options: {
-      storySort: { order: ["示例", "控件", "母题"] },
+      // Game 实机风格排在最后：它是独立入口的一类，自己的示例收在自己下面
+      storySort: {
+        order: ["示例", "控件", "母题", "Game 实机风格", ["示例", "*"]],
+      },
     },
   },
   tags: ["autodocs"],

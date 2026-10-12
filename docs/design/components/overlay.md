@@ -12,7 +12,6 @@
 | --- | --- | --- |
 | 文字提示 | `<Tooltip content side align delay arrow>` 包住触发元素；一组相邻的提示外面包 `<TooltipProvider>` | 已实现 |
 | 弹窗 | `<Dialog trigger title description footer size alert ornament cornerArt>`；"点了就关"的按钮包进 `<DialogClose>` | 已实现 |
-| 动画弹窗 | `<AnimatedDialog trigger title icon width height onClose onDismiss>`；独立固定配色，见[社区变体](community-variants.md) | 已实现 |
 | 抽屉 | `<Drawer trigger title description footer side size accent>` | 已实现 |
 | 下拉菜单 | `<DropdownMenu trigger variant side align>` + `DropdownMenuItem` / `Group` / `Separator` / `RadioGroup` / `RadioItem` / `CheckboxItem` / `Sub` | 已实现 |
 | 右键菜单 | `<ContextMenu menu variant>` 包住被右键的区域；`menu` 里放下拉菜单的那一组选项 | 已实现 |
