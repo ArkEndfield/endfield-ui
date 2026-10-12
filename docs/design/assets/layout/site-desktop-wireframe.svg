@@ -18,7 +18,8 @@
   <rect x="40" y="40" width="30" height="360" fill="#ffffff"/>
   <path d="M70 40v360" stroke="#d9d9d9"/>
   <rect x="45" y="46" width="20" height="20" fill="#191919"/>
-  <rect x="40" y="84" width="3" height="18" fill="#191919"/>
+  <rect x="40" y="83" width="26" height="20" fill="#e6e6e6"/>
+  <rect x="40" y="83" width="3" height="20" fill="#191919"/>
   <rect x="49" y="87" width="12" height="12" fill="#191919"/>
   <g fill="#d9d9d9">
     <rect x="49" y="105" width="12" height="12"/>
@@ -71,8 +72,8 @@
   <g font-size="12" fill="#626262">
     <text x="736" y="84">白底、只放图标，悬停</text>
     <text x="736" y="101">时向右展开文字</text>
-    <text x="736" y="144">图标变墨色，左缘</text>
-    <text x="736" y="161">出现短竖条</text>
+    <text x="736" y="144">图标变墨色，压在浅灰</text>
+    <text x="736" y="161">底块上，左缘一条竖条</text>
     <text x="736" y="204">黑底白字竖排，悬停</text>
     <text x="736" y="221">整块变信号黄</text>
     <text x="736" y="264">人物或主图偏离</text>
