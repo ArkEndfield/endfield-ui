@@ -177,9 +177,15 @@
   cursor: progress;
 }
 
+/*
+ * 焦点环画两圈：里圈墨色贴着黄钮，外圈白色。按钮探出面板的右上角，环的上、右两边
+ * 压在遮罩上，另外两边压在深灰的标题带上——页面是暗色时这两处都是深的，只有墨色
+ * 那一圈就看不见。高对比模式下阴影不画，剩外圈，颜色由系统换。
+ */
 .ef-animated-dialog__close:focus-visible {
-  outline: 2px solid #191919;
+  outline: 2px solid #fff;
   outline-offset: 3px;
+  box-shadow: 0 0 0 3px #191919;
 }
 
 .ef-animated-dialog__separator {
@@ -422,6 +428,22 @@
 }
 
 @media (forced-colors: active) {
+  /* 遮罩和各层底色都被系统换成页面色：面板要靠一圈线才和页面分得开 */
+  .ef-animated-dialog {
+    border: 1px solid CanvasText;
+    background: Canvas;
+  }
+  /*
+   * 装饰都拿掉。镂空的大字平时是 5% 的白，系统会把它换成实心的字色，压在标题上；
+   * 分隔条的小箭头、页脚的小方框是用边线画的，底色没了之后只剩几个孤零零的白块。
+   */
+  .ef-animated-dialog__top-strip,
+  .ef-animated-dialog__title-deco,
+  .ef-animated-dialog__separator,
+  .ef-animated-dialog__registration,
+  .ef-animated-dialog__footer {
+    display: none;
+  }
   .ef-animated-dialog__content {
     background: Canvas;
     color: CanvasText;
