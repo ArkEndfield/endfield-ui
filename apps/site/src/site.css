@@ -1,0 +1,436 @@
+/*
+ * 文档站的样式入口：组件库的样式 + 三款开源字体 + 正文（从 Markdown 转出来的那一块）的排版。
+ * 颜色只用令牌，亮暗两个主题不用各写一套。
+ */
+@import "@endfield-ui/react/tailwind.css";
+
+/* 页面外壳里用到的工具类 */
+@source "./";
+
+/*
+ * 令牌只声明字体栈，不负责加载。这里把三款开源的替代字体打进站点，
+ * 不走外面的字体服务；中文回退到系统黑体。
+ */
+@import "@fontsource-variable/archivo/wdth.css";
+@import "@fontsource-variable/outfit/index.css";
+@import "@fontsource-variable/space-grotesk/index.css";
+
+/* fontsource 的可变字体叫"某某 Variable"，排在令牌原来的字体名前面 */
+@theme {
+  --font-display:
+    "Archivo Variable", "Archivo", "Montserrat", "HarmonyOS Sans SC", sans-serif;
+  --font-latin:
+    "Outfit Variable", "Outfit", "Urbanist", "HarmonyOS Sans SC", sans-serif;
+  --font-tech:
+    "Space Grotesk Variable", "Space Grotesk", "HarmonyOS Sans SC", sans-serif;
+}
+
+@layer base {
+  html {
+    /* 顶栏吸在上面的时候（窄屏），锚点跳过去不被它压住 */
+    scroll-padding-top: 4.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (width >= 64rem) {
+    html {
+      scroll-padding-top: 1.5rem;
+    }
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--ef-surface-inverse);
+    color: var(--ef-ink-inverse);
+  }
+
+  /* 搜索框里浏览器自带的那个彩色小叉不要：Esc 关弹窗，全选了再打就是重来 */
+  input[type="search"]::-webkit-search-cancel-button {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 正文                                                                 */
+/* ------------------------------------------------------------------ */
+
+.doc {
+  /* 代码高亮的几档颜色：以墨色为主，只有字符串和数值点一下强调色 */
+  --code-foreground: var(--ef-ink);
+  --code-token-keyword: var(--ef-ink);
+  --code-token-function: var(--ef-info);
+  --code-token-constant: var(--ef-info);
+  --code-token-string: var(--ef-accent-ink);
+  --code-token-string-expression: var(--ef-accent-ink);
+  --code-token-parameter: var(--ef-ink);
+  --code-token-punctuation: var(--ef-ink-secondary);
+  --code-token-comment: var(--ef-ink-tertiary);
+  --code-token-link: var(--ef-info);
+
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+.doc > * + * {
+  margin-top: 1rem;
+}
+
+.doc h2,
+.doc h3,
+.doc h4 {
+  position: relative;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+/* 二级标题：左侧一条短竖条——分节标题在文档页上的简化版 */
+.doc h2 {
+  margin-top: 3.5rem;
+  padding-left: 1rem;
+  font-size: var(--text-2xl);
+}
+
+.doc h2::before {
+  content: "";
+  position: absolute;
+  top: 0.2em;
+  left: 0;
+  width: 0.25rem;
+  height: 0.9em;
+  background-color: var(--ef-ink);
+}
+
+.doc h3 {
+  margin-top: 2.5rem;
+  font-size: var(--text-lg);
+}
+
+.doc h4 {
+  margin-top: 2rem;
+  font-size: var(--text-base);
+}
+
+.doc > :first-child {
+  margin-top: 0;
+}
+
+.doc h2 + *,
+.doc h3 + *,
+.doc h4 + * {
+  margin-top: 0.75rem;
+}
+
+/* 标题后面的锚点：平时藏着，指针停在标题上或键盘走到它时才出来 */
+.doc-anchor {
+  margin-left: 0.5rem;
+  font-family: var(--font-tech);
+  font-weight: 500;
+  color: var(--ef-ink-tertiary);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-standard);
+}
+
+.doc :is(h2, h3, h4):hover .doc-anchor,
+.doc-anchor:focus-visible {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .doc-anchor {
+    display: none;
+  }
+}
+
+.doc a:not(.doc-anchor) {
+  color: var(--ef-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--ef-line-strong);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color var(--duration-fast) var(--ease-standard);
+}
+
+.doc a:not(.doc-anchor):hover {
+  text-decoration-color: var(--ef-ink);
+}
+
+.doc a:focus-visible,
+.doc-table:focus-visible,
+.doc-code:focus-visible,
+.doc-copy:focus-visible {
+  outline: 2px solid var(--ef-focus);
+  outline-offset: 2px;
+}
+
+/* 往站外走的链接后面带一个斜向上的小箭头 */
+.doc a.doc-ext::after {
+  content: "↗";
+  margin-left: 0.15em;
+  font-family: var(--font-tech);
+  font-size: 0.75em;
+  color: var(--ef-ink-tertiary);
+}
+
+.doc strong {
+  font-weight: 700;
+}
+
+.doc ul,
+.doc ol {
+  padding-left: 1.5rem;
+}
+
+.doc ul {
+  list-style: square;
+}
+
+.doc ol {
+  list-style: decimal;
+}
+
+.doc li + li,
+.doc li > ul,
+.doc li > ol {
+  margin-top: 0.375rem;
+}
+
+.doc li::marker {
+  color: var(--ef-ink-tertiary);
+  font-family: var(--font-tech);
+}
+
+/* 引用：文档里用它写"证据说明"这类旁注 */
+.doc blockquote {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--ef-line);
+  border-left: 0.25rem solid var(--ef-ink);
+  background-color: var(--ef-surface-raised);
+  color: var(--ef-ink);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+}
+
+.doc blockquote > * + * {
+  margin-top: 0.5rem;
+}
+
+.doc hr {
+  border: 0;
+  border-top: 1px solid var(--ef-line);
+  margin-block: 2.5rem;
+}
+
+/* 行内代码 */
+.doc :not(pre) > code {
+  padding: 0.1em 0.35em;
+  background-color: var(--ef-surface-sunken);
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  /* 长的类名、选择器在窄屏上要能折行 */
+  overflow-wrap: anywhere;
+}
+
+.doc :is(h2, h3, h4) code {
+  font-size: 0.9em;
+}
+
+.doc code.doc-nowrap {
+  white-space: nowrap;
+}
+
+/* 色值前面的小色块 */
+.doc-swatch {
+  display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  margin-right: 0.35em;
+  border: 1px solid var(--ef-line-strong);
+  vertical-align: -0.05em;
+}
+
+/* 代码块：凹陷的底加一条底边线，和输入框是同一个做法 */
+.doc-codeblock {
+  position: relative;
+}
+
+.doc-code {
+  padding: 1rem;
+  border-bottom: 2px solid var(--ef-line-strong);
+  background-color: var(--ef-surface-sunken);
+  color: var(--code-foreground);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  overflow-x: auto;
+  overflow-wrap: normal;
+  tab-size: 2;
+}
+
+.doc-code code {
+  font: inherit;
+}
+
+.doc-copy {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.125rem 0.5rem;
+  background-color: var(--ef-surface);
+  color: var(--ef-ink-secondary);
+  font-family: var(--font-tech);
+  font-size: var(--text-xs);
+  line-height: 1.5rem;
+  opacity: 0;
+  transition:
+    opacity var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.doc-codeblock:hover .doc-copy,
+.doc-copy:focus-visible,
+.doc-copy[data-copied] {
+  opacity: 1;
+}
+
+.doc-copy:hover {
+  color: var(--ef-ink);
+}
+
+@media (hover: none) {
+  .doc-copy {
+    opacity: 1;
+  }
+}
+
+/* 表格：宽了在自己里面横向滚动。表头是反转的标题带 */
+.doc-table {
+  overflow-x: auto;
+  border-bottom: 1px solid var(--ef-line);
+}
+
+.doc table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.doc th {
+  padding: 0.375rem 0.75rem;
+  background-color: var(--ef-surface-inverse);
+  color: var(--ef-ink-inverse);
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.doc td {
+  /* 一格里至少排得下七八个字：再窄就让表格横向滚动，不把字挤成一个一行 */
+  min-width: 7.5em;
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid var(--ef-line);
+  vertical-align: top;
+}
+
+/* 只放了一个短名字、一个来源等级的格子，跟着内容走，不用撑到最小宽度 */
+.doc td:has(> code:only-child),
+.doc td:has(> .doc-evidence:only-child) {
+  min-width: 0;
+}
+
+.doc tbody tr:first-child td {
+  border-top: 0;
+}
+
+@media (hover: hover) {
+  .doc tbody tr:hover td {
+    background-color: color-mix(in srgb, var(--ef-ink) 5%, transparent);
+  }
+}
+
+/* 表头带上的行内代码：底换成半透明的，不然是一块页面色的补丁 */
+.doc th code {
+  background-color: color-mix(in srgb, var(--ef-ink-inverse) 16%, transparent);
+}
+
+/* 来源等级的小标签：四档的画法各不相同，不只靠颜色分 */
+.doc-evidence {
+  display: inline-block;
+  padding: 0 0.375rem;
+  border: 1px solid transparent;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  line-height: 1.125rem;
+  white-space: nowrap;
+}
+
+.doc-evidence[data-level="实测"] {
+  background-color: var(--ef-surface-inverse);
+  color: var(--ef-ink-inverse);
+}
+
+.doc-evidence[data-level="观察"] {
+  border-color: var(--ef-ink);
+}
+
+.doc-evidence[data-level="社区"] {
+  background-color: var(--ef-surface-muted);
+}
+
+.doc-evidence[data-level="推断"] {
+  border-style: dashed;
+  border-color: var(--ef-line-strong);
+  color: var(--ef-ink-secondary);
+}
+
+/*
+ * 图解：都是亮底画的 SVG。垫一块固定的"纸"，暗色主题下不反色——
+ * 它是印在纸上的图，不是界面的一部分。
+ */
+.doc-figure {
+  margin-block: 1.5rem;
+  border: 1px solid var(--ef-line);
+  background-color: var(--color-neutral-50);
+}
+
+.doc-figure a {
+  display: block;
+  cursor: zoom-in;
+}
+
+.doc-figure a:focus-visible {
+  outline-offset: -2px;
+}
+
+.doc-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.doc-figure figcaption {
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid var(--color-neutral-300);
+  color: var(--color-neutral-600);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+.doc-figure figcaption::before {
+  content: "// ";
+  font-family: var(--font-tech);
+}
+
+@media print {
+  .doc-copy,
+  .doc-anchor {
+    display: none;
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node", "vite/client"],
+    // scripts 和 checks 由 Node 直接运行，导入要写出 .ts 后缀
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "@endfield-ui/react": ["../../packages/ui/src/index.ts"]
+    }
+  },
+  "include": ["src", "scripts", "checks", "vite.config.ts"]
+}
