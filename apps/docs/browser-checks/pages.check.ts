@@ -649,9 +649,19 @@ test("内容页：轮播翻页换说明，头像切换换人，排期在自己�
   );
 
   const name = async () =>
-    (await page.text("#storybook-root [role=radiogroup] + [aria-live] p"))[0] ??
-    "";
+    (
+      await page.text("#storybook-root [role=radiogroup] + [aria-live] h3")
+    )[0] ?? "";
   assert.match(await name(), /陈知远/);
+  // 够宽：头像一列在左，介绍在右。窄了才改成上下叠放（narrow.check.ts）
+  assert.equal(
+    await page.evaluate(() =>
+      document
+        .querySelector("#storybook-root [role=radiogroup][aria-label=队员]")!
+        .getAttribute("aria-orientation"),
+    ),
+    "vertical",
+  );
   await page.evaluate(() =>
     document
       .querySelector<HTMLElement>(

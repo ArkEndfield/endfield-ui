@@ -3,6 +3,7 @@ import {
   AvatarSwitcherItem,
   BackToTop,
   Badge,
+  BracketTitle,
   Button,
   Carousel,
   CarouselSlide,
@@ -29,7 +30,7 @@ import {
   TocItem,
 } from "@endfield-ui/react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useId, useState } from "react";
+import { useId, useLayoutEffect, useRef, useState } from "react";
 import { IsoCube } from "./_shared/IsoCube";
 import { photo, ScenePlaceholder } from "./_shared/Placeholders";
 import { crew } from "./_shared/Portraits";
@@ -127,17 +128,46 @@ const works = [
   },
 ];
 
-/* 官网"干员情报"的排法：左边一列头像，右边是选中这个人的介绍 */
+/*
+ * 这个元素是不是比 below 窄。头像切换的方向是一个属性，容器查询换不了它：
+ * 量出来，排法的类名和方向跟着同一个结果走
+ */
+function useNarrow<T extends HTMLElement>(below: number) {
+  const ref = useRef<T>(null);
+  const [narrow, setNarrow] = useState(false);
+  useLayoutEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    const measure = () => setNarrow(node.clientWidth < below);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [below]);
+  return [ref, narrow] as const;
+}
+
+/*
+ * 官网"干员情报"的排法：左边一列头像，右边是选中这个人的介绍。
+ * 窄了放不下两栏，改成头像横排在上面、介绍在下面占整行
+ */
 function Crew() {
   const people = crew.slice(0, 4);
   const [current, setCurrent] = useState(people[0]!.value);
   const person = people.find((item) => item.value === current)!;
+  const [frame, narrow] = useNarrow<HTMLDivElement>(448);
   return (
-    <div className="flex items-start gap-6">
+    <div
+      ref={frame}
+      className={narrow ? "flex flex-col gap-4" : "flex items-start gap-6"}
+    >
       <AvatarSwitcher
         aria-label="队员"
         value={current}
         onValueChange={setCurrent}
+        orientation={narrow ? "horizontal" : "vertical"}
+        // 横排时按头像的总宽来，不拉满一行；比这一行宽了它自己会滚
+        className={narrow ? "self-start" : undefined}
       >
         {people.map((item) => (
           <AvatarSwitcherItem
@@ -148,16 +178,16 @@ function Crew() {
           />
         ))}
       </AvatarSwitcher>
-      <div aria-live="polite" className="flex min-w-0 flex-col gap-3 pt-10">
-        <p className="text-3xl font-bold wrap-anywhere">
-          <span aria-hidden="true" className="text-line-strong">
-            {"[ "}
-          </span>
-          {person.label}
-          <span aria-hidden="true" className="text-line-strong">
-            {" ]"}
-          </span>
-        </p>
+      <div
+        aria-live="polite"
+        className={
+          narrow
+            ? "flex min-w-0 flex-col gap-3"
+            : "flex min-w-0 flex-col gap-3 pt-10"
+        }
+      >
+        {/* 方括号不自己拼：名字折行时右括号要跟着最后一个字 */}
+        <BracketTitle className="text-3xl">{person.label}</BracketTitle>
         <div className="flex flex-wrap gap-2">
           <TagPair name="岗位" value={person.role} />
           <TagPair name="所属" value="第七勘探队" />
@@ -219,8 +249,13 @@ function Content({
       </SectionTitle>
 
       <section id={anchor("bulletin")} className="flex flex-col gap-6">
-        <div className="flex items-end justify-between gap-4">
-          <SectionTitle latin="Bulletin" meta="// 情报　共 5 条">
+        {/* 放不下时"查看全部"换到标题下面，不把标题挤折 */}
+        <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-3">
+          <SectionTitle
+            latin="Bulletin"
+            meta="// 情报　共 5 条"
+            className="min-w-0"
+          >
             最新情报
           </SectionTitle>
           <Button variant="text" href="#all">
@@ -239,8 +274,9 @@ function Content({
             <EntryList items={entries.notice} />
           </TabPanel>
         </Tabs>
-        <div className="flex items-center justify-between">
-          <div className="inline-flex items-center gap-2 rounded-full bg-surface-muted p-1.5">
+        {/* 胶囊和按钮都不收缩：一行放不下时按钮换到下一行，页码不折 */}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="inline-flex shrink-0 items-center gap-2 rounded-full bg-surface-muted p-1.5">
             <IconButton
               aria-label="上一页"
               variant="floating"
@@ -249,7 +285,9 @@ function Content({
             >
               <ChevronLeft />
             </IconButton>
-            <span className="px-2 font-tech text-sm tabular-nums">01 / 04</span>
+            <span className="px-2 font-tech text-sm whitespace-nowrap tabular-nums">
+              01 / 04
+            </span>
             <IconButton aria-label="下一页" variant="floating" size="sm">
               <ChevronRight />
             </IconButton>

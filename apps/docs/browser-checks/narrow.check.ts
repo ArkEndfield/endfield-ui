@@ -1,4 +1,4 @@
-// 320px 宽：页面不横向溢出，浮层整个在视口里
+// 320px 宽：页面不横向溢出，浮层整个在视口里；手机上看文档页：一行里的东西不被挤折、挤出去
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { useStorybook, type Page } from "./lib/harness.ts";
@@ -174,4 +174,153 @@ test("气泡卡片：面板在视口里", async () => {
   await page.click("text=显示设置");
   await page.waitVisible("[role=dialog]");
   assert.ok(await inside(page, "[role=dialog]"), "面板超出了视口");
+});
+
+/*
+ * 手机上看文档页。文档页自己的留白加上并排外壳的内边距要吃掉 130px：360px 的屏，
+ * story 只剩 230px 上下，比 320px 的单页预览（272px）还窄。一行里的东西被挤折、挤出去，
+ * 在上面那些"页面不横向溢出"的检查里看不出来——外面那一层照样不滚
+ */
+
+/** 每个匹配到的元素里，字排成了几行。`text` 只留内容正好是它的那几个 */
+function lineCounts(page: Page, selector: string, text?: string) {
+  return page.evaluate(
+    (css, only) =>
+      [...document.querySelectorAll(css)]
+        .filter(
+          (element) => only === null || element.textContent?.trim() === only,
+        )
+        .map((element) => {
+          const range = document.createRange();
+          range.selectNodeContents(element);
+          // 同一行里字号不一样的几段，矩形的上下沿对不齐：纵向重叠过半就算同一行
+          const lines: { top: number; bottom: number }[] = [];
+          for (const rect of range.getClientRects()) {
+            if (rect.width < 0.5 || rect.height < 0.5) continue;
+            const line = lines.find(
+              (known) =>
+                Math.min(known.bottom, rect.bottom) -
+                  Math.max(known.top, rect.top) >
+                Math.min(known.bottom - known.top, rect.height) / 2,
+            );
+            if (line) {
+              line.top = Math.min(line.top, rect.top);
+              line.bottom = Math.max(line.bottom, rect.bottom);
+            } else {
+              lines.push({ top: rect.top, bottom: rect.bottom });
+            }
+          }
+          return lines.length;
+        }),
+    selector,
+    text ?? null,
+  );
+}
+
+/**
+ * 这些容器里，伸到容器右边之外的东西。自己会滚动或裁切的祖先里面的不算；
+ * 绝对定位的也不算——角标本来就骑在边上
+ */
+function stickingOut(page: Page, selector: string) {
+  return page.evaluate((css) => {
+    const found: string[] = [];
+    for (const box of document.querySelectorAll(css)) {
+      const edge = box.getBoundingClientRect().right;
+      const exempt = (element: Element) => {
+        for (
+          let node: Element | null = element;
+          node && node !== box;
+          node = node.parentElement
+        ) {
+          const style = getComputedStyle(node);
+          if (style.position === "absolute") return true;
+          if (node !== element && style.overflowX !== "visible") return true;
+        }
+        return false;
+      };
+      for (const element of box.querySelectorAll("*")) {
+        const rect = element.getBoundingClientRect();
+        if (rect.width === 0 || rect.right <= edge + 0.5) continue;
+        if (exempt(element)) continue;
+        const text = (element.textContent ?? "").trim().slice(0, 12);
+        found.push(`${element.tagName.toLowerCase()}「${text}」`);
+      }
+    }
+    return found.slice(0, 6);
+  }, selector);
+}
+
+const NAME = ".docs-story [role=radiogroup] + [aria-live] > :first-child";
+
+test("手机上的文档页：内容页的页码不折行，标题不被旁边的按钮挤折，没有东西伸出去", async () => {
+  const { page } = storybook;
+  await page.setSize(360, 800);
+  await page.docs("示例-内容页--docs");
+
+  // 并排的两份各有一个
+  assert.deepEqual(
+    await lineCounts(page, ".docs-story span", "01 / 04"),
+    [1, 1],
+    "页码应该排在一行里",
+  );
+  assert.deepEqual(
+    await lineCounts(page, ".docs-story h2", "最新情报"),
+    [1, 1],
+    "标题不应该被“查看全部”挤成两行",
+  );
+  assert.deepEqual(await stickingOut(page, ".docs-story section"), []);
+});
+
+test("手机上的文档页：内容页的队员一节上下叠放，名字排在一行里", async () => {
+  const { page } = storybook;
+  await page.setSize(360, 800);
+  await page.docs("示例-内容页--docs");
+
+  assert.deepEqual(
+    await page.evaluate(() =>
+      [
+        ...document.querySelectorAll(
+          ".docs-story [role=radiogroup][aria-label=队员]",
+        ),
+      ].map((group) => group.getAttribute("aria-orientation")),
+    ),
+    ["horizontal", "horizontal"],
+    "窄的时候头像应该横排在介绍上面",
+  );
+  assert.deepEqual(await lineCounts(page, NAME), [1, 1], "名字应该排在一行里");
+});
+
+test("手机上的文档页：内容页的名字折行时，右括号跟着最后一个字", async () => {
+  const { page } = storybook;
+  await page.setSize(360, 800);
+  await page.docs("示例-内容页--docs");
+
+  const together = await page.evaluate(
+    (css) =>
+      [...document.querySelectorAll<HTMLElement>(css)].map((name) => {
+        // 不靠字宽（CI 上没有中文字体）：压到两个字多一点，三个字的名字怎么都得折
+        name.style.width = "2.25em";
+        const walker = document.createTreeWalker(name, NodeFilter.SHOW_TEXT);
+        const letters: DOMRect[] = [];
+        const range = document.createRange();
+        for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+          const value = node.nodeValue ?? "";
+          for (let at = 0; at < value.length; at++) {
+            if (value[at]!.trim() === "") continue;
+            range.setStart(node, at);
+            range.setEnd(node, at + 1);
+            letters.push(range.getBoundingClientRect());
+          }
+        }
+        // 最后两个字：名字的末一个字、右括号
+        const [last, bracket] = letters.slice(-2) as [DOMRect, DOMRect];
+        return (
+          Math.min(last.bottom, bracket.bottom) -
+            Math.max(last.top, bracket.top) >
+          Math.min(last.height, bracket.height) / 2
+        );
+      }),
+    NAME,
+  );
+  assert.deepEqual(together, [true, true], "右括号不应该自己落到下一行");
 });
