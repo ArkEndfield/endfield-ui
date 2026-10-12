@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" width="960" height="480" role="img" aria-labelledby="t d" font-family="'HarmonyOS Sans SC','Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif">
   <title id="t">数据展示类组件</title>
-  <desc id="d">数据行带：浅色画布上的深色行，行内嵌入小型面积图。统计块：大号等宽数字加标签。表格：胶囊列头与直角数据行。时间线：菱形节点。</desc>
+  <desc id="d">数据行带：浅色画布上的深色行，行内嵌入小型面积图。统计块：大号等宽数字加标签。表格：墨底白字的表头与直角数据行。时间线：菱形节点。</desc>
   <rect width="960" height="480" fill="#fafafa"/>
 
   <!-- 数据行带 -->

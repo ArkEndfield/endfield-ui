@@ -64,8 +64,8 @@
   <text x="665" y="305" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">LV.20</text>
   <polygon points="770,280 920,280 920,318 754,318" fill="#fffa00"/>
   <text x="840" y="305" font-size="15" font-weight="700" fill="#191919" text-anchor="middle">当前页签</text>
-  <text x="590" y="340" font-size="12" fill="#626262">用伪元素 skewX 画底板，</text>
-  <text x="590" y="358" font-size="12" fill="#626262">或只斜切一侧。</text>
+  <text x="590" y="340" font-size="12" fill="#626262">用 clip-path 的多边形画底板，</text>
+  <text x="590" y="358" font-size="12" fill="#626262">可以只斜切一侧。</text>
 
   <!-- 焦点环 -->
   <text x="40" y="402" font-size="13" font-weight="700" fill="#191919">焦点环</text>

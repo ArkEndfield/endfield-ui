@@ -88,7 +88,7 @@
   </g>
   <g font-size="12" fill="#626262">
     <text x="490" y="312">默认：表面色，行间 1px 线</text>
-    <text x="490" y="336">悬停：surface-sunken</text>
+    <text x="490" y="336">悬停：墨色 5%</text>
     <text x="490" y="360">选中：surface-muted + 左缘 4px 强调条 + 加粗</text>
     <text x="490" y="394">深色界面里选中行可以整行反转为白底墨字（社区）。</text>
     <text x="490" y="414">行内不放装饰；数字右对齐、等宽。</text>
