@@ -52,7 +52,7 @@ import { FullWidthAlert, RoundedButton } from "@endfield-ui/react/game";
 
 确认调用 `onConfirm`，取消调用 `onCancel`，遮罩或 Escape 调用 `onDismiss`。对应操作允许后再调用 `onClose`，然后请求 `onOpenChange(false)`。任一回调返回 `false`、抛错或 Promise 拒绝，都保留当前弹窗。异步操作期间同一实例只接受一次请求；关闭后重新打开，前一次的迟到结果不会关闭新弹窗。
 
-`loading` 或等待回调期间，按钮与外部关闭请求都被禁用，面板标记 `aria-busy`。`dismissible={false}` 禁止遮罩关闭并默认禁止 Escape，`keyboardCloseable` 可单独控制 Escape；确认、取消按钮仍使用各自回调。`showIcon={false}` 隐藏按钮图标，`hideCancel` 隐藏取消。`keepMounted` 可以保留关闭后的正文状态。
+`loading` 或等待回调期间，按钮与外部关闭请求都被禁用，面板标记 `aria-busy`。`dismissible={false}` 禁止遮罩关闭并默认禁止 Escape，`keyboardCloseable` 可单独控制 Escape；确认、取消按钮仍使用各自回调。两个按钮上的字默认是“取消”“确认”，用 `cancelText`、`confirmText` 换。`showIcon={false}` 隐藏按钮图标，`hideCancel` 隐藏取消。`keepMounted` 可以保留关闭后的正文状态。
 
 禁用使当前按钮失焦时，焦点落在面板；没有可用控件时 Tab 和 Shift+Tab 都留在面板内。回调否决后，若用户仍停在面板，焦点恢复到原动作按钮。有可用输入框时继续使用正常的键盘导航。
 

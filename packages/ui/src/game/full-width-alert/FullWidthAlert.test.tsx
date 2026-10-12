@@ -49,7 +49,7 @@ describe("FullWidthAlert", () => {
     const dialog = await screen.findByRole("alertdialog", { name: "确认" });
     const confirm = screen.getByRole("button", { name: "继续" });
     expect(
-      screen.queryByRole("button", { name: "Cancel" }),
+      screen.queryByRole("button", { name: "取消" }),
     ).not.toBeInTheDocument();
     expect(dialog).toContainElement(confirm);
     await waitFor(() => expect(confirm).toHaveFocus());
@@ -63,8 +63,8 @@ describe("FullWidthAlert", () => {
     );
     const dialog = await screen.findByRole("alertdialog", { name: "确认" });
     expect(dialog).toHaveAttribute("aria-busy", "true");
-    expect(screen.getByRole("button", { name: "Confirm" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "Cancel" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "确认" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "取消" })).toBeDisabled();
     expect(
       dialog.querySelector(".ef-rounded-button-icon"),
     ).not.toBeInTheDocument();
@@ -97,10 +97,10 @@ describe("FullWidthAlert", () => {
     expect(content).toHaveStyle({ overflowX: "hidden" });
     expect(content).toContainElement(screen.getByText("完整记录"));
     expect(content).not.toContainElement(
-      screen.getByRole("button", { name: "Confirm" }),
+      screen.getByRole("button", { name: "确认" }),
     );
     expect(content).not.toContainElement(
-      screen.getByRole("button", { name: "Cancel" }),
+      screen.getByRole("button", { name: "取消" }),
     );
   });
 });

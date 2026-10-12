@@ -33,7 +33,7 @@ function Basic(props: Partial<ComponentProps<typeof BannerAlert>>) {
 }
 
 describe("BannerAlert", () => {
-  it("alertdialog名称和说明关联读屏，默认焦点在Cancel，取消后回到触发按钮", async () => {
+  it("alertdialog名称和说明关联读屏，默认焦点在“取消”，取消后回到触发按钮", async () => {
     const user = userEvent.setup();
     render(<Basic description="移除后可以再次添加。" />);
     const trigger = screen.getByRole("button", { name: "打开" });
@@ -41,7 +41,7 @@ describe("BannerAlert", () => {
     const popup = await screen.findByRole("alertdialog", { name: "移除物品" });
     expect(popup).toHaveAccessibleDescription("移除后可以再次添加。");
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Cancel" })).toHaveFocus(),
+      expect(screen.getByRole("button", { name: "取消" })).toHaveFocus(),
     );
     await user.keyboard("{Enter}");
     await waitFor(() =>
@@ -50,7 +50,7 @@ describe("BannerAlert", () => {
     await waitFor(() => expect(trigger).toHaveFocus());
   });
 
-  it("Confirm、Cancel、遮罩、Esc分别执行对应回调再执行onClose", async () => {
+  it("确认、取消、遮罩、Esc分别执行对应回调再执行onClose", async () => {
     const user = userEvent.setup();
     const calls: string[] = [];
     render(
@@ -70,7 +70,7 @@ describe("BannerAlert", () => {
       />,
     );
     const trigger = screen.getByRole("button", { name: "打开" });
-    for (const action of ["Confirm", "Cancel", "backdrop", "Escape"]) {
+    for (const action of ["确认", "取消", "backdrop", "Escape"]) {
       await user.click(trigger);
       await screen.findByRole("alertdialog");
       if (action === "backdrop")
@@ -95,7 +95,7 @@ describe("BannerAlert", () => {
     ]);
   });
 
-  it("Confirm否决不继续关闭，onClose否决也保持打开", async () => {
+  it("确认被否决不继续关闭，onClose否决也保持打开", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn(() => false);
     const onConfirm = vi
@@ -104,14 +104,14 @@ describe("BannerAlert", () => {
       .mockResolvedValueOnce(true);
     render(<Basic defaultOpen onConfirm={onConfirm} onClose={onClose} />);
     await screen.findByRole("alertdialog");
-    await user.click(screen.getByRole("button", { name: "Confirm" }));
+    await user.click(screen.getByRole("button", { name: "确认" }));
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Confirm" })).toBeEnabled(),
+      expect(screen.getByRole("button", { name: "确认" })).toBeEnabled(),
     );
     expect(onClose).not.toHaveBeenCalled();
-    await user.click(screen.getByRole("button", { name: "Confirm" }));
+    await user.click(screen.getByRole("button", { name: "确认" }));
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Confirm" })).toBeEnabled(),
+      expect(screen.getByRole("button", { name: "确认" })).toBeEnabled(),
     );
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(screen.getByRole("alertdialog")).toBeInTheDocument();
@@ -129,14 +129,14 @@ describe("BannerAlert", () => {
     render(<Basic defaultOpen onConfirm={onConfirm} />);
     await screen.findByRole("alertdialog");
     for (let attempt = 0; attempt < 2; attempt += 1) {
-      await user.click(screen.getByRole("button", { name: "Confirm" }));
+      await user.click(screen.getByRole("button", { name: "确认" }));
       await waitFor(() =>
         expect(screen.getByRole("alertdialog")).not.toHaveAttribute(
           "aria-busy",
         ),
       );
     }
-    await user.click(screen.getByRole("button", { name: "Confirm" }));
+    await user.click(screen.getByRole("button", { name: "确认" }));
     await waitFor(() =>
       expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument(),
     );
@@ -160,10 +160,10 @@ describe("BannerAlert", () => {
       />,
     );
     const popup = await screen.findByRole("alertdialog");
-    const confirm = screen.getByRole("button", { name: "Confirm" });
+    const confirm = screen.getByRole("button", { name: "确认" });
     fireEvent.click(confirm);
     fireEvent.click(confirm);
-    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    fireEvent.click(screen.getByRole("button", { name: "取消" }));
     await user.keyboard("{Escape}");
     expect(onConfirm).toHaveBeenCalledTimes(1);
     expect(onCancel).not.toHaveBeenCalled();
@@ -189,7 +189,7 @@ describe("BannerAlert", () => {
     );
     const popup = await screen.findByRole("alertdialog");
     await waitFor(() => expect(popup).toHaveFocus());
-    await user.click(screen.getByRole("button", { name: "Confirm" }));
+    await user.click(screen.getByRole("button", { name: "确认" }));
     await user.click(
       document.querySelector<HTMLElement>(".ef-banner-alert-backdrop")!,
     );
@@ -204,7 +204,7 @@ describe("BannerAlert", () => {
     const request = deferred<boolean>();
     render(<Basic defaultOpen onConfirm={() => request.promise} />);
     const popup = await screen.findByRole("alertdialog");
-    const confirm = screen.getByRole("button", { name: "Confirm" });
+    const confirm = screen.getByRole("button", { name: "确认" });
     await user.click(confirm);
     await waitFor(() => expect(popup).toHaveFocus());
     await user.tab();
@@ -219,17 +219,17 @@ describe("BannerAlert", () => {
     expect(confirm).toBeEnabled();
   });
 
-  it("隐藏Cancel才默认聚焦Confirm，遮罩与Esc开关可以独立", async () => {
+  it("隐藏“取消”才默认聚焦“确认”，遮罩与Esc开关可以独立", async () => {
     const user = userEvent.setup();
     render(
       <Basic defaultOpen hideCancel dismissible={false} keyboardCloseable />,
     );
     const popup = await screen.findByRole("alertdialog");
     expect(
-      screen.queryByRole("button", { name: "Cancel" }),
+      screen.queryByRole("button", { name: "取消" }),
     ).not.toBeInTheDocument();
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Confirm" })).toHaveFocus(),
+      expect(screen.getByRole("button", { name: "确认" })).toHaveFocus(),
     );
     await user.click(
       document.querySelector<HTMLElement>(".ef-banner-alert-backdrop")!,
@@ -254,7 +254,7 @@ describe("BannerAlert", () => {
       <Basic open onConfirm={onConfirm} onOpenChange={onOpenChange} />,
     );
     await screen.findByRole("alertdialog");
-    await user.click(screen.getByRole("button", { name: "Confirm" }));
+    await user.click(screen.getByRole("button", { name: "确认" }));
     rerender(
       <Basic open={false} onConfirm={onConfirm} onOpenChange={onOpenChange} />,
     );
@@ -264,7 +264,7 @@ describe("BannerAlert", () => {
     rerender(<Basic open onConfirm={onConfirm} onOpenChange={onOpenChange} />);
     const popup = await screen.findByRole("alertdialog");
     expect(popup).not.toHaveAttribute("aria-busy");
-    await user.click(screen.getByRole("button", { name: "Confirm" }));
+    await user.click(screen.getByRole("button", { name: "确认" }));
     await act(async () => oldRequest.resolve(true));
     expect(onOpenChange).not.toHaveBeenCalled();
     expect(popup).toHaveAttribute("aria-busy", "true");
@@ -284,7 +284,7 @@ describe("BannerAlert", () => {
       />,
     );
     await screen.findByRole("alertdialog");
-    await user.click(screen.getByRole("button", { name: "Confirm" }));
+    await user.click(screen.getByRole("button", { name: "确认" }));
     unmount();
     await act(async () => request.resolve(true));
     expect(onOpenChange).not.toHaveBeenCalled();
@@ -299,7 +299,7 @@ describe("BannerAlert", () => {
     );
     await user.click(screen.getByRole("button", { name: "编辑" }));
     await user.type(screen.getByRole("textbox", { name: "草稿" }), "内容");
-    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    await user.click(screen.getByRole("button", { name: "取消" }));
     await waitFor(() =>
       expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument(),
     );

@@ -15,8 +15,8 @@ export function BannerAlert({
   children,
   width = "30em",
   hideCancel = false,
-  cancelText = "Cancel",
-  confirmText = "Confirm",
+  cancelText = "取消",
+  confirmText = "确认",
   showIcon = true,
   classNames,
   ...props

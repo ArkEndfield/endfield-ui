@@ -10,8 +10,8 @@ export type FullWidthAlertProps = Omit<AlertModalProps, "width">;
 /** 横贯视口的确认面板，底部按钮突出于面板下沿。 */
 export function FullWidthAlert({
   hideCancel = false,
-  cancelText = "Cancel",
-  confirmText = "Confirm",
+  cancelText = "取消",
+  confirmText = "确认",
   showIcon = true,
   height = "auto",
   classNames,

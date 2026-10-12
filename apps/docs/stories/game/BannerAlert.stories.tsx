@@ -40,7 +40,7 @@ export const NonDismissible: Story = {
   args: { dismissible: false, keyboardCloseable: true },
 };
 export const WithForm: Story = {
-  name: "正文表单 / Cancel先获焦",
+  name: "正文表单 / “取消”先获焦",
   args: {
     children: (
       <Field label="备注">
