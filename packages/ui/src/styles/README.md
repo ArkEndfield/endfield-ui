@@ -6,6 +6,8 @@
 | [utilities.css](utilities.css) | `@utility`：母题工具类（斜纹、切角、斜楔、角括号、镂空字、警示条纹、竖条变箭头），以及菱形表单符号的开关 |
 | [index.css](index.css) | 入口：`tailwindcss` → `theme.css` → `utilities.css` → 基础样式 → `@source` |
 
+圆形图标按钮的本地纹理由 `scripts/copy-assets.mjs` 在 `build:css` 后复制到 `dist/assets`，对应预编译 CSS 中的相对地址。源码样式保留组件目录内的同一张图片；两种入口都不需要外部资源地址。
+
 对外的三个入口（见包的 `exports`）：
 
 | 引入路径 | 对应 | 给谁用 |

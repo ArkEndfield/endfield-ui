@@ -2,12 +2,12 @@
 
 终末地风格的 React 基础控件库。非官方，详见 [NOTICE](https://github.com/icaruszezen/endfield-ui/blob/main/NOTICE.md)。
 
-已实现的控件如下。默认控件适配亮 / 暗主题与主题色接管；`AnimatedDialog`、`RoundedSelect` 保留各自的固定配色。
+已实现的控件如下。默认控件适配亮 / 暗主题与主题色接管；社区变体保留各自的固定配色。
 
 | 类别 | 控件 |
 | --- | --- |
-| 基础 | Button / ButtonGroup、IconButton、Toolbar、Tag / TagPair、Badge、Kbd、SectionTitle、BracketTitle、Tabs、Panel |
-| 表单 | Field、Input、OtpInput、Textarea、Select / RoundedSelect、Combobox、TagInput、DatePicker / DateRangePicker / Calendar、FileUpload / FileItem、Checkbox、Radio / RadioGroup、SegmentedControl、Switch、Stepper、Slider、FilterChip |
+| 基础 | Button / ButtonGroup / RoundedButton、IconButton / RoundedIconButton、RoundedToggle、Toolbar、Tag / TagPair、Badge、Kbd、SectionTitle、BracketTitle、Tabs、Panel |
+| 表单 | Field、Input、OtpInput、Textarea、Select / RoundedSelect、Combobox、TagInput、DatePicker / DateRangePicker / Calendar、FileUpload / FileItem、Checkbox、Radio / RadioGroup、SegmentedControl、Switch / RoundedSwitch、Stepper、Slider、FilterChip |
 | 反馈 | Alert、Toast、Progress / ProgressRing、Spinner、Skeleton、EmptyState、Loader、CompletionBanner、RecIndicator |
 | 浮层 | Tooltip、Popover、HoverCard、Dialog / AnimatedDialog、Drawer、DropdownMenu、ContextMenu、FlyoutBar |
 | 展示 | Table（行能展开）、Stat、RollingNumber、Sparkline、DataRowList / DataRow、List / ListRow、Accordion、ScrollArea、MediaCard、PlayButton / PlayMark、Carousel、ImageViewer、ItemSlot / ItemGrid、Avatar、Timeline、Schedule、Term、ResourceChip、Countdown、Marquee、ScrollHint |
@@ -827,6 +827,8 @@ function ThemeToggle() {
 动效是控件自带的，不用配置：状态变了有过渡（勾和圆点淡入、选中的墨块滑过去、明细按高度展开、删掉的一项淡出、其余的补位），浮层从触发它的那一侧来。都在 0.2 – 0.3 秒里做完，没有回弹，悬停不放大。
 
 `AnimatedDialog` 的图标和关闭按钮保留 EndfieldMap 的短暂回弹入场，主体从 90% 放大到原尺寸。它和圆角下拉的用法见[社区变体](../../docs/design/components/community-variants.md)；系统开启减少动态效果时同样直接显示终态。
+
+圆角按钮、分段选择和文字开关的用法见[圆角控件](../../docs/design/components/rounded-controls.md)。它们保留原悬停闪动与滑块移动，不带音效；圆形图标按钮的 PNG 纹理使用包内相对路径，两种样式入口都能解析，不需要资源域名。
 
 - **只播一次的入场**带一个 `animate` 属性，默认开，传 `animate={false}` 关掉：`SectionTitle`、`BracketTitle`、`PageHeader`、`CompletionBanner`、`EmptyState`、`Sparkline`、`RollingNumber`。反过来默认关着的有两个：`Progress`（入场时充填一次）和 `Viewfinder`（取景角落位）。
 - **系统开了"减少动态效果"时全部停在终态。** CSS 的动画和过渡由样式入口末尾的一条全局规则统一降级；脚本驱动的几处（滚动数字、平滑滚动、主题的交叉淡化）各自看系统设置。你自己写脚本驱动的动效时用 `useReducedMotion()`。

@@ -1,0 +1,87 @@
+.ef-rounded-switch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 32px;
+  border-radius: 9999px;
+  background: #5c5a5d;
+  box-shadow: 0 0 3px #0004;
+  font-size: 16px;
+  line-height: 24px;
+  isolation: isolate;
+}
+.ef-rounded-switch__highlight {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 1;
+  width: calc(50% + 0.5em);
+  height: 100%;
+  border-radius: 9999px;
+  background: #edebec;
+  box-shadow: 0 0 3px #0006;
+  pointer-events: none;
+  transition-property: none;
+}
+.ef-rounded-switch__option {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 32px;
+  padding: 4px 16px;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: #b3b1b4;
+  font: inherit;
+  cursor: pointer;
+}
+.ef-rounded-switch__option[data-checked] {
+  color: #373537;
+}
+.ef-rounded-switch__option:is([disabled], [aria-disabled="true"]) {
+  cursor: not-allowed;
+}
+.ef-rounded-switch__option:focus-visible {
+  outline: 2px solid var(--ef-focus, #191919);
+  outline-offset: 2px;
+  z-index: 3;
+}
+.ef-rounded-switch__option > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (forced-colors: active) {
+  .ef-rounded-switch {
+    background: Canvas;
+    border: 1px solid ButtonText;
+    box-shadow: none;
+  }
+  .ef-rounded-switch__highlight {
+    background: Highlight;
+    box-shadow: none;
+    forced-color-adjust: none;
+  }
+  .ef-rounded-switch__option {
+    color: ButtonText;
+  }
+  .ef-rounded-switch__option[data-checked] {
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+  .ef-rounded-switch__option:is([disabled], [aria-disabled="true"]) {
+    color: GrayText;
+  }
+  .ef-rounded-switch__option:focus-visible {
+    outline-color: Highlight;
+  }
+}

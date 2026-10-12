@@ -47,7 +47,7 @@
   },
   "scripts": {
     "build": "tsdown && pnpm build:css",
-    "build:css": "tailwindcss -i src/styles/index.css -o dist/styles.css --minify",
+    "build:css": "tailwindcss -i src/styles/index.css -o dist/styles.css --minify && node scripts/copy-assets.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",

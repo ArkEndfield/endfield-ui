@@ -12,6 +12,9 @@
 @import "./utilities.css";
 @import "../components/animated-dialog/animated-dialog.css";
 @import "../components/rounded-select/rounded-select.css";
+@import "../components/rounded-button/rounded-button.css";
+@import "../components/rounded-toggle/rounded-toggle.css";
+@import "../components/rounded-switch/rounded-switch.css";
 
 /*
  * 让 Tailwind 扫到本包用到的类名。要扫整个 src，不能只扫 components：

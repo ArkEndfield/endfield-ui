@@ -3,6 +3,7 @@
 | 目录 | 导出 | 规范 |
 | --- | --- | --- |
 | `button/` | `Button`、`ButtonGroup` | [按钮](../../../../docs/design/components/button.md) |
+| `rounded-button/` | `RoundedButton`、`RoundedIconButton` | [圆角控件](../../../../docs/design/components/rounded-controls.md) |
 | `icon-button/` | `IconButton` | [按钮](../../../../docs/design/components/button.md) |
 | `toolbar/` | `Toolbar`、`ToolbarButton`、`ToolbarToggle`、`ToolbarToggleGroup`、`ToolbarGroup`、`ToolbarSeparator`（工具栏：整条一个 Tab 停靠点） | [按钮](../../../../docs/design/components/button.md) |
 | `tag/` | `Tag`、`TagPair` | [数据展示](../../../../docs/design/components/data-display.md) |
@@ -50,7 +51,9 @@
 | `checkbox/` | `Checkbox`（可整体换成菱形符号） | [表单](../../../../docs/design/components/form.md) |
 | `radio/` | `RadioGroup`、`Radio`（同上） | [表单](../../../../docs/design/components/form.md) |
 | `segmented-control/` | `SegmentedControl`、`Segment`（分段选择：并排的单选） | [表单](../../../../docs/design/components/form.md) |
+| `rounded-toggle/` | `RoundedToggle`（圆角分段选择） | [圆角控件](../../../../docs/design/components/rounded-controls.md) |
 | `switch/` | `Switch`（含双标签开关） | [表单](../../../../docs/design/components/form.md) |
+| `rounded-switch/` | `RoundedSwitch`（ON / OFF 圆角文字开关） | [圆角控件](../../../../docs/design/components/rounded-controls.md) |
 | `stepper/` | `Stepper` | [表单](../../../../docs/design/components/form.md) |
 | `slider/` | `Slider`（传两个值是范围滑块） | [表单](../../../../docs/design/components/form.md) |
 | `calendar/` | `Calendar`（月历；加 `range` 是选一段） | [表单](../../../../docs/design/components/form.md) |
