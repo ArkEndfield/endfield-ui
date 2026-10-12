@@ -243,4 +243,5 @@
   [data-ef-game-images="off"] *
 ) {
   display: none;
+  background: none;
 }

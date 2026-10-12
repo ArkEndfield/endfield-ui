@@ -295,4 +295,15 @@
   [data-ef-game-images="off"] *
 ) {
   display: none;
+  background: none;
+}
+.ef-full-width-alert-banner-left:is(
+  [data-ef-game-images="off"],
+  [data-ef-game-images="off"] *
+),
+.ef-full-width-alert-banner-right:is(
+  [data-ef-game-images="off"],
+  [data-ef-game-images="off"] *
+) {
+  background: none;
 }

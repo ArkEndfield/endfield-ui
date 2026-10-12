@@ -361,6 +361,7 @@ a.ef-item-tooltip-card__obtain-row:focus-visible {
   [data-ef-game-images="off"] *
 ) {
   display: none;
+  background: none;
 }
 .ef-item-tooltip-card__detail-texture:is(
   [data-ef-game-images="off"],

@@ -214,3 +214,10 @@
 ) {
   display: none;
 }
+.ef-banner-alert__banner:is(
+    [data-ef-game-images="off"],
+    [data-ef-game-images="off"] *
+  )
+  > * {
+  background: none;
+}
