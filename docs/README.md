@@ -67,6 +67,11 @@
 - [表单](design/components/form.md)
 - [反馈](design/components/feedback.md)
 - [浮层](design/components/overlay.md)
+- [社区变体](design/components/community-variants.md)——动画弹窗与圆角下拉
+- [圆角控件](design/components/rounded-controls.md)——无音效的按钮、分段选择与文字开关
+- [确认提示](design/components/confirmation-alerts.md)——紧凑卡片、通栏面板及本地图片
+- [物品卡片](design/components/item-cards.md)——稀有度、亮暗背景、库存和分层图标
+- [物品悬浮卡](design/components/item-hover-cards.md)——详情、获取途径与网格悬浮预览
 - [数据展示](design/components/data-display.md)
 
 ### 依据

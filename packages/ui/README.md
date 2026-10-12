@@ -2,15 +2,15 @@
 
 终末地风格的 React 基础控件库。非官方，详见 [NOTICE](https://github.com/icaruszezen/endfield-ui/blob/main/NOTICE.md)。
 
-已实现的控件，全部适配亮 / 暗主题与主题色接管：
+已实现的控件如下。默认控件适配亮 / 暗主题与主题色接管；社区变体保留各自的固定配色。
 
 | 类别 | 控件 |
 | --- | --- |
-| 基础 | Button / ButtonGroup、IconButton、Toolbar、Tag / TagPair、Badge、Kbd、SectionTitle、BracketTitle、Tabs、Panel |
-| 表单 | Field、Input、OtpInput、Textarea、Select、Combobox、TagInput、DatePicker / DateRangePicker / Calendar、FileUpload / FileItem、Checkbox、Radio / RadioGroup、SegmentedControl、Switch、Stepper、Slider、FilterChip |
-| 反馈 | Alert、Toast、Progress / ProgressRing、Spinner、Skeleton、EmptyState、Loader、CompletionBanner、RecIndicator |
-| 浮层 | Tooltip、Popover、HoverCard、Dialog、Drawer、DropdownMenu、ContextMenu、FlyoutBar |
-| 展示 | Table（行能展开）、Stat、RollingNumber、Sparkline、DataRowList / DataRow、List / ListRow、Accordion、ScrollArea、MediaCard、PlayButton / PlayMark、Carousel、ImageViewer、ItemSlot / ItemGrid、Avatar、Timeline、Schedule、Term、ResourceChip、Countdown、Marquee、ScrollHint |
+| 基础 | Button / ButtonGroup / RoundedButton、IconButton / RoundedIconButton、RoundedToggle、Toolbar、Tag / TagPair、Badge、Kbd、SectionTitle、BracketTitle、Tabs、Panel |
+| 表单 | Field、Input、OtpInput、Textarea、Select / RoundedSelect、Combobox、TagInput、DatePicker / DateRangePicker / Calendar、FileUpload / FileItem、Checkbox、Radio / RadioGroup、SegmentedControl、Switch / RoundedSwitch、Stepper、Slider、FilterChip |
+| 反馈 | Alert / BannerAlert / FullWidthAlert、Toast、Progress / ProgressRing、Spinner、Skeleton、EmptyState、Loader、CompletionBanner、RecIndicator |
+| 浮层 | Tooltip、Popover、HoverCard、Dialog / AnimatedDialog、Drawer、DropdownMenu、ContextMenu、FlyoutBar |
+| 展示 | Table（行能展开）、Stat、RollingNumber、Sparkline、DataRowList / DataRow、List / ListRow、Accordion、ScrollArea、MediaCard、PlayButton / PlayMark、Carousel、ImageViewer、ItemSlot / ItemGrid、ItemCard / ItemIcon、Avatar、Timeline、Schedule、Term、ResourceChip、Countdown、Marquee、ScrollHint |
 | 导航 | SideRail（含二级）、TopBar、NavMenu、NavAction、PageHeader、Breadcrumb、Pagination、Navigator、AvatarSwitcher、DashIndicator、Steps、Toc、BackToTop |
 | 母题 | CornerBrackets、Viewfinder、GhostText、Hatch、Texture、RegistrationStrip、TickRing、HazardStripe |
 
@@ -653,7 +653,7 @@ import {
 - `ScrollArea` 是一块限高、自己滚的区域，滚动条是画出来的；高度（或上限）用 `className` 给。只有真的溢出才有滚动条，也才是一个能聚焦的区域，所以 `aria-label` 必填。整页的滚动留给浏览器，不要包。`viewportRef` 交出真正在滚的元素，给 `Toc`、`BackToTop` 的 `target`。
 - `Schedule` 的条目只写起止日期，位置和错行都是算出来的；放不下时在自己的容器里横向滚动。
 - `BackToTop` 滚过 400px 才出现，默认钉在视口右下角；点了回到顶部，焦点也交还给页面的头上。要看某个滚动容器时传 `target`，并用 `className` 改位置。祖先上有 `transform` 或容器查询（`@container`）时 `fixed` 不再相对视口：把它放在那一栏的最后，加 `className="sticky bottom-4 self-end"`。
-- 本库不带任何图片：头像、轮播和排期里的图都由使用方给。
+- 头像、轮播和排期里的图由使用方给。社区控件的装饰图片与物品示例图片随包提供，来源和素材归属见仓库的 `NOTICE.md`。
 
 每一页顶上放一个页头：
 
@@ -825,6 +825,16 @@ function ThemeToggle() {
 ### 动效
 
 动效是控件自带的，不用配置：状态变了有过渡（勾和圆点淡入、选中的墨块滑过去、明细按高度展开、删掉的一项淡出、其余的补位），浮层从触发它的那一侧来。都在 0.2 – 0.3 秒里做完，没有回弹，悬停不放大。
+
+`AnimatedDialog` 的图标和关闭按钮保留 EndfieldMap 的短暂回弹入场，主体从 90% 放大到原尺寸。它和圆角下拉的用法见[社区变体](../../docs/design/components/community-variants.md)；系统开启减少动态效果时同样直接显示终态。
+
+圆角按钮、分段选择和文字开关的用法见[圆角控件](../../docs/design/components/rounded-controls.md)。它们保留原悬停闪动与滑块移动，不带音效；圆形图标按钮的 PNG 纹理使用包内相对路径，两种样式入口都能解析，不需要资源域名。
+
+`BannerAlert` 的卡片展开与短暂闪动、`FullWidthAlert` 的横向展开保留 EndfieldMap 的表现，两者复用同一套确认、取消与关闭处理。用法、焦点规则与四张本地图片见[确认提示](../../docs/design/components/confirmation-alerts.md)。
+
+`ItemCard` 支持六档稀有度、三种物品类别的亮暗背景和库存数量。`ItemIcon` 提供背景、主图、叠加、瓶内内容及角标图层；数据和路由由使用方传入。十七张本地图片的用途与组件 API 见[物品卡片](../../docs/design/components/item-cards.md)。
+
+`ItemTooltipCard` 展示详情和获取途径。`ItemHoverCard` 为单个控件提供悬浮预览，`ItemHoverCardLayer` 用一组事件监听服务整片网格；底层由 Base UI Popover 定位并处理关闭，组件不查询 Wiki，也不带声音。API、键盘行为及三张本地装饰图片见[物品悬浮卡](../../docs/design/components/item-hover-cards.md)。
 
 - **只播一次的入场**带一个 `animate` 属性，默认开，传 `animate={false}` 关掉：`SectionTitle`、`BracketTitle`、`PageHeader`、`CompletionBanner`、`EmptyState`、`Sparkline`、`RollingNumber`。反过来默认关着的有两个：`Progress`（入场时充填一次）和 `Viewfinder`（取景角落位）。
 - **系统开了"减少动态效果"时全部停在终态。** CSS 的动画和过渡由样式入口末尾的一条全局规则统一降级；脚本驱动的几处（滚动数字、平滑滚动、主题的交叉淡化）各自看系统设置。你自己写脚本驱动的动效时用 `useReducedMotion()`。

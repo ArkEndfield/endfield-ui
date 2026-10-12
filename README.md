@@ -2,7 +2,7 @@
 
 《明日方舟：终末地》设计风格指导文档，以及按这套文档实现的 React + Tailwind CSS v4 组件库。
 
-> 非官方的爱好者项目，与鹰角网络（Hypergryph）无关。本仓库不包含任何官方素材。详见 [NOTICE](NOTICE.md)。
+> 非官方的爱好者项目，与鹰角网络（Hypergryph）无关。社区控件引用的图片单独记录来源与素材归属，详见 [NOTICE](NOTICE.md)。
 
 [设计文档站](https://icaruszezen.github.io/endfield-ui/design/) · [组件预览](https://icaruszezen.github.io/endfield-ui/) · [组件库用法](packages/ui/README.md) · [npm](https://www.npmjs.com/package/@endfield-ui/react) · [更新记录](CHANGELOG.md) · [路线](ROADMAP.md)
 
@@ -55,11 +55,11 @@
 
 | 类别 | 控件 |
 | --- | --- |
-| 基础 | Button / ButtonGroup、IconButton、Toolbar、Tag / TagPair、Badge、Kbd、SectionTitle、BracketTitle、Tabs、Panel |
-| 表单 | Field、Input、OtpInput、Textarea、Select、Combobox、TagInput、DatePicker / DateRangePicker / Calendar、FileUpload / FileItem、Checkbox、Radio / RadioGroup、SegmentedControl、Switch、Stepper、Slider、FilterChip |
-| 反馈 | Alert、Toast、Progress / ProgressRing、Spinner、Skeleton、EmptyState、Loader、CompletionBanner、RecIndicator |
-| 浮层 | Tooltip、Popover、HoverCard、Dialog、Drawer、DropdownMenu、ContextMenu、FlyoutBar |
-| 展示 | Table（行能展开）、Stat、RollingNumber、Sparkline、DataRowList / DataRow、List / ListRow、Accordion、ScrollArea、MediaCard、PlayButton / PlayMark、Carousel、ImageViewer、ItemSlot / ItemGrid、Avatar、Timeline、Schedule、Term、ResourceChip、Countdown、Marquee、ScrollHint |
+| 基础 | Button / ButtonGroup / RoundedButton、IconButton / RoundedIconButton、RoundedToggle、Toolbar、Tag / TagPair、Badge、Kbd、SectionTitle、BracketTitle、Tabs、Panel |
+| 表单 | Field、Input、OtpInput、Textarea、Select / RoundedSelect、Combobox、TagInput、DatePicker / DateRangePicker / Calendar、FileUpload / FileItem、Checkbox、Radio / RadioGroup、SegmentedControl、Switch / RoundedSwitch、Stepper、Slider、FilterChip |
+| 反馈 | Alert / BannerAlert / FullWidthAlert、Toast、Progress / ProgressRing、Spinner、Skeleton、EmptyState、Loader、CompletionBanner、RecIndicator |
+| 浮层 | Tooltip、Popover、HoverCard、Dialog / AnimatedDialog、Drawer、DropdownMenu、ContextMenu、FlyoutBar |
+| 展示 | Table（行能展开）、Stat、RollingNumber、Sparkline、DataRowList / DataRow、List / ListRow、Accordion、ScrollArea、MediaCard、PlayButton / PlayMark、Carousel、ImageViewer、ItemSlot / ItemGrid、ItemCard / ItemIcon、Avatar、Timeline、Schedule、Term、ResourceChip、Countdown、Marquee、ScrollHint |
 | 导航 | SideRail（含二级）、TopBar、NavMenu、NavAction、PageHeader、Breadcrumb、Pagination、Navigator、AvatarSwitcher、DashIndicator、Steps、Toc、BackToTop |
 | 母题 | CornerBrackets、Viewfinder、GhostText、Hatch、Texture、RegistrationStrip、TickRing、HazardStripe |
 
@@ -70,6 +70,16 @@
 - **键盘、读屏和高对比模式。** 每个控件都能用键盘操作、有焦点环，状态不只靠颜色说；系统的高对比模式（`forced-colors`）下，靠底色成形的地方另有一份画法，见 [色彩](docs/design/foundations/color.md#高对比模式)。
 - **行为交给 Base UI。** 浮层和几个行为复杂的控件（组合框、滑块、工具栏、验证码输入…）的焦点、键盘、定位建立在 [Base UI](https://base-ui.com) 上，其余控件用的是原生元素。
 - **链接接得上路由。** 能当链接用的控件除了 `href` 还收一个 `render`，用来接路由库的链接组件。
+
+`AnimatedDialog` 和 `RoundedSelect` 是来自 EndfieldMap 的两种独立外观：前者保留分段入场的黄色装饰弹窗，后者保留圆角触发器和灰色下拉面板。它们使用固定配色，不随主题反转；原有 `Dialog`、`Select` 继续按本库的主题令牌绘制。用法与尺寸见[社区变体](docs/design/components/community-variants.md)。
+
+`RoundedButton`、`RoundedIconButton`、`RoundedToggle`、`RoundedSwitch` 保留同一来源的圆角外观，全部不带声音。圆形图标按钮的一张纹理随包提供，使用时不请求外链；用法与图片来源见[圆角控件](docs/design/components/rounded-controls.md)。
+
+确认提示使用 `BannerAlert` 或 `FullWidthAlert`：前者是紧凑卡片，后者横贯视口。它们复用无音效圆角按钮，四张装饰图片随包提供；原有 `Alert` 继续作为页面内提示条。用法与资源清单见[确认提示](docs/design/components/confirmation-alerts.md)。
+
+`ItemCard` 和 `ItemIcon` 来自 EndfieldWiki，提供六档稀有度、物品 / 武器 / 敌人背景、库存数量和分层图标。亮暗背景、稀有度底边及示例图片均保存在本地；用法与来源见[物品卡片](docs/design/components/item-cards.md)。
+
+`ItemTooltipCard` 展示物品详情，`ItemHoverCard` 和 `ItemHoverCardLayer` 为单个控件或整片网格提供悬浮预览。详情卡使用固定灰色皮肤和六档稀有度标题，三张装饰图片本地打包；数据、富文本和路由由使用方接入，见[物品悬浮卡](docs/design/components/item-hover-cards.md)。
 
 [![同一组控件在亮暗两个主题下的截图，上半是默认的信号黄，下半把强调色换成了青色](docs/screenshots/takeover.png)](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-主题色接管--takeover)
 

@@ -6,6 +6,14 @@
 | [utilities.css](utilities.css) | `@utility`：母题工具类（斜纹、切角、斜楔、角括号、镂空字、警示条纹、竖条变箭头），以及菱形表单符号的开关 |
 | [index.css](index.css) | 入口：`tailwindcss` → `theme.css` → `utilities.css` → 基础样式 → `@source` |
 
+圆形图标按钮的本地纹理由 `scripts/copy-assets.mjs` 在 `build:css` 后复制到 `dist/assets`，对应预编译 CSS 中的相对地址。源码样式保留组件目录内的同一张图片；两种入口都不需要外部资源地址。
+
+确认提示的四张图片也由同一脚本复制。`banner-alert.css` 在共享弹层上声明图片变量，紧凑与通栏样式共同使用；因此源码与预编译 CSS 都从各自的 `assets` 路径读取，不需要为通栏面板配置另一套资源地址。
+
+物品卡片的六张背景、六张稀有度底边及五张示例图片保存在 `item-card/assets`，同样复制到 `dist/assets`。这些文件实际编码为 WebP，迁入时保留原字节；主题变量选择亮暗背景，使用方也可在容器上覆盖背景变量。
+
+物品详情的 `header.webp`、`link.webp` 和 `detail.png` 保存在 `item-tooltip-card/assets`。源码和预编译 CSS 使用相对路径，构建脚本复制原字节到 `dist/assets`；悬浮卡复用同一份样式和图片。
+
 对外的三个入口（见包的 `exports`）：
 
 | 引入路径 | 对应 | 给谁用 |

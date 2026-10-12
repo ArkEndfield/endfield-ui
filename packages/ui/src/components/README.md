@@ -3,6 +3,7 @@
 | 目录 | 导出 | 规范 |
 | --- | --- | --- |
 | `button/` | `Button`、`ButtonGroup` | [按钮](../../../../docs/design/components/button.md) |
+| `rounded-button/` | `RoundedButton`、`RoundedIconButton` | [圆角控件](../../../../docs/design/components/rounded-controls.md) |
 | `icon-button/` | `IconButton` | [按钮](../../../../docs/design/components/button.md) |
 | `toolbar/` | `Toolbar`、`ToolbarButton`、`ToolbarToggle`、`ToolbarToggleGroup`、`ToolbarGroup`、`ToolbarSeparator`（工具栏：整条一个 Tab 停靠点） | [按钮](../../../../docs/design/components/button.md) |
 | `tag/` | `Tag`、`TagPair` | [数据展示](../../../../docs/design/components/data-display.md) |
@@ -40,6 +41,10 @@
 | `carousel/` | `Carousel`、`CarouselSlide`（媒体轮播） | [卡片](../../../../docs/design/components/card.md) |
 | `image-viewer/` | `ImageViewer`、`ImageViewerItem`（图片查看：缩略图点开看大图） | [卡片](../../../../docs/design/components/card.md) |
 | `item-slot/` | `ItemSlot`、`ItemGrid`（方向键导航的矩阵） | [卡片](../../../../docs/design/components/card.md) |
+| `item-card/` | `ItemCard`（稀有度卡片与库存） | [物品卡片](../../../../docs/design/components/item-cards.md) |
+| `item-icon/` | `ItemIcon`（分层物品图标） | [物品卡片](../../../../docs/design/components/item-cards.md) |
+| `item-tooltip-card/` | `ItemTooltipCard`（物品详情） | [物品悬浮卡](../../../../docs/design/components/item-hover-cards.md) |
+| `item-hover-card/` | `ItemHoverCard`、`ItemHoverCardLayer`（单个控件与网格预览） | [物品悬浮卡](../../../../docs/design/components/item-hover-cards.md) |
 | `table/` | `Table`、`TableHead`、`TableBody`、`TableRow`、`TableHeaderCell`、`TableCell`、`TableExpander`（行展开的钮） | [数据展示](../../../../docs/design/components/data-display.md) |
 | `timeline/` | `Timeline`、`TimelineItem` | [数据展示](../../../../docs/design/components/data-display.md) |
 | `schedule/` | `Schedule`、`ScheduleTrack`、`ScheduleItem`（排期：横向的时间轨图） | [数据展示](../../../../docs/design/components/data-display.md) |
@@ -50,12 +55,16 @@
 | `checkbox/` | `Checkbox`（可整体换成菱形符号） | [表单](../../../../docs/design/components/form.md) |
 | `radio/` | `RadioGroup`、`Radio`（同上） | [表单](../../../../docs/design/components/form.md) |
 | `segmented-control/` | `SegmentedControl`、`Segment`（分段选择：并排的单选） | [表单](../../../../docs/design/components/form.md) |
+| `rounded-toggle/` | `RoundedToggle`（圆角分段选择） | [圆角控件](../../../../docs/design/components/rounded-controls.md) |
 | `switch/` | `Switch`（含双标签开关） | [表单](../../../../docs/design/components/form.md) |
+| `rounded-switch/` | `RoundedSwitch`（ON / OFF 圆角文字开关） | [圆角控件](../../../../docs/design/components/rounded-controls.md) |
 | `stepper/` | `Stepper` | [表单](../../../../docs/design/components/form.md) |
 | `slider/` | `Slider`（传两个值是范围滑块） | [表单](../../../../docs/design/components/form.md) |
 | `calendar/` | `Calendar`（月历；加 `range` 是选一段） | [表单](../../../../docs/design/components/form.md) |
 | `date-picker/` | `DatePicker`、`DateRangePicker`（日期选择与日期范围：外框 + 一块带月历的面板；两个共用内部的 `DateField`） | [表单](../../../../docs/design/components/form.md) |
 | `alert/` | `Alert` | [反馈](../../../../docs/design/components/feedback.md) |
+| `banner-alert/` | `BannerAlert`（紧凑确认卡片） | [确认提示](../../../../docs/design/components/confirmation-alerts.md) |
+| `full-width-alert/` | `FullWidthAlert`（通栏确认面板） | [确认提示](../../../../docs/design/components/confirmation-alerts.md) |
 | `progress/` | `Progress`、`ProgressRing` | [反馈](../../../../docs/design/components/feedback.md) |
 | `skeleton/` | `Skeleton` | [反馈](../../../../docs/design/components/feedback.md) |
 | `empty-state/` | `EmptyState` | [反馈](../../../../docs/design/components/feedback.md) |
@@ -64,6 +73,7 @@
 | `completion-banner/` | `CompletionBanner` | [反馈](../../../../docs/design/components/feedback.md) |
 | `tooltip/` | `Tooltip`、`TooltipProvider` | [浮层](../../../../docs/design/components/overlay.md) |
 | `dialog/` | `Dialog`、`DialogClose` | [浮层](../../../../docs/design/components/overlay.md) |
+| `animated-dialog/` | `AnimatedDialog` | [社区变体](../../../../docs/design/components/community-variants.md) |
 | `drawer/` | `Drawer` | [浮层](../../../../docs/design/components/overlay.md) |
 | `dropdown-menu/` | `DropdownMenu`、`DropdownMenuItem`、`DropdownMenuCheckboxItem`、`DropdownMenuGroup`、`DropdownMenuSeparator`、`DropdownMenuRadioGroup`、`DropdownMenuRadioItem`、`DropdownMenuSub` | [浮层](../../../../docs/design/components/overlay.md) |
 | `context-menu/` | `ContextMenu`（右键菜单；选项用 `DropdownMenuItem` 那一组） | [浮层](../../../../docs/design/components/overlay.md) |
@@ -71,6 +81,7 @@
 | `popover/` | `Popover`、`PopoverClose` | [浮层](../../../../docs/design/components/overlay.md) |
 | `hover-card/` | `HoverCard`（悬浮卡：链接悬停时预览它的去处） | [浮层](../../../../docs/design/components/overlay.md) |
 | `select/` | `Select`、`SelectItem`、`SelectGroup`、`SelectSeparator` | [表单](../../../../docs/design/components/form.md) |
+| `rounded-select/` | `RoundedSelect` | [社区变体](../../../../docs/design/components/community-variants.md) |
 | `combobox/` | `Combobox`（可搜索的下拉，含多选、分组与远程检索） | [表单](../../../../docs/design/components/form.md) |
 | `tag-input/` | `TagInput`（标签输入：自己打出来的一串短词） | [表单](../../../../docs/design/components/form.md) |
 | `file-upload/` | `FileUpload`、`FileItem`（文件上传：只管选和列，不管传） | [表单](../../../../docs/design/components/form.md) |

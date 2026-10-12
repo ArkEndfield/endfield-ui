@@ -14,6 +14,7 @@
 | 分段进度 | `<Progress segments={6} value={3}>` | 已实现 |
 | 不确定进度 | `<Progress>`（不传 `value`） | 已实现 |
 | 提示条 | `<Alert tone title action onClose open>` | 已实现 |
+| 确认提示 | `<BannerAlert title trigger onConfirm>` 或 `<FullWidthAlert title trigger onConfirm>`；见[确认提示](confirmation-alerts.md) | 已实现 |
 | 骨架 | `<Skeleton variant lines pulse>` | 已实现 |
 | 空状态 | `<EmptyState title description action>` | 已实现 |
 | 按钮提交中 | `<Button loading>`，见 [按钮](button.md) | 已实现 |
