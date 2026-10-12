@@ -9,3 +9,19 @@ await copyFile(
   ),
   new URL("pag-button-texture.png", destination),
 );
+
+const alertAssets = new URL(
+  "../src/components/banner-alert/assets/",
+  import.meta.url,
+);
+for (const filename of [
+  "alert_banner_bg_left.png",
+  "alert_banner_bg_right.png",
+  "alert_bg.png",
+  "deco_common_logo_bg.png",
+]) {
+  await copyFile(
+    new URL(filename, alertAssets),
+    new URL(filename, destination),
+  );
+}

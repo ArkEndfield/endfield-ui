@@ -69,6 +69,7 @@
 - [浮层](design/components/overlay.md)
 - [社区变体](design/components/community-variants.md)——动画弹窗与圆角下拉
 - [圆角控件](design/components/rounded-controls.md)——无音效的按钮、分段选择与文字开关
+- [确认提示](design/components/confirmation-alerts.md)——紧凑卡片、通栏面板及本地图片
 - [数据展示](design/components/data-display.md)
 
 ### 依据

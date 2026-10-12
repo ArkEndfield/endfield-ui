@@ -1,0 +1,186 @@
+.ef-alert-modal-viewport {
+  --ef-alert-background: url("./assets/alert_bg.png");
+  --ef-alert-banner-left: url("./assets/alert_banner_bg_left.png");
+  --ef-alert-banner-right: url("./assets/alert_banner_bg_right.png");
+  --ef-alert-logo: url("./assets/deco_common_logo_bg.png");
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay, 300);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.ef-alert-modal-viewport[hidden],
+.ef-banner-alert[hidden],
+.ef-banner-alert-backdrop[hidden] {
+  display: none;
+}
+.ef-alert-modal-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.ef-banner-alert-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay, 300);
+  background: rgb(0 0 0 / 20%);
+}
+.ef-banner-alert {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 10em;
+  max-height: calc(100vh - 4em);
+  max-width: calc(100vw - 2em);
+  margin: 1em;
+  padding: 1.7em 0 16px;
+  border-radius: 0.2em;
+  background-color: #fefefe;
+  background-image: var(--ef-alert-background);
+  background-repeat: no-repeat;
+  background-size: 90% auto;
+  background-position: bottom right;
+  box-shadow: 0 0 0.4em rgb(0 0 0 / 30%);
+  color: #2a2728;
+  transform-origin: top;
+  outline: none;
+}
+.ef-banner-alert__banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  height: 4.5em;
+  pointer-events: none;
+}
+.ef-banner-alert__banner > :first-child {
+  display: block;
+  flex: 1;
+  height: 100%;
+  padding-right: 30%;
+  background: var(--ef-alert-banner-left) top left / contain repeat-x;
+}
+.ef-banner-alert__banner > :last-child {
+  display: block;
+  flex-shrink: 0;
+  width: calc(4.5em * 353 / 228);
+  height: 4.5em;
+  background: var(--ef-alert-banner-right) top right / 100% 100% no-repeat;
+}
+.ef-banner-alert__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  margin-inline: 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  transition-property: none;
+}
+.ef-banner-alert__body {
+  flex: 1;
+  padding-block: 16px;
+  color: #2a2728;
+}
+.ef-banner-alert__actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 16px 0;
+  transition-property: none;
+}
+.ef-banner-alert__actions[data-hide-cancel] {
+  justify-content: center;
+}
+.ef-banner-alert__button {
+  width: 50%;
+}
+.ef-banner-alert[data-open] {
+  animation: ef-banner-alert-enter 150ms ease-out both;
+}
+.ef-banner-alert[data-ending-style] {
+  animation:
+    ef-banner-alert-scale-exit 150ms ease-out both,
+    ef-banner-alert-opacity-exit 30ms ease-out 70ms both;
+}
+.ef-banner-alert[data-ending-style]
+  :is(.ef-banner-alert__content, .ef-banner-alert__actions) {
+  animation: ef-banner-alert-content-exit 150ms ease-out both;
+}
+@keyframes ef-banner-alert-enter {
+  from {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+@keyframes ef-banner-alert-scale-exit {
+  from {
+    transform: scaleY(1);
+  }
+  to {
+    transform: scaleY(0);
+  }
+}
+@keyframes ef-banner-alert-opacity-exit {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes ef-banner-alert-content-exit {
+  from {
+    opacity: var(--ef-alert-exit-opacity, 1);
+  }
+  to {
+    opacity: 0;
+  }
+}
+@media (min-width: 768px) {
+  .ef-banner-alert {
+    max-width: calc(100vw - 0.2em);
+    margin: 0.5em;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ef-banner-alert,
+  .ef-banner-alert :is(.ef-banner-alert__content, .ef-banner-alert__actions) {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+  }
+}
+@media (forced-colors: active) {
+  .ef-banner-alert {
+    background: Canvas;
+    color: CanvasText;
+    border: 1px solid CanvasText;
+    box-shadow: none;
+  }
+  .ef-banner-alert__body {
+    color: CanvasText;
+  }
+  .ef-banner-alert__banner {
+    display: none;
+  }
+}

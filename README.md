@@ -2,7 +2,7 @@
 
 《明日方舟：终末地》设计风格指导文档，以及按这套文档实现的 React + Tailwind CSS v4 组件库。
 
-> 非官方的爱好者项目，与鹰角网络（Hypergryph）无关。社区圆形按钮引用的一张纹理单独记录来源与素材归属，详见 [NOTICE](NOTICE.md)。
+> 非官方的爱好者项目，与鹰角网络（Hypergryph）无关。社区控件引用的图片单独记录来源与素材归属，详见 [NOTICE](NOTICE.md)。
 
 [设计文档站](https://icaruszezen.github.io/endfield-ui/design/) · [组件预览](https://icaruszezen.github.io/endfield-ui/) · [组件库用法](packages/ui/README.md) · [npm](https://www.npmjs.com/package/@endfield-ui/react) · [更新记录](CHANGELOG.md) · [路线](ROADMAP.md)
 
@@ -57,7 +57,7 @@
 | --- | --- |
 | 基础 | Button / ButtonGroup / RoundedButton、IconButton / RoundedIconButton、RoundedToggle、Toolbar、Tag / TagPair、Badge、Kbd、SectionTitle、BracketTitle、Tabs、Panel |
 | 表单 | Field、Input、OtpInput、Textarea、Select / RoundedSelect、Combobox、TagInput、DatePicker / DateRangePicker / Calendar、FileUpload / FileItem、Checkbox、Radio / RadioGroup、SegmentedControl、Switch / RoundedSwitch、Stepper、Slider、FilterChip |
-| 反馈 | Alert、Toast、Progress / ProgressRing、Spinner、Skeleton、EmptyState、Loader、CompletionBanner、RecIndicator |
+| 反馈 | Alert / BannerAlert / FullWidthAlert、Toast、Progress / ProgressRing、Spinner、Skeleton、EmptyState、Loader、CompletionBanner、RecIndicator |
 | 浮层 | Tooltip、Popover、HoverCard、Dialog / AnimatedDialog、Drawer、DropdownMenu、ContextMenu、FlyoutBar |
 | 展示 | Table（行能展开）、Stat、RollingNumber、Sparkline、DataRowList / DataRow、List / ListRow、Accordion、ScrollArea、MediaCard、PlayButton / PlayMark、Carousel、ImageViewer、ItemSlot / ItemGrid、Avatar、Timeline、Schedule、Term、ResourceChip、Countdown、Marquee、ScrollHint |
 | 导航 | SideRail（含二级）、TopBar、NavMenu、NavAction、PageHeader、Breadcrumb、Pagination、Navigator、AvatarSwitcher、DashIndicator、Steps、Toc、BackToTop |
@@ -74,6 +74,8 @@
 `AnimatedDialog` 和 `RoundedSelect` 是来自 EndfieldMap 的两种独立外观：前者保留分段入场的黄色装饰弹窗，后者保留圆角触发器和灰色下拉面板。它们使用固定配色，不随主题反转；原有 `Dialog`、`Select` 继续按本库的主题令牌绘制。用法与尺寸见[社区变体](docs/design/components/community-variants.md)。
 
 `RoundedButton`、`RoundedIconButton`、`RoundedToggle`、`RoundedSwitch` 保留同一来源的圆角外观，全部不带声音。圆形图标按钮的一张纹理随包提供，使用时不请求外链；用法与图片来源见[圆角控件](docs/design/components/rounded-controls.md)。
+
+确认提示使用 `BannerAlert` 或 `FullWidthAlert`：前者是紧凑卡片，后者横贯视口。它们复用无音效圆角按钮，四张装饰图片随包提供；原有 `Alert` 继续作为页面内提示条。用法与资源清单见[确认提示](docs/design/components/confirmation-alerts.md)。
 
 [![同一组控件在亮暗两个主题下的截图，上半是默认的信号黄，下半把强调色换成了青色](docs/screenshots/takeover.png)](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-主题色接管--takeover)
 

@@ -59,6 +59,8 @@
 | `calendar/` | `Calendar`（月历；加 `range` 是选一段） | [表单](../../../../docs/design/components/form.md) |
 | `date-picker/` | `DatePicker`、`DateRangePicker`（日期选择与日期范围：外框 + 一块带月历的面板；两个共用内部的 `DateField`） | [表单](../../../../docs/design/components/form.md) |
 | `alert/` | `Alert` | [反馈](../../../../docs/design/components/feedback.md) |
+| `banner-alert/` | `BannerAlert`（紧凑确认卡片） | [确认提示](../../../../docs/design/components/confirmation-alerts.md) |
+| `full-width-alert/` | `FullWidthAlert`（通栏确认面板） | [确认提示](../../../../docs/design/components/confirmation-alerts.md) |
 | `progress/` | `Progress`、`ProgressRing` | [反馈](../../../../docs/design/components/feedback.md) |
 | `skeleton/` | `Skeleton` | [反馈](../../../../docs/design/components/feedback.md) |
 | `empty-state/` | `EmptyState` | [反馈](../../../../docs/design/components/feedback.md) |
