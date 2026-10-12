@@ -1,6 +1,6 @@
 # 开源项目调研
 
-GitHub 上与终末地视觉风格相关的开源项目。数据取自 2026-10-08（星标数会变）。
+GitHub 上与终末地视觉风格相关的开源项目。数据取自 2026-10-12（星标数会变）：列出的仓库都还在，许可证没有变化。
 
 本仓库对这些项目的用法是：**读它们的方法和结论，用自己的话写规范，注明出处；不复制代码、不拷贝素材。** 标注"无许可证"的项目默认保留所有权利，只能阅读。
 
@@ -24,7 +24,7 @@ MIT · 面向 Claude Code / Codex 的设计 Skill。
 
 ### [ymh0000123/dsh-theme-endfield](https://github.com/ymh0000123/dsh-theme-endfield)
 
-MIT · ★130 · 某 Web 应用的终末地官网风格主题插件。
+MIT · ★136 · 某 Web 应用的终末地官网风格主题插件。
 
 `docs/design-language.md` 是目前写得最清楚的"官网风格"说明，核心概括是**工业编辑风：纸与墨是主体，强调色是信号**。
 
@@ -63,7 +63,7 @@ MIT · 把任意网页改造成终末地官网风格的 Skill。
 
 ### [VBeatDead/ReEnd-Components](https://github.com/VBeatDead/ReEnd-Components)
 
-MIT · ★24 · React + Tailwind CSS v3 + Radix UI · [文档站](https://reend-components.pages.dev)
+MIT · ★25 · React + Tailwind CSS v3 + Radix UI · [文档站](https://reend-components.pages.dev)
 
 目前最完整的终末地风格 React 组件库，75+ 组件，暗色优先。和本仓库的目标最接近，是组件清单与工程结构的主要参照。
 
@@ -88,7 +88,7 @@ AGPL-3.0 · Vue · 蓝图分享站 [talospioneers.com](https://talospioneers.com
 
 ### DSH 主题系列
 
-[rison114514/dsh-endfield-ui](https://github.com/rison114514/dsh-endfield-ui)（★80）、[thjyy/dph-endfield-theme](https://github.com/thjyy/dph-endfield-theme)、[Longxiangjunlin/dsh-endfield-theme](https://github.com/Longxiangjunlin/dsh-endfield-theme)、[INnoVationEE/dsh-endfield-theme](https://github.com/INnoVationEE/dsh-endfield-theme)。
+[rison114514/dsh-endfield-ui](https://github.com/rison114514/dsh-endfield-ui)（★85）、[thjyy/dph-endfield-theme](https://github.com/thjyy/dph-endfield-theme)、[Longxiangjunlin/dsh-endfield-theme](https://github.com/Longxiangjunlin/dsh-endfield-theme)、[INnoVationEE/dsh-endfield-theme](https://github.com/INnoVationEE/dsh-endfield-theme)。
 
 同一个宿主应用上的多套终末地主题。可以对比同一界面在"奶油纸 + 信号黄"与"炭黑 + 警示黄 HUD"两种取向下的效果。这四个仓库要么没有许可证，要么许可证无法被 GitHub 识别，只读不抄。
 
@@ -108,9 +108,9 @@ AGPL-3.0 · Vue · 蓝图分享站 [talospioneers.com](https://talospioneers.com
 | --- | --- | --- | --- |
 | [Yue-plus/endfield_icons](https://github.com/Yue-plus/endfield_icons) | MIT · ★92 | 终末地图标与 Logo 的矢量整理 | 仓库的 MIT 只覆盖作者的整理工作，图形本身的权利属于鹰角。本仓库不收录 |
 | [NCreeper233/endfield-logo-maker](https://github.com/NCreeper233/endfield-logo-maker) | MIT | 终末地风格 Logo 生成器 | 可观察标志的字形结构与排版比例 |
-| [Naptie/endfield-docmaker](https://github.com/Naptie/endfield-docmaker) | MPL-2.0 · ★130 | 生成世界观内各机构签发文档的工具 | 档案 / 公文类版式的参照 |
-| [GlacierGlimmer/zmd-charge-plus](https://github.com/GlacierGlimmer/zmd-charge-plus) | MIT · ★139 | 终末地风格的系统状态 HUD | 小尺寸 HUD 元件的参照 |
-| [Terra-Online/Atlos](https://github.com/Terra-Online/Atlos) | AGPL-3.0 · ★158 | 互动地图 | 地图类界面的参照，AGPL 只读 |
+| [Naptie/endfield-docmaker](https://github.com/Naptie/endfield-docmaker) | MPL-2.0 · ★131 | 生成世界观内各机构签发文档的工具 | 档案 / 公文类版式的参照 |
+| [GlacierGlimmer/zmd-charge-plus](https://github.com/GlacierGlimmer/zmd-charge-plus) | MIT · ★158 | 终末地风格的系统状态 HUD | 小尺寸 HUD 元件的参照 |
+| [Terra-Online/Atlos](https://github.com/Terra-Online/Atlos) | AGPL-3.0 · ★159 | 互动地图 | 地图类界面的参照，AGPL 只读 |
 | [palmcivet/awesome-arknights-endfield](https://github.com/palmcivet/awesome-arknights-endfield) | MIT · ★110 | 终末地相关项目的 Awesome 列表 | 找更多项目的入口 |
 
 ## 各项目的取值对照
