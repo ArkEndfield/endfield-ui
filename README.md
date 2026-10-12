@@ -79,6 +79,8 @@
 
 `ItemCard` 和 `ItemIcon` 来自 EndfieldWiki，提供六档稀有度、物品 / 武器 / 敌人背景、库存数量和分层图标。亮暗背景、稀有度底边及示例图片均保存在本地；用法与来源见[物品卡片](docs/design/components/item-cards.md)。
 
+`ItemTooltipCard` 展示物品详情，`ItemHoverCard` 和 `ItemHoverCardLayer` 为单个控件或整片网格提供悬浮预览。详情卡使用固定灰色皮肤和六档稀有度标题，三张装饰图片本地打包；数据、富文本和路由由使用方接入，见[物品悬浮卡](docs/design/components/item-hover-cards.md)。
+
 [![同一组控件在亮暗两个主题下的截图，上半是默认的信号黄，下半把强调色换成了青色](docs/screenshots/takeover.png)](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-主题色接管--takeover)
 
 ### 在本地看

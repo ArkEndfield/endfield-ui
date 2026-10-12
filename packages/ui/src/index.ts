@@ -37,6 +37,8 @@ export * from "./components/image-viewer";
 export * from "./components/input";
 export * from "./components/item-card";
 export * from "./components/item-icon";
+export * from "./components/item-tooltip-card";
+export * from "./components/item-hover-card";
 export * from "./components/item-slot";
 export * from "./components/kbd";
 export * from "./components/list";

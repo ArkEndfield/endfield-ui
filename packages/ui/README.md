@@ -834,6 +834,8 @@ function ThemeToggle() {
 
 `ItemCard` 支持六档稀有度、三种物品类别的亮暗背景和库存数量。`ItemIcon` 提供背景、主图、叠加、瓶内内容及角标图层；数据和路由由使用方传入。十七张本地图片的用途与组件 API 见[物品卡片](../../docs/design/components/item-cards.md)。
 
+`ItemTooltipCard` 展示详情和获取途径。`ItemHoverCard` 为单个控件提供悬浮预览，`ItemHoverCardLayer` 用一组事件监听服务整片网格；底层由 Base UI Popover 定位并处理关闭，组件不查询 Wiki，也不带声音。API、键盘行为及三张本地装饰图片见[物品悬浮卡](../../docs/design/components/item-hover-cards.md)。
+
 - **只播一次的入场**带一个 `animate` 属性，默认开，传 `animate={false}` 关掉：`SectionTitle`、`BracketTitle`、`PageHeader`、`CompletionBanner`、`EmptyState`、`Sparkline`、`RollingNumber`。反过来默认关着的有两个：`Progress`（入场时充填一次）和 `Viewfinder`（取景角落位）。
 - **系统开了"减少动态效果"时全部停在终态。** CSS 的动画和过渡由样式入口末尾的一条全局规则统一降级；脚本驱动的几处（滚动数字、平滑滚动、主题的交叉淡化）各自看系统设置。你自己写脚本驱动的动效时用 `useReducedMotion()`。
 - 时长、缓动、位移量都是令牌（`--duration-fast`、`--ease-exit`、`--motion-shift`…），各自的用途见 [动效规范](https://github.com/icaruszezen/endfield-ui/blob/main/docs/design/foundations/motion.md)。

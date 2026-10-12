@@ -48,6 +48,20 @@
 
 图片从 EndfieldMap 已保存的样本复制，保留原字节；原 URL 虽以 `.png` 结尾，文件实际编码为 WebP。完整原 URL、Wiki 来源字段、尺寸和 SHA256 记录在 `packages/ui/src/components/item-icon/resource-provenance.json`。这些素材的权利归原权利人，本库不宣称其原创，组件代码的 MIT 许可不延伸至图片。
 
+### 物品详情图片与图标
+
+`ItemTooltipCard` 的详情排版来自同一 Wiki 提交的 `item-tooltip/ItemTooltipCard.tsx`；`ItemHoverCard`、`ItemHoverCardLayer` 保留 Wiki 的悬浮与聚焦规则，浮层定位和关闭使用 Base UI Popover。
+
+| 本地文件 | 尺寸 | 来源 | 用途 |
+| --- | --- | --- | --- |
+| `header.webp` | 568×80 | `https://assets.fz.wiki/0f1bfaac667a4bf6/646d3d3aaa2e8a74.png` | 稀有度标题纹理 |
+| `link.webp` | 84×84 | `https://assets.fz.wiki/cc5243ea76178097/2128e62936f3ba56.png` | 物品详情链接图标 |
+| `detail.png` | 64×252 | Wiki `apps/web/public/deco/item-tooltip/bg_tips_a_2.png` | 详情九宫格底图 |
+
+三张图片保存在 `packages/ui/src/components/item-tooltip-card/assets`，保留原字节并随包提供。前两张原 URL 以 `.png` 结尾，实际编码为 WebP；素材归原权利人，组件代码的 MIT 许可不延伸至图片。尺寸、SHA256 和来源见同目录的 `resource-provenance.json`。预览复用上面的本地物品图，不请求原 CDN，不包含音效或字体文件。
+
+获取途径的包裹和双箭头 SVG 使用 Lucide 的 `package-search`、`chevrons-right` 路径，保留 Wiki 图标外形；不是本库的原创图标。Lucide 的 ISC 许可与 Feather 图标的 MIT 声明保存在 `packages/ui/src/components/item-tooltip-card/LICENSE.lucide` 并随包提供。
+
 ## 使用本项目时请注意
 
 - 本项目提供的是"受终末地视觉语言启发"的设计规范和按它实现的组件库，不是官方设计规范，也不代表官方立场。

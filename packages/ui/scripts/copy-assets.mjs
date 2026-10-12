@@ -51,3 +51,14 @@ for (const filename of [
 ]) {
   await copyFile(new URL(filename, itemAssets), new URL(filename, destination));
 }
+
+const tooltipAssets = new URL(
+  "../src/components/item-tooltip-card/assets/",
+  import.meta.url,
+);
+for (const filename of ["header.webp", "link.webp", "detail.png"]) {
+  await copyFile(
+    new URL(filename, tooltipAssets),
+    new URL(filename, destination),
+  );
+}

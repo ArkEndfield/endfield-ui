@@ -12,6 +12,8 @@
 
 物品卡片的六张背景、六张稀有度底边及五张示例图片保存在 `item-card/assets`，同样复制到 `dist/assets`。这些文件实际编码为 WebP，迁入时保留原字节；主题变量选择亮暗背景，使用方也可在容器上覆盖背景变量。
 
+物品详情的 `header.webp`、`link.webp` 和 `detail.png` 保存在 `item-tooltip-card/assets`。源码和预编译 CSS 使用相对路径，构建脚本复制原字节到 `dist/assets`；悬浮卡复用同一份样式和图片。
+
 对外的三个入口（见包的 `exports`）：
 
 | 引入路径 | 对应 | 给谁用 |

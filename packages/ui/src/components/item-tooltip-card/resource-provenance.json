@@ -1,0 +1,45 @@
+{
+  "presentationSource": {
+    "repository": "ArkEndfield/EndfieldWiki",
+    "revision": "bbcc1813",
+    "file": "apps/web/src/plugins/endfield/_shared/item-tooltip/ItemTooltipCard.tsx"
+  },
+  "copySource": "EndfieldMap/packages/web-components/src/assets/item-tooltip",
+  "resources": [
+    {
+      "file": "assets/header.webp",
+      "originalUrl": "https://assets.fz.wiki/0f1bfaac667a4bf6/646d3d3aaa2e8a74.png",
+      "format": "WebP",
+      "width": 568,
+      "height": 80,
+      "bytes": 14812,
+      "sha256": "0abb6d08cbe0b06c142bd02c0fd3f570be94f2ebee56d935ad3ef6550d296703"
+    },
+    {
+      "file": "assets/link.webp",
+      "originalUrl": "https://assets.fz.wiki/cc5243ea76178097/2128e62936f3ba56.png",
+      "format": "WebP",
+      "width": 84,
+      "height": 84,
+      "bytes": 738,
+      "sha256": "8478f50adb20f3f69a085b0e5cf2afec7d2a323d128a348a8e554f226908d9e4"
+    },
+    {
+      "file": "assets/detail.png",
+      "originalFile": "EndfieldWiki/apps/web/public/deco/item-tooltip/bg_tips_a_2.png",
+      "format": "PNG",
+      "width": 64,
+      "height": 252,
+      "bytes": 4203,
+      "sha256": "478e03ef19b647366fb782918a0c4faf61e7e7875b35305fde3ee4e20c1b3f34"
+    }
+  ],
+  "icons": {
+    "note": "Equivalent SVG paths to the Wiki's lucide-react icons; no runtime dependency.",
+    "licenseFile": "LICENSE.lucide",
+    "packageSearch": "https://github.com/lucide-icons/lucide/blob/main/icons/package-search.svg",
+    "chevronsRight": "https://github.com/lucide-icons/lucide/blob/main/icons/chevrons-right.svg"
+  },
+  "sampleResourcesManifest": "../item-icon/resource-provenance.json",
+  "font": "No font file is bundled. Supply fontFamily to use the host application's registered font."
+}
