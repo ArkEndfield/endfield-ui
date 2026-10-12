@@ -101,11 +101,11 @@ pnpm test:browser
 - 只断言行为（焦点在哪、开没开、在不在视口里），不断言具体的像素值：CI 上没有中文字体，文字的宽度和本机不一样。
 - 关掉后还留在 DOM 里的浮层（下拉选择）要问"看得见吗"，不要问"在不在"——`page.visible()` 已经处理了。
 
-## 还没做的
+## 设计文档不在这里
 
-- 把 [docs/design](../../docs/design/overview.md) 里的规范渲染成可浏览的页面，令牌表直接读取 `packages/ui/src/styles/theme.css`。
+[docs/design](../../docs/design/overview.md) 里的规范渲染成的站点是另一个应用，见 [apps/site](../site/README.md)（在线：<https://icaruszezen.github.io/endfield-ui/design/>）。预览站只放控件和示例页。
 
 ## 约束
 
 - 演示内容用原创占位图与虚构文案，不使用官方截图、立绘、Logo 和字体，见 [NOTICE](../../NOTICE.md)。演示用的图形（等距方块、资源图标、灰色的占位图、头像用的几何剪影）放在 `stories/_shared/`，都是简单的几何形；人名、站名、批次也都是编的。
-- 文档站代码不被 `packages/ui` 依赖；依赖方向只能是 `apps/docs → packages/ui`。stories 因此放在这里，而不是组件目录里。
+- 预览站的代码不被 `packages/ui` 依赖；依赖方向只能是 `apps/docs → packages/ui`。stories 因此放在这里，而不是组件目录里。

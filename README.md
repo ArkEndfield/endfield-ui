@@ -4,20 +4,21 @@
 
 > 非官方的爱好者项目，与鹰角网络（Hypergryph）无关。本仓库不包含任何官方素材。详见 [NOTICE](NOTICE.md)。
 
-[在线预览](https://icaruszezen.github.io/endfield-ui/) · [设计文档](docs/README.md) · [组件库用法](packages/ui/README.md) · [npm](https://www.npmjs.com/package/@endfield-ui/react) · [更新记录](CHANGELOG.md) · [路线](ROADMAP.md)
+[设计文档站](https://icaruszezen.github.io/endfield-ui/design/) · [组件预览](https://icaruszezen.github.io/endfield-ui/) · [组件库用法](packages/ui/README.md) · [npm](https://www.npmjs.com/package/@endfield-ui/react) · [更新记录](CHANGELOG.md) · [路线](ROADMAP.md)
 
 [![示例页"仓库"的暗色截图：镂空巨字、楔形页签、物品格、带取景角与刻度圆环的详情面板](docs/screenshots/depot-dark.png)](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-仓库页--page&globals=theme:dark)
 
 ## 这个仓库是什么
 
-四样东西，后一样建立在前一样上：
+五样东西，后一样建立在前一样上：
 
 | | 是什么 | 位置 |
 | --- | --- | --- |
-| 设计风格文档 | 把终末地官网、游戏界面和宣传物料的视觉语言拆成能照着做的规范：色彩、字体、形状、布局、动效，标志性的母题，以及每个控件的规格 | [docs/](docs/README.md) |
+| 设计风格文档 | 把终末地官网、游戏界面和宣传物料的视觉语言拆成能照着做的规范：色彩、字体、形状、布局、动效，标志性的母题，以及每个控件的规格 | [docs/](docs/README.md)，在线读：[文档站](https://icaruszezen.github.io/endfield-ui/design/) |
 | 设计令牌 | 文档里的取值落成一份 Tailwind CSS v4 的 `@theme`，可以脱离组件单独用 | [theme.css](packages/ui/src/styles/theme.css) |
 | 组件库 | `@endfield-ui/react`：按规范实现的 React 控件，适配亮 / 暗主题 | [packages/ui/](packages/ui/README.md) |
 | 预览站 | Storybook：每个控件的变体与状态，外加几个用它们搭出来的示例页 | [apps/docs/](apps/docs/README.md) |
+| 文档站 | 把设计风格文档渲染成可以浏览、能搜索的站点；外壳是用组件库自己的控件搭的 | [apps/site/](apps/site/README.md) |
 
 这套风格可以叫**工业编辑风**：纸白或烟黑的底、墨黑的字、一处高饱和的信号黄，再叠一层克制的印刷与测绘痕迹。它不等于"黑底黄字加切角"，六条核心原则：
 
@@ -82,9 +83,9 @@ pnpm install
 pnpm dev
 ```
 
-第二条命令启动 Storybook（`http://localhost:6106`）。其余命令见 [packages/ui/README.md](packages/ui/README.md#开发)。
+第二条命令启动 Storybook（`http://localhost:6106`）；文档站是 `pnpm dev:site`（`http://localhost:6107`）。其余命令见 [packages/ui/README.md](packages/ui/README.md#开发)。
 
-每次推送到 `main`，[GitHub Actions](.github/workflows/deploy.yml) 会跑格式检查、代码检查、类型检查、测试和构建，把 Storybook 发布到上面的在线地址，并在真的浏览器里跑一遍键盘、焦点与布局的[实测](apps/docs/README.md#浏览器实测)。
+每次推送到 `main`，[GitHub Actions](.github/workflows/deploy.yml) 会跑格式检查、代码检查、类型检查、测试和构建，把 Storybook 和[文档站](https://icaruszezen.github.io/endfield-ui/design/)一起发布（文档站在 `design/` 这个子路径下），并在真的浏览器里各跑一遍[实测](apps/docs/README.md#浏览器实测)。构建文档站之前会先核对设计文档：链接、锚点、图，以及文档里的令牌表和 `theme.css` 对不对得上。
 
 ## 仓库结构
 
@@ -110,9 +111,13 @@ endfield-ui/
 │           ├── lib/           工具函数
 │           └── icons/         原创图标
 ├── apps/
-│   └── docs/                  Storybook 预览站
-│       ├── stories/           每个组件一个文件，外加几个示例页
-│       └── browser-checks/    在真的浏览器里做的检查（键盘、焦点、布局）
+│   ├── docs/                  Storybook 预览站
+│   │   ├── stories/           每个组件一个文件，外加几个示例页
+│   │   └── browser-checks/    在真的浏览器里做的检查（键盘、焦点、布局）
+│   └── site/                  设计文档站：把 docs/design 渲染成站点
+│       ├── scripts/           读文档、核对、构建
+│       ├── src/               外壳、文档页、首页、搜索
+│       └── checks/            文档站的浏览器实测
 ├── pnpm-workspace.yaml
 ├── CHANGELOG.md               更新记录
 ├── ROADMAP.md                 路线
@@ -121,9 +126,9 @@ endfield-ui/
 ```
 
 - 仓库按 pnpm monorepo 组织，需要 Node 22 以上与 pnpm 10。
-- 依赖方向只有一个：`apps/docs → packages/ui`，所以 stories 放在预览站里，不在组件目录里。
+- 依赖方向只有一个：`apps/* → packages/ui`，所以 stories 放在预览站里，不在组件目录里；文档站也只是用组件库，不被它依赖。
 - 视觉上的决定以 `docs/design` 为准；令牌的唯一来源是 [theme.css](packages/ui/src/styles/theme.css)，文档里的令牌表与它逐项对应。
-- 三个目录各有一份说明：[docs/](docs/README.md)（完整索引与阅读建议）、[packages/ui/](packages/ui/README.md)（用法与命令）、[apps/docs/](apps/docs/README.md)（预览站与浏览器实测）。
+- 四个目录各有一份说明：[docs/](docs/README.md)（完整索引与阅读建议）、[packages/ui/](packages/ui/README.md)（用法与命令）、[apps/docs/](apps/docs/README.md)（预览站与浏览器实测）、[apps/site/](apps/site/README.md)（文档站怎么搭的、构建时核对什么）。
 
 ## 使用
 

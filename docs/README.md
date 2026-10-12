@@ -2,6 +2,8 @@
 
 《明日方舟：终末地》设计风格指导文档。非官方，详见 [NOTICE](../NOTICE.md)。
 
+在线读：<https://icaruszezen.github.io/endfield-ui/design/>——同一批文档渲染成的站点，带目录、页内目录和搜索。站点的目录就取自下面的"全部文档"，加一篇文档要在那里加一行（见 [apps/site](../apps/site/README.md)）。
+
 ## 从哪里开始
 
 | 你想 | 读 |
@@ -102,7 +104,7 @@
 ### 更新文档
 
 - 官网改版后，重新测量并更新 [measurements.md](design/references/measurements.md) 的日期与数值，再检查引用它的文档。
-- 改动任何令牌值时，同步修改 [theme.css](../packages/ui/src/styles/theme.css) 与对应文档里的表格。
+- 改动任何令牌值时，同步修改 [theme.css](../packages/ui/src/styles/theme.css) 与对应文档里的表格。`pnpm check:docs` 会核对两边对不对得上，连同链接、锚点和图；文档站构建之前也会跑它。
 - 组件的实现取值与规范不一致时（多半是为了适配暗色主题），把取值和理由写回对应的组件文档。
 - 把"社区"级别的结论升级为"观察"时，注明游戏版本与观察日期。
 - 新增图解只放原创 SVG。不提交官方截图、立绘、Logo 与字体。
