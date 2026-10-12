@@ -1,7 +1,8 @@
 name: 构建与部署
 
-# 推送到 main 后：格式检查、代码检查、类型检查、测试、构建组件库与 Storybook，
-# 再把 Storybook 发布到 GitHub Pages；同时拿这份 Storybook 去跑浏览器实测。
+# 推送到 main 后：格式检查、代码检查、类型检查、测试、构建组件库、Storybook 与文档站，
+# 再把两个站点一起发布到 GitHub Pages（Storybook 在根路径，文档站在 design/ 下）；
+# 同时拿这两份构建产物去跑各自的浏览器实测。
 on:
   push:
     branches: [main]
@@ -14,7 +15,7 @@ concurrency:
 
 # 运行环境固定到具体版本，不用 ubuntu-latest：这个标签会跟着 GitHub 换到新系统
 # （2026-10-19 起指向 Ubuntu 26），固定之后升级由我们自己决定。
-# 要升的时候三个 job 一起改，并确认一次完整的构建与部署。
+# 要升的时候四个 job 一起改，并确认一次完整的构建与部署。
 jobs:
   build:
     name: 检查与构建
@@ -55,15 +56,35 @@ jobs:
       - name: 构建 Storybook
         run: pnpm build:docs
 
+      # 先核对设计文档（链接、锚点、图、令牌表对 theme.css），再把它渲染成静态站点；
+      # 核对没过这一步就失败，两个站点都不发布
+      - name: 构建文档站
+        run: pnpm build:site
+
+      # 一个仓库只有一个 Pages 站点：Storybook 留在根路径（npm 上的 README 链着它），
+      # 文档站放进 design/ 这个子目录
+      - name: 合并两个站点
+        run: |
+          mkdir _site
+          cp -r apps/docs/storybook-static/. _site/
+          cp -r apps/site/dist _site/design
+
       - uses: actions/upload-pages-artifact@v5
         with:
-          path: apps/docs/storybook-static
+          path: _site
 
       # 给 browser job 用。Pages 的那一份是打过包的，不方便直接拿来起服务
       - uses: actions/upload-artifact@v7
         with:
           name: storybook-static
           path: apps/docs/storybook-static
+          retention-days: 1
+
+      # 给 site job 用
+      - uses: actions/upload-artifact@v7
+        with:
+          name: site-dist
+          path: apps/site/dist
           retention-days: 1
 
   deploy:
@@ -117,5 +138,43 @@ jobs:
         with:
           name: browser-check-screenshots
           path: apps/docs/browser-checks/.artifacts
+          if-no-files-found: ignore
+          include-hidden-files: true
+
+  # 文档站自己的实测（apps/site/checks）：每一页渲染得出来、导航、目录、主题、搜索、窄屏。
+  # 和 browser 一样与 deploy 并行、不挡发布，脚本同样没有依赖、不装包。
+  site:
+    name: 文档站实测
+    needs: build
+    runs-on: ubuntu-24.04
+    # 正常十来秒跑完。理由同上：工作流共用一个并发组，挂住了会堵住后面的发布
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: site-dist
+          path: apps/site/dist
+
+      - name: 页面、导航、主题与搜索的实测
+        working-directory: apps/site
+        # 和 apps/site/package.json 里的 test:browser 是同一条命令（这里没装 pnpm）
+        run: node --test --test-concurrency=1 --test-timeout=120000 --test-force-exit "checks/*.check.ts"
+        env:
+          BROWSER_FLAGS: --no-sandbox
+
+      - name: 上传没过时的截图
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: site-check-screenshots
+          path: apps/site/checks/.artifacts
           if-no-files-found: ignore
           include-hidden-files: true
