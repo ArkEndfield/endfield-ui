@@ -42,7 +42,8 @@
   display: flex;
   flex-direction: column;
   min-height: 10em;
-  max-height: calc(100vh - 4em);
+  /* dvh：手机上地址栏伸出来的时候，100vh 比看得见的那块高 */
+  max-height: calc(100dvh - 4em);
   max-width: calc(100vw - 2em);
   margin: 1em;
   padding: 1.7em 0 16px;

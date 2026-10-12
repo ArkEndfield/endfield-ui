@@ -5,7 +5,7 @@
 }
 
 .ef-item-hover-positioner {
-  z-index: var(--z-overlay);
+  z-index: var(--z-overlay, 300);
   max-width: calc(100vw - 16px);
 }
 
