@@ -65,6 +65,8 @@ export function AlertModal({
   initialFocus,
   finalFocus,
   keepMounted = false,
+  modal,
+  container,
   popupClassName,
   backdropClassName,
   viewportClassName,
@@ -148,9 +150,14 @@ export function AlertModal({
       open={open}
       onOpenChange={changeOpen}
       disablePointerDismissal={!dismissible || busy}
+      modal={modal}
     >
       {trigger && <BaseDialog.Trigger ref={anchorRef} render={trigger} />}
-      <BaseDialog.Portal ref={portalRef} keepMounted={keepMounted}>
+      <BaseDialog.Portal
+        ref={portalRef}
+        keepMounted={keepMounted}
+        container={container}
+      >
         <BaseDialog.Backdrop
           className={cn(
             backdropClassName,

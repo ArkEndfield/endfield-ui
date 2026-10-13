@@ -14,6 +14,7 @@ import { AnimatedDialog, RoundedButton } from "@endfield-ui/react/game";
 ```
 
 - `AnimatedDialog`：分段入场的装饰弹窗，关闭可以异步否决。
+- 三个弹窗控件（`AnimatedDialog`、`BannerAlert`、`FullWidthAlert`）都收 `container` 和 `modal`：挂进指定的元素、不做成模态，可以嵌在页面的一块区域里展示。
 - `RoundedSelect`、`RoundedButton` / `RoundedIconButton`、`RoundedToggle`、`RoundedSwitch`：圆角的下拉、按钮、分段选择和 ON / OFF 文字开关。
 - `BannerAlert`、`FullWidthAlert`：紧凑卡片与通栏面板两种确认提示。
 - `ItemCard`、`ItemIcon`：带稀有度、库存的物品卡片与分层图标。

@@ -8,6 +8,7 @@ import type {
 } from "react";
 
 type PopupProps = ComponentProps<typeof BaseDialog.Popup>;
+type PortalProps = ComponentProps<typeof BaseDialog.Portal>;
 export type AlertAction = () => boolean | void | PromiseLike<boolean | void>;
 export type AlertClassName = string | ((open: boolean) => string);
 export type AlertClassNames = {
@@ -43,6 +44,13 @@ export type AlertModalProps = Omit<
   initialFocus?: PopupProps["initialFocus"];
   finalFocus?: PopupProps["finalFocus"];
   keepMounted?: boolean;
+  /**
+   * 是不是模态。默认是。传 `false` 时不锁焦点、不锁页面滚动，页面的其余部分照常能用——
+   * 配上 `container` 可以把弹窗嵌在页面的一块区域里展示。
+   */
+  modal?: boolean;
+  /** 弹层挂到哪个元素里。默认挂在 `<body>` 下 */
+  container?: PortalProps["container"];
   children?: ReactNode;
 };
 

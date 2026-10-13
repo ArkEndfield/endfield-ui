@@ -54,6 +54,8 @@ import { FullWidthAlert, RoundedButton } from "@endfield-ui/react/game";
 
 `loading` 或等待回调期间，按钮与外部关闭请求都被禁用，面板标记 `aria-busy`。`dismissible={false}` 禁止遮罩关闭并默认禁止 Escape，`keyboardCloseable` 可单独控制 Escape；确认、取消按钮仍使用各自回调。两个按钮上的字默认是“取消”“确认”，用 `cancelText`、`confirmText` 换。`showIcon={false}` 隐藏按钮图标，`hideCancel` 隐藏取消。`keepMounted` 可以保留关闭后的正文状态。
 
+默认是模态的，弹层挂在 `<body>` 下。`container` 把它挂进指定的元素，`modal={false}` 时不锁焦点、不锁页面滚动——两样合起来，可以把提示嵌在页面的一块区域里展示（设计稿对照、文档里的预览）：那一块要自己定高，并且是里面 `position: fixed` 元素的包含块（`contain: layout`），遮罩就只盖住它；再配上 `dismissible={false}` 和 `initialFocus={false}`，它不关、也不抢焦点。预览站的“示例 / 实机风格”就是这样摆的。
+
 禁用使当前按钮失焦时，焦点落在面板；没有可用控件时 Tab 和 Shift+Tab 都留在面板内。回调否决后，若用户仍停在面板，焦点恢复到原动作按钮。有可用输入框时继续使用正常的键盘导航。
 
 ## 本地图片

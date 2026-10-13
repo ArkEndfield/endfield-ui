@@ -30,6 +30,8 @@ import { AnimatedDialog } from "@endfield-ui/react/game";
 
 `dismissible={false}` 禁止遮罩关闭，并默认禁止 Escape；仍可以点击关闭按钮。`keyboardCloseable` 可以单独控制 Escape。`closeLabel` 是关闭按钮的读屏名称，默认"关闭"。正文过长时只在内容区滚动，装饰和标题保持原位。
 
+默认是模态的，弹层挂在 `<body>` 下。`container` 把它挂进指定的元素，`modal={false}` 时不锁焦点、不锁页面滚动——两样合起来，可以把弹窗嵌在页面的一块区域里展示（设计稿对照、文档里的预览）：那一块要自己定高，并且是里面 `position: fixed` 元素的包含块（`contain: layout`），遮罩就只盖住它；再配上 `dismissible={false}` 和 `initialFocus={false}`，它不关、也不抢焦点。预览站的“示例 / 实机风格”就是这样摆的。
+
 装饰条上的两处字（`ARKNIGHTS:ENDFIELD`、`ENDFIELD`）是代码画的，声明的字体是 `Outfit`，库不负责加载；它们是游戏的英文名，见[风险与处理](README.md#风险与处理)。
 
 ## RoundedSelect

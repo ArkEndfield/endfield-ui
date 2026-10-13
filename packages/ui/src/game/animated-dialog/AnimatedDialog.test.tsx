@@ -6,7 +6,7 @@ import {
   waitFor,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { ComponentProps } from "react";
+import { useState, type ComponentProps } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { DialogClose } from "../../components/dialog/Dialog";
 import { AnimatedDialog } from "./AnimatedDialog";
@@ -262,5 +262,45 @@ describe("AnimatedDialog", () => {
     unmount();
     await act(async () => request.resolve(true));
     expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
+  it("container 把弹层挂进指定的元素；modal={false} 时不挡住页面、不抢焦点", async () => {
+    function Embedded({ modal }: { modal: boolean }) {
+      const [stage, setStage] = useState<HTMLDivElement | null>(null);
+      return (
+        <>
+          <button type="button">外面的按钮</button>
+          <div data-testid="stage" ref={setStage} />
+          {stage && (
+            <AnimatedDialog
+              open
+              modal={modal}
+              container={stage}
+              dismissible={false}
+              initialFocus={false}
+              title="设置"
+            >
+              <button type="button">里面的按钮</button>
+            </AnimatedDialog>
+          )}
+        </>
+      );
+    }
+    const blocked = (element: HTMLElement) =>
+      element.closest("[inert], [aria-hidden='true']");
+
+    const { unmount } = render(<Embedded modal={false} />);
+    const dialog = await screen.findByRole("dialog", { name: "设置" });
+    expect(screen.getByTestId("stage")).toContainElement(dialog);
+    expect(blocked(screen.getByText("外面的按钮"))).toBeNull();
+    expect(document.body).toHaveFocus();
+    unmount();
+
+    // 对照：同样挂进去，默认的模态会把外面的内容挡在外头
+    render(<Embedded modal />);
+    await screen.findByRole("dialog", { name: "设置" });
+    await waitFor(() =>
+      expect(blocked(screen.getByText("外面的按钮"))).not.toBeNull(),
+    );
   });
 });

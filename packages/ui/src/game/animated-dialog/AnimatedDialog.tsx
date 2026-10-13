@@ -13,6 +13,7 @@ import { cn, usePortalScope } from "../lib/core";
 import { firstFocusableIn } from "../lib/first-focusable";
 
 type PopupProps = ComponentProps<typeof BaseDialog.Popup>;
+type PortalProps = ComponentProps<typeof BaseDialog.Portal>;
 type ChangeDetails = Parameters<
   NonNullable<ComponentProps<typeof BaseDialog.Root>["onOpenChange"]>
 >[1];
@@ -56,6 +57,13 @@ export type AnimatedDialogProps = Omit<
   initialFocus?: PopupProps["initialFocus"];
   finalFocus?: PopupProps["finalFocus"];
   keepMounted?: boolean;
+  /**
+   * 是不是模态。默认是。传 `false` 时不锁焦点、不锁页面滚动，页面的其余部分照常能用——
+   * 配上 `container` 可以把弹窗嵌在页面的一块区域里展示。
+   */
+  modal?: boolean;
+  /** 弹层挂到哪个元素里。默认挂在 `<body>` 下 */
+  container?: PortalProps["container"];
   children?: ReactNode;
 };
 
@@ -83,6 +91,8 @@ export function AnimatedDialog({
   initialFocus,
   finalFocus,
   keepMounted = false,
+  modal,
+  container,
   children,
   ...popupProps
 }: AnimatedDialogProps) {
@@ -176,9 +186,14 @@ export function AnimatedDialog({
       open={open}
       onOpenChange={handleOpenChange}
       disablePointerDismissal={!dismissible}
+      modal={modal}
     >
       {trigger && <BaseDialog.Trigger ref={anchorRef} render={trigger} />}
-      <BaseDialog.Portal ref={portalRef} keepMounted={keepMounted}>
+      <BaseDialog.Portal
+        ref={portalRef}
+        keepMounted={keepMounted}
+        container={container}
+      >
         <BaseDialog.Backdrop
           className={cn(
             "ef-animated-dialog-backdrop",

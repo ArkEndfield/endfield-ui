@@ -6,7 +6,7 @@ import {
   waitFor,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { ComponentProps } from "react";
+import { useState, type ComponentProps } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { BannerAlert } from "./BannerAlert";
 
@@ -307,5 +307,36 @@ describe("BannerAlert", () => {
     expect(screen.getByRole("textbox", { name: "草稿" })).toHaveValue(
       "未修改内容",
     );
+  });
+
+  it("container 把提示挂进指定的元素；modal={false} 时不挡住页面、不抢焦点", async () => {
+    function Embedded() {
+      const [stage, setStage] = useState<HTMLDivElement | null>(null);
+      return (
+        <>
+          <button type="button">外面的按钮</button>
+          <div data-testid="stage" ref={setStage} />
+          {stage && (
+            <BannerAlert
+              open
+              modal={false}
+              container={stage}
+              dismissible={false}
+              initialFocus={false}
+              title="移除物品"
+            >
+              <p>移除这件物品？</p>
+            </BannerAlert>
+          )}
+        </>
+      );
+    }
+    render(<Embedded />);
+    const alert = await screen.findByRole("alertdialog", { name: "移除物品" });
+    expect(screen.getByTestId("stage")).toContainElement(alert);
+    expect(
+      screen.getByText("外面的按钮").closest("[inert], [aria-hidden='true']"),
+    ).toBeNull();
+    expect(document.body).toHaveFocus();
   });
 });
