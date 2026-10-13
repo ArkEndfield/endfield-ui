@@ -3,3 +3,15 @@
 /* stories 与预览外壳里用到的工具类 */
 @source "../stories";
 @source "./";
+
+/*
+ * 文档页里每个 story 外面，Storybook 套了一层给"缩放"用的外壳：它量里面的高度，
+ * 抄成自己的像素高度——晚一帧。story 里的东西一变高（折叠面板展开、表格的明细行），
+ * 这一帧里内容比外壳高，再外面那层 overflow: auto 的容器就闪出一条竖向滚动条，
+ * 把 story 挤窄 15px，高度停下来又弹回去：看着是控件在抖。
+ * 缩放的工具栏这里没开（比例恒为 1），用不着那个写死的高度，交还给内容自己撑。
+ * 以后要是开了 docs.canvas.withToolbar，这条得撤掉：缩小之后外壳会留出一截空白
+ */
+.docs-story div:has(> .innerZoomElementWrapper) {
+  height: auto !important;
+}

@@ -39,7 +39,7 @@ pnpm dev
 ## 怎么接的
 
 - `.storybook/main.ts` 把 `@endfield-ui/react` 别名到 `packages/ui/src/index.ts`，所以改组件源码即热更新，不用先构建。
-- `.storybook/preview.css` 引入 `@endfield-ui/react/tailwind.css`，再用 `@source` 把 stories 里的类名交给 Tailwind。
+- `.storybook/preview.css` 引入 `@endfield-ui/react/tailwind.css`，再用 `@source` 把 stories 里的类名交给 Tailwind。里面还有一条规则是改 Storybook 自己的：文档页里每个 story 外面有一层给缩放用的外壳，它的高度比内容晚一帧，story 一变高（折叠面板展开、表格的明细行）就闪出一条滚动条、把 story 挤窄一下，看着像控件在抖。缩放的工具栏没开，所以把这个高度交还给了内容；`docs.check.ts` 的最后一条守着它。
 - `.storybook/manager.tsx` 管的是预览站自己的界面（侧栏、工具栏），不是画布里的 story：工具栏上到仓库的链接在这里。这个文件由 Storybook 自己打包，JSX 走旧式转换，所以要 `import React`；改了它要重启 `pnpm dev`。
 - `.storybook/preview-head.html` 从 Google Fonts 加载 Archivo、Outfit、Space Grotesk 三款开源字体；断网时回退到系统字体，层级关系仍然成立。
 - 根 README 里的示例页截图（`docs/screenshots/`）由 `browser-checks/readme-shots.ts` 生成。示例页改了样子之后，先 `pnpm build:docs`，再 `pnpm --filter @endfield-ui/docs shots` 重截；换了哪一页、哪个主题，README 里那张图的链接跟着改。

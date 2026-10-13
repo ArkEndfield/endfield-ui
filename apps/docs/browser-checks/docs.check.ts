@@ -69,3 +69,40 @@ for (const id of pages) {
     assert.deepEqual(page.errors, [], "页面报了错");
   });
 }
+
+// Storybook 给每个 story 套的缩放外壳把里面的高度抄成自己的像素高度，晚一帧：
+// story 一变高就溢出，外面的容器闪出一条滚动条，把 story 挤窄（看着是控件在抖）。
+// `.storybook/preview.css` 里有一条规则把这个高度交还给内容
+test("文档页：story 变高的那一刻，外面的容器不溢出", async () => {
+  const { page } = storybook;
+  // "减少动态效果"给每个元素都挂了 0.01ms 的过渡：同一步里读到的还是变高之前的样子
+  await page.setReducedMotion(false);
+  try {
+    await page.docs("控件-accordion-折叠面板--docs");
+    const overflow = await page.evaluate(() =>
+      [...document.querySelectorAll(".docs-story")].map((story) => {
+        const inner = story.querySelector<HTMLElement>(
+          ".innerZoomElementWrapper",
+        );
+        if (!inner) return null;
+        // 直接撑高，同一步里读：外壳来不及跟上的那一刻就是这个样子
+        inner.style.paddingBottom = "40px";
+        const over = story.scrollHeight - story.clientHeight;
+        inner.style.paddingBottom = "";
+        return over;
+      }),
+    );
+    assert.ok(overflow.length > 0, "文档页里没有 story");
+    assert.ok(
+      !overflow.includes(null),
+      "没有找到 Storybook 的缩放外壳：它的结构变了，preview.css 里那条规则要跟着改",
+    );
+    assert.deepEqual(
+      overflow,
+      overflow.map(() => 0),
+      "story 变高时比外面的容器高出了一截",
+    );
+  } finally {
+    await page.setReducedMotion(true);
+  }
+});
