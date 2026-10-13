@@ -40,6 +40,8 @@ import { AnimatedDialog, RoundedButton } from "@endfield-ui/react/game";
 
 主库里名字相近的控件各是各的：`Dialog`、`Select`、`Button`、`SegmentedControl`、`Switch`、`Alert`、`ItemSlot`、`HoverCard` 的接口和样子都不因为这一类而变。
 
+预览站里，这一类的 story 在侧栏最后一组；顶上“示例”组的最后另有一页“实机风格”，把这些控件摆在一页里——三个弹窗除了能点开，还直接摆在页面上。
+
 这一类的控件用的是固定的浅色皮肤。弹窗和确认提示的正文区是一块局部的亮色主题：页面是暗色时，放进去的主库控件也按亮色取值。
 
 ## 风险与处理

@@ -49,7 +49,7 @@
 | [![设置页的亮色截图](docs/screenshots/settings-light.png)](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-设置页--page&globals=theme:light) | [![列表页的暗色截图](docs/screenshots/list-dark.png)](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-列表页--page&globals=theme:dark) |
 | 表单与反馈：页头、步骤条、字段与校验、下拉选择与组合框、标签输入、文件上传、验证码输入、分段选择、滑块、折叠面板，带一次完整的"提交 → 报错 → 改正 → 保存" | 页头，检索、排序、筛选，网格与列表两种视图，分页；侧栏里是胶囊导航器、进度环、步进器和一条限高、在滚动区里滚的时间线 |
 
-"示例"组里还有两个小的：[主题色接管](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-主题色接管--takeover)（下面有图）和[主题切换](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-主题切换--switch)（切亮暗时整页交叉淡化一次）。演示内容都是原创的占位图和虚构文案。
+"示例"组里还有两个小的：[主题色接管](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-主题色接管--takeover)（下面有图）和[主题切换](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-主题切换--switch)（切亮暗时整页交叉淡化一次）。除了最后一页“实机风格”，演示内容都是原创的占位图和虚构文案；那一页是 [Game 实机风格](#game-实机风格独立入口)的控件搭的，带官方图片，三个弹窗除了能点开，还直接摆在页面上。
 
 ### 控件一览
 
@@ -75,7 +75,7 @@
 
 ### Game 实机风格（独立入口）
 
-预览站侧栏的第四组。照游戏内界面复刻的一组控件，迁自社区项目 EndfieldMap 与 EndfieldWiki：固定的灰与黄，不随主题变；和上面那张表里的控件是两套东西，所以不在表里，也不从主入口导出。
+预览站侧栏的第四组，“示例”组的最后还有一页[实机风格](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-实机风格--page)。照游戏内界面复刻的一组控件，迁自社区项目 EndfieldMap 与 EndfieldWiki：固定的灰与黄，不随主题变；和上面那张表里的控件是两套东西，所以不在表里，也不从主入口导出。
 
 | 控件 | |
 | --- | --- |
