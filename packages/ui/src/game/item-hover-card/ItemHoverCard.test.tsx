@@ -50,6 +50,31 @@ describe("ItemHoverCard", () => {
     expect(trigger).not.toHaveAttribute("aria-expanded");
   });
 
+  it("面板里没有能聚焦的东西时，Tab 照常走到页面里的下一个元素", async () => {
+    // 面板为了排进 Tab 顺序放了两个接力用的占位元素；面板里没处可去时，焦点原来会掉到 <body> 上
+    const user = userEvent.setup();
+    render(
+      <>
+        <ItemHoverCard item={{ ...item, obtainWays: [{ name: "精炼炉" }] }}>
+          <button>物品</button>
+        </ItemHoverCard>
+        <button>后面的按钮</button>
+      </>,
+    );
+    await user.tab();
+    await screen.findByRole("dialog", { name: item.name });
+    expect(screen.getByRole("button", { name: "物品" })).toHaveFocus();
+
+    await user.tab();
+    expect(screen.getByRole("button", { name: "后面的按钮" })).toHaveFocus();
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+
+    // 往回走也一样：面板重新打开，再 Shift+Tab 不被占位元素截住
+    await user.tab({ shift: true });
+    expect(screen.getByRole("button", { name: "物品" })).toHaveFocus();
+    await screen.findByRole("dialog", { name: item.name });
+  });
+
   it("解析为空不渲染，resolver 换数据后显示新内容", async () => {
     const resolver = vi.fn(() => null as ItemTooltipItem | null);
     const { rerender } = render(

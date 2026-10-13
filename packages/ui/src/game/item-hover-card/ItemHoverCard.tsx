@@ -11,6 +11,7 @@ import {
   type ReactNode,
   type RefObject,
 } from "react";
+import { flushSync } from "react-dom";
 import { cn, usePortalScope } from "../lib/core";
 import {
   ItemTooltipCard,
@@ -233,11 +234,21 @@ function ItemHoverPanel({
     };
     syncAria();
     const focusPanel = (event: KeyboardEvent) => {
-      if (event.key !== "ArrowDown" || event.defaultPrevented) return;
+      if (event.defaultPrevented) return;
       const first = panelRef.current?.querySelector<HTMLElement>(
         "a[href],button:not(:disabled),[tabindex='0']",
       );
-      if (first) {
+      if (event.key === "Tab" && !first) {
+        /*
+         * 面板里没有能聚焦的东西。Base UI 为了把面板排进 Tab 顺序，在这一层所在的位置放了两个
+         * 接力用的占位元素：焦点落上去之后本该进面板，面板里没处可去，随后面板一收，焦点就掉在
+         * <body> 上，后面的内容走不到。所以在浏览器挪焦点之前先把面板（连同占位）收掉，
+         * 这一下 Tab 就照常落到页面里的下一个元素上。
+         */
+        flushSync(close);
+        return;
+      }
+      if (event.key === "ArrowDown" && first) {
         event.preventDefault();
         first.focus({ preventScroll: true });
       }
@@ -249,7 +260,7 @@ function ItemHoverPanel({
       anchor.host.removeEventListener("focusin", syncAria);
       restoreAria();
     };
-  }, [anchor.host, id, panelRef]);
+  }, [anchor.host, close, id, panelRef]);
   useEffect(() => {
     const observer =
       typeof IntersectionObserver === "undefined"
