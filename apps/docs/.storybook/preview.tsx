@@ -29,9 +29,15 @@ function ThemeFrame({
 
   if (mode !== "both") {
     // 文字色显式写在外壳上，不只靠 body 继承：主题是挂载后才写到 <html> 上的，
-    // 无头浏览器截图时继承来的颜色偶尔停在切换前
+    // 无头浏览器截图时继承来的颜色偶尔停在切换前。
+    // 底色也写在外壳上：文档页里 story 外面套着 Storybook 自己的白底容器，
+    // 盖住了 body 的底色，只切暗色时就成了白底上的浅色字
     return (
-      <div className={bleed ? "text-ink" : "p-6 text-ink"}>{children}</div>
+      <div
+        className={bleed ? "bg-surface text-ink" : "bg-surface p-6 text-ink"}
+      >
+        {children}
+      </div>
     );
   }
 
