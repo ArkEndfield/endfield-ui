@@ -18,3 +18,4 @@ export * from "./rounded-button";
 export * from "./rounded-select";
 export * from "./rounded-switch";
 export * from "./rounded-toggle";
+export * from "./splash-screen";

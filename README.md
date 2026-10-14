@@ -85,13 +85,14 @@
 | BannerAlert、FullWidthAlert | 紧凑卡片与通栏面板两种确认提示 |
 | ItemCard / ItemIcon | 带稀有度、库存的物品卡片与分层图标 |
 | ItemTooltipCard、ItemHoverCard / ItemHoverCardLayer | 物品详情卡与悬浮预览 |
+| EndfieldSplashScreen | 官网首次载入的开屏页：主入口的 SplashScreen 填上官方的标志、底图和微标 |
 
 ```tsx
 import "@endfield-ui/react/game.css";
 import { AnimatedDialog, RoundedButton } from "@endfield-ui/react/game";
 ```
 
-> **这个入口带着 25 张官方图片**（界面纹理、卡片背景、一张官方标志），没有取得授权，MIT 许可不覆盖它们；权利人提出异议时会撤下。不引它，主入口和主样式里就没有其中任何一张。在 `<html>` 上写 `data-ef-game-images="off"` 可以整类关掉。用之前请读[风险与处理](docs/design/game/README.md#风险与处理)。
+> **这个入口带着 30 张官方图片**（界面纹理、卡片背景、开屏页的底图，和两张官方标志——其中一张是游戏的标志本身），没有取得授权，MIT 许可不覆盖它们；权利人提出异议时会撤下。不引它，主入口和主样式里就没有其中任何一张。在 `<html>` 上写 `data-ef-game-images="off"` 可以整类关掉。用之前请读[风险与处理](docs/design/game/README.md#风险与处理)。
 
 ### 在本地看
 
@@ -118,7 +119,7 @@ endfield-ui/
 │   │   ├── elements/          母题：切角、括号、斜纹、分节标题、镂空字、底纹、测绘叠层
 │   │   ├── surfaces/          载体：官网、游戏界面、宣传物料
 │   │   ├── components/        组件：按钮、导航、卡片、表单、反馈、浮层、数据展示
-│   │   ├── game/              Game 实机风格：总览与风险说明，五篇控件文档
+│   │   ├── game/              Game 实机风格：总览与风险说明，六篇控件文档
 │   │   ├── references/        依据：官网实测数据、官方来源、开源项目调研
 │   │   └── assets/            原创 SVG 图解
 │   ├── motion-plan.md         动效是怎么一步步补上的（已做完，留作记录）

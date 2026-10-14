@@ -27,6 +27,7 @@ const docsPages = [
   `${GROUP}-itemicon-分层物品图标--docs`,
   `${GROUP}-itemtooltipcard-物品详情卡片--docs`,
   `${GROUP}-itemhovercard-物品悬浮卡--docs`,
+  `${GROUP}-endfieldsplashscreen-官网开屏页--docs`,
 ];
 
 for (const id of docsPages) {
@@ -124,6 +125,56 @@ test("图片都随站点发：样式和示例里的图没有一张指向外面�
     [...cards.styled, ...alert.styled].filter(isFile),
   );
   assert.deepEqual(missing, [], "样式里引用的图片取不到");
+});
+
+test("官网开屏页：底图、标志、微标、三角标四处都是图，都随站点发；竖着的框里底图换成竖的那一张", async () => {
+  const { page } = storybook;
+  const SPLASH = "#storybook-root .ef-splash";
+  /** 这四处各自引用的图（底图和微标是背景，标志是遮罩） */
+  const used = () =>
+    page.evaluate((css) => {
+      const root = document.querySelector(css)!;
+      const url = (value: string) => /url\("?([^")]+)"?\)/.exec(value)?.[1];
+      const style = (name: string) =>
+        getComputedStyle(root.querySelector(`.${name}`)!);
+      return {
+        backdrop: url(style("ef-splash-backdrop").backgroundImage),
+        logo: url(style("ef-splash-logo").maskImage),
+        deco: url(style("ef-splash-deco__text").backgroundImage),
+        mark: url(style("ef-splash-deco__mark").backgroundImage),
+        origin: location.origin,
+      };
+    }, SPLASH);
+
+  await page.story(`${GROUP}-endfieldsplashscreen-官网开屏页--playground`);
+  const { origin, ...wide } = await used();
+  for (const [part, url] of Object.entries(wide)) {
+    assert.ok(url, `${part} 应该是一张图片`);
+    // 小图构建时会被内联成 data:，不算文件
+    assert.ok(
+      !isFile(url) || url.startsWith(origin),
+      `${part} 的图指到了站外：${url}`,
+    );
+  }
+  const missing = await page.evaluate(
+    async (urls) => {
+      const results = await Promise.all(
+        urls.map(async (url) => ((await fetch(url)).ok ? null : url)),
+      );
+      return results.filter(Boolean);
+    },
+    Object.values(wide).filter(
+      (url): url is string => url !== undefined && isFile(url),
+    ),
+  );
+  assert.deepEqual(missing, [], "开屏页引用的图片取不到");
+
+  // 横竖看的是它所在的那个框：这个 story 的框是竖的
+  await page.story(`${GROUP}-endfieldsplashscreen-官网开屏页--portrait`);
+  const tall = await used();
+  assert.ok(tall.backdrop, "竖排也应该有底图");
+  assert.notEqual(tall.backdrop, wide.backdrop, "竖排应该换一张底图");
+  assert.equal(tall.logo, wide.logo, "标志还是同一张");
 });
 
 test("关掉官方图片：整类不再引用任何图片文件，弹出来的确认提示也是", async () => {

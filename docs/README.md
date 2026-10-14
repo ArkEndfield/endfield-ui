@@ -80,6 +80,7 @@
 - [确认提示](design/game/confirmation-alerts.md)——紧凑卡片与通栏面板
 - [物品卡片](design/game/item-cards.md)——稀有度、亮暗背景、库存和分层图标
 - [物品悬浮卡](design/game/item-hover-cards.md)——详情、获取途径与网格悬浮预览
+- [官网开屏页](design/game/splash-screen.md)——主入口的开屏页填上官方的标志、底图和微标
 
 ### 依据
 

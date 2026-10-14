@@ -1,13 +1,13 @@
 # Game 实机风格
 
-照游戏内界面复刻的一组控件。它和本库其余的部分是两套东西，所以单独成一类、单独一个入口：
+照游戏内界面复刻的一组控件，外加一个带官方图片的[官网开屏页](splash-screen.md)。它和本库其余的部分是两套东西，所以单独成一类、单独一个入口：
 
 | | 主库 | Game 实机风格 |
 | --- | --- | --- |
-| 依据 | 官网的实测，和从它延伸出来的规范 | 游戏内界面的样子，经社区项目 EndfieldMap、EndfieldWiki 的实现转来 |
+| 依据 | 官网的实测，和从它延伸出来的规范 | 游戏内界面的样子，经社区项目 EndfieldMap、EndfieldWiki 的实现转来；开屏页是官网的实测 |
 | 配色 | 语义令牌，随亮 / 暗主题翻转，强调色可以换 | 固定的灰与黄，不随主题变；只有物品卡片的背景分亮暗 |
 | 样式 | Tailwind 工具类 | 每个控件一份纯 CSS，类名以 `ef-` 开头 |
-| 图片 | 不带任何图片 | 带 25 张官方图片，见[风险与处理](#风险与处理) |
+| 图片 | 不带任何图片 | 带 30 张官方图片，见[风险与处理](#风险与处理) |
 | 入口 | `@endfield-ui/react` | `@endfield-ui/react/game` |
 
 主入口不导出这里的任何东西，主样式里也没有它的一条规则：不引这个入口，就和它不存在一样。
@@ -37,12 +37,15 @@ import { AnimatedDialog, RoundedButton } from "@endfield-ui/react/game";
 | `FullWidthAlert` | 横贯视口的确认面板 | [确认提示](confirmation-alerts.md#fullwidthalert) |
 | `ItemCard`、`ItemIcon` | 物品卡片（稀有度、库存）与分层图标 | [物品卡片](item-cards.md) |
 | `ItemTooltipCard`、`ItemHoverCard`、`ItemHoverCardLayer` | 物品详情卡与悬浮预览 | [物品悬浮卡](item-hover-cards.md) |
+| `EndfieldSplashScreen` | 官网首次载入的开屏页：主入口的 `SplashScreen` 填上官方的标志、底图和微标 | [官网开屏页](splash-screen.md) |
 
 主库里名字相近的控件各是各的：`Dialog`、`Select`、`Button`、`SegmentedControl`、`Switch`、`Alert`、`ItemSlot`、`HoverCard` 的接口和样子都不因为这一类而变。
 
 预览站里，这一类的 story 在侧栏最后一组；顶上“示例”组的最后另有一页“实机风格”，把这些控件摆在一页里——三个弹窗除了能点开，还直接摆在页面上。
 
-这一类的控件用的是固定的浅色皮肤。弹窗和确认提示的正文区是一块局部的亮色主题：页面是暗色时，放进去的主库控件也按亮色取值。
+`EndfieldSplashScreen` 和别的不一样：它复刻的是官网，不是游戏内的界面，排法和动画都在主入口的 `SplashScreen` 里，这个入口只是替它把官方的图填上——带官方图片的东西只许放在这里。
+
+这一类的控件用的是固定的浅色皮肤（开屏页是固定的近黑底）。弹窗和确认提示的正文区是一块局部的亮色主题：页面是暗色时，放进去的主库控件也按亮色取值。
 
 ## 风险与处理
 
@@ -50,7 +53,7 @@ import { AnimatedDialog, RoundedButton } from "@endfield-ui/react/game";
 
 ### 带了什么
 
-25 张图片，都取自《明日方舟：终末地》的游戏界面与物品图，经社区项目 [EndfieldMap](https://github.com/ArkEndfield/EndfieldMap) 和 EndfieldWiki 转来：
+30 张图片。前 25 张取自《明日方舟：终末地》的游戏界面与物品图，经社区项目 [EndfieldMap](https://github.com/ArkEndfield/EndfieldMap) 和 EndfieldWiki 转来；开屏页的 5 张是 2026-10-14 直接从[官网](https://endfield.hypergryph.com/)首页的加载页取的：
 
 | 用在哪 | 张数 | 内容 | 随 npm 包 |
 | --- | --- | --- | --- |
@@ -58,6 +61,7 @@ import { AnimatedDialog, RoundedButton } from "@endfield-ui/react/game";
 | 两种确认提示 | 4 | 横幅的斜纹装饰两张、卡片的半调底图、**通栏面板的标志底图** | 是 |
 | 物品卡片 | 12 | 物品 / 武器 / 敌人的亮暗背景六张、六档稀有度的底边六张 | 是 |
 | 物品详情卡 | 3 | 标题纹理、详情入口的图标、正文底图 | 是 |
+| 官网开屏页 | 5 | 横竖两张暗色底图、**游戏的标志**、一张微标（带框的加号、两行微文字、方点阵）、一枚三角标 | 是 |
 | 预览站的示例 | 5 | 四件物品的图标和一张瓶内内容 | 否 |
 
 逐张的路径、尺寸、字节数、SHA256 和来源登记在 [`resource-provenance.json`](../../../packages/ui/src/game/resource-provenance.json)。
@@ -67,7 +71,7 @@ import { AnimatedDialog, RoundedButton } from "@endfield-ui/react/game";
 ### 风险
 
 1. **没有授权。** 这些图片的著作权归鹰角网络及其权利人。本仓库没有取得授权，转来它们的两个上游仓库也没有标明许可。本仓库的 MIT 许可只覆盖代码，**不覆盖这些图片**——它给不了你使用这些图片的权利。
-2. **商标。** `deco_common_logo_bg.png`（`FullWidthAlert` 左下的底图）里是官方的「终末地 / ENDFIELD INDUSTRIES」标志，`AnimatedDialog` 的装饰字是游戏的英文名。比起别的纹理，它们更容易让人把你的页面认成官方的，是这一类里风险最高的两处。
+2. **商标。** `splash_logo.svg`（`EndfieldSplashScreen` 正中偏右的那一块）就是游戏的标志「明日方舟：终末地 / ARKNIGHTS ENDFIELD」本身，而且开屏页是别人打开你的页面看到的第一样东西。`deco_common_logo_bg.png`（`FullWidthAlert` 左下的底图）里是官方的「终末地 / ENDFIELD INDUSTRIES」标志，`AnimatedDialog` 的装饰字是游戏的英文名。比起别的纹理，它们更容易让人把你的页面认成官方的，是这一类里风险最高的三处，开屏页的标志排第一。
 3. **可能被撤下。** 权利人提出异议时，这些图片会从仓库和之后的版本里拿掉，已经发布的版本可能被标记为弃用。依赖它们的外观会跟着变。
 4. **你自己的发布。** 把带这些图片的页面公开发布，尤其是用于商业用途，合不合规要由你自己判断并负责。截至撰写时，我们没有检索到针对《终末地》的官方同人创作规范原文（见 [NOTICE](../../../NOTICE.md)）。
 5. **包里有这些文件。** 不引这个入口，打包工具不会把任何一张图带进你的产物；但 npm 包的压缩包里仍然有它们（`dist/game/assets/`）。连依赖包里都不能出现官方素材的场合，这个包目前满足不了。
@@ -89,7 +93,7 @@ import { AnimatedDialog, RoundedButton } from "@endfield-ui/react/game";
 <html data-ef-game-images="off">
 ```
 
-关了之后这一类的控件不再请求任何一张官方图片，退回代码画的样子：按钮没有纹理，两种确认提示是白底，物品卡片的背景是一块跟主题的底色、稀有度是一条色带，详情卡的标题没有纹理、正文底是一段渐变、详情入口是一个画出来的箭头。预览站的"Game 实机风格 / 示例 / 关掉官方图片"就是这个样子。
+关了之后这一类的控件不再请求任何一张官方图片，退回代码画的样子：按钮没有纹理，两种确认提示是白底，物品卡片的背景是一块跟主题的底色、稀有度是一条色带，详情卡的标题没有纹理、正文底是一段渐变、详情入口是一个画出来的箭头；开屏页没有底图和标志，微标和三角标是代码画的。预览站的"Game 实机风格 / 示例 / 关掉官方图片"就是这个样子。
 
 **单独换一张**：每张图都经一个变量引用，设了就用你的，写 `none` 就是不画。写在 `:root` 上：
 
@@ -111,6 +115,9 @@ import { AnimatedDialog, RoundedButton } from "@endfield-ui/react/game";
 | `--ef-game-item-tooltip-header` | `header.webp` | `ItemTooltipCard` 标题的纹理 |
 | `--ef-game-item-tooltip-detail` | `detail.png` | `ItemTooltipCard` 正文的底图（九宫格） |
 | `--ef-game-item-tooltip-link-icon` | `link.webp` | `ItemTooltipCard` 的详情入口 |
+| `--ef-game-splash-bg`、`--ef-game-splash-bg-portrait` | `splash_bg.jpg`、`splash_bg_portrait.jpg` | `EndfieldSplashScreen` 横排、竖排的底图 |
+| `--ef-game-splash-deco`、`--ef-game-splash-mark` | `splash_deco.svg`、`splash_triangles.svg` | `EndfieldSplashScreen` 的微标和三角标 |
+| `--ef-game-splash-logo` | `splash_logo.svg`（官方标志） | `EndfieldSplashScreen` 标志的形状。它是当遮罩用的：要换成自己的标志或者不要，用 `logo` 属性，见[官网开屏页](splash-screen.md#换掉或关掉图片) |
 
 - 开关和变量管的都是图片。`AnimatedDialog` 装饰条上那两处游戏英文名是代码画的字，不受它们管；要去掉，在自己的样式里把 `.ef-animated-dialog__title-deco`（标题带右边的大字）和 `.ef-animated-dialog__top-deco > svg:first-child`（顶条上的小字）藏掉，用 `visibility: hidden`，位置留着。
 - 换了 `ItemCard` 的背景就不再分亮暗；要分，在各自的主题容器（`[data-theme="dark"]`）上各设一次。
@@ -119,6 +126,6 @@ import { AnimatedDialog, RoundedButton } from "@endfield-ui/react/game";
 
 ### 给使用方的建议
 
-- 个人的、非商业的同人场景之外，上线前把图片换成你有权使用的，或者关掉。标志那一张建议总是换掉。
+- 个人的、非商业的同人场景之外，上线前把图片换成你有权使用的，或者关掉。两张标志建议总是换掉：`FullWidthAlert` 的那张底图经变量换，开屏页的用 `logo` 属性换——或者直接用主入口不带图的 `SplashScreen`。
 - 不要用它做容易被认成官方产品、官方公告或官方周边的东西。
 - 完全不想沾官方素材：只用主入口。

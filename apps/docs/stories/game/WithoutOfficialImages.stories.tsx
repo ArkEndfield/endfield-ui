@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight } from "@endfield-ui/react";
 import {
   BannerAlert,
+  EndfieldSplashScreen,
   FullWidthAlert,
   ItemCard,
   ItemTooltipCard,
@@ -137,6 +138,16 @@ function WithoutOfficialImages() {
           </FullWidthAlert>
         </div>
         {result && <output>{result}</output>}
+      </section>
+
+      <section className="grid gap-4">
+        <h2 className="text-lg font-bold">官网开屏页</h2>
+        <p className="max-w-prose text-sm text-ink-secondary">
+          没有底图和标志；微标退回代码画的方点和三角标。进度条、读数、分隔线和标语本来就不是图。
+        </p>
+        <div className="relative aspect-video w-full overflow-hidden border border-line">
+          <EndfieldSplashScreen value={51} fullscreen={false} />
+        </div>
       </section>
     </div>
   );

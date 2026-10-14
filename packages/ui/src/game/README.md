@@ -1,6 +1,6 @@
 # game
 
-Game 实机风格：照游戏内界面复刻的一组控件，独立入口（`@endfield-ui/react/game` + `@endfield-ui/react/game.css`）。是什么、怎么用、带了哪些官方图片和有什么风险，见 [docs/design/game](../../../../docs/design/game/README.md)。
+Game 实机风格：照游戏内界面复刻的一组控件，外加一个带官方图片的官网开屏页，独立入口（`@endfield-ui/react/game` + `@endfield-ui/react/game.css`）。是什么、怎么用、带了哪些官方图片和有什么风险，见 [docs/design/game](../../../../docs/design/game/README.md)。
 
 | 目录 | 导出 | 规范 |
 | --- | --- | --- |
@@ -15,12 +15,13 @@ Game 实机风格：照游戏内界面复刻的一组控件，独立入口（`@e
 | `item-card/` | `ItemCard`（稀有度卡片与库存） | [物品卡片](../../../../docs/design/game/item-cards.md) |
 | `item-tooltip-card/` | `ItemTooltipCard`（物品详情） | [物品悬浮卡](../../../../docs/design/game/item-hover-cards.md) |
 | `item-hover-card/` | `ItemHoverCard`、`ItemHoverCardLayer`（单个控件与网格的悬浮预览） | [物品悬浮卡](../../../../docs/design/game/item-hover-cards.md) |
+| `splash-screen/` | `EndfieldSplashScreen`（官网开屏页：主入口的 `SplashScreen` 填上官方的标志、底图和微标） | [官网开屏页](../../../../docs/design/game/splash-screen.md) |
 
 几个控件共用的内部模块（不导出）：
 
 | 文件 | 谁在用 |
 | --- | --- |
-| `lib/core.ts` | 这一类用到的主库的东西，都从这里过 |
+| `lib/core.ts` | 这一类用到的主库的东西，都从这里过。开屏页整个就是主库的 `SplashScreen`，也从这里取 |
 | `lib/first-focusable.ts` | `AnimatedDialog` 打开时焦点落在哪 |
 | `banner-alert/AlertModal.tsx`、`useAlertActions.ts`、`types.ts`、`AlertIcons.tsx` | `BannerAlert`、`FullWidthAlert` 共用的模态外壳、确认 / 取消 / 关闭的处理和两个按钮图标 |
 | `banner-alert/banner-alert.css` 里的 `.ef-alert-modal-*` | 同上：两种提示共用的视口、读屏文字，和四张图的变量 |

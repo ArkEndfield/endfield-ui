@@ -1,6 +1,10 @@
 {
-  "note": "Game 实机风格这一类带的全部图片。它们取自游戏与官方素材，经下面两个社区仓库转来，没有取得授权，上游也没有标许可；权利归鹰角网络及其权利人，本仓库的 MIT 许可不覆盖它们。风险与处理见 docs/design/game/README.md。path 相对 packages/ui/src/game；shipped 为 true 的被样式引用、随 npm 包发在 dist/game/assets，为 false 的只有预览站的示例在用。来源地址的后缀是 .png 的几张实际编码是 WebP，迁入时只复制字节，没有下载、转换或重新编码。",
+  "note": "Game 实机风格这一类带的全部图片。它们取自游戏与官方素材：开屏页的五张直接取自官网，其余的经下面两个社区仓库转来。都没有取得授权，上游也没有标许可；权利归鹰角网络及其权利人，本仓库的 MIT 许可不覆盖它们。风险与处理见 docs/design/game/README.md。path 相对 packages/ui/src/game；shipped 为 true 的被样式引用、随 npm 包发在 dist/game/assets，为 false 的只有预览站的示例在用。来源地址的后缀是 .png 的几张实际编码是 WebP，迁入时只复制字节，没有转换或重新编码；从社区仓库来的那些没有另外下载。",
   "sources": {
+    "endfield.hypergryph.com": {
+      "retrieved": "2026-10-14",
+      "note": "开屏页（EndfieldSplashScreen）的五张图直接取自官网首页的加载页，不经社区仓库：四张是它的样式引用的文件，按地址取下来原样存；标志是页面里内联的 SVG。其中标志是游戏的注册商标"
+    },
     "ArkEndfield/EndfieldMap": {
       "revision": "75fd60a82ca7c91305cb2e7dadc33fd5047c7ac2",
       "note": "圆形按钮纹理与确认提示的四张图直接取自这里；物品与详情卡的图是它保存的 EndfieldWiki 资源副本"
@@ -379,6 +383,71 @@
       "sha256": "478e03ef19b647366fb782918a0c4faf61e7e7875b35305fde3ee4e20c1b3f34",
       "copiedFrom": "ArkEndfield/EndfieldMap/packages/web-components/src/assets/item-tooltip",
       "sourceFile": "EndfieldWiki/apps/web/public/deco/item-tooltip/bg_tips_a_2.png"
+    },
+    {
+      "path": "splash-screen/assets/splash_bg.jpg",
+      "usedBy": ["EndfieldSplashScreen"],
+      "role": "splash-backdrop-landscape",
+      "shipped": true,
+      "format": "JPEG",
+      "width": 2560,
+      "height": 1440,
+      "bytes": 331663,
+      "sha256": "28c36eca5da88a1c7d223f2801c3aa999f2251b7b36b438070204aca2594e6f5",
+      "copiedFrom": "endfield.hypergryph.com",
+      "sourceUrl": "https://web.hycdn.cn/endfield/official-v4/_next/static/media/bg.9e174372.jpg"
+    },
+    {
+      "path": "splash-screen/assets/splash_bg_portrait.jpg",
+      "usedBy": ["EndfieldSplashScreen"],
+      "role": "splash-backdrop-portrait",
+      "shipped": true,
+      "format": "JPEG",
+      "width": 1080,
+      "height": 1920,
+      "bytes": 162169,
+      "sha256": "03a7dcd5eb647c2fd8fc2e66c86e946153de23eba3fac2c5e48dafff8b9d5d62",
+      "copiedFrom": "endfield.hypergryph.com",
+      "sourceUrl": "https://web.hycdn.cn/endfield/official-v4/_next/static/media/bg_m.529c4e62.jpg"
+    },
+    {
+      "path": "splash-screen/assets/splash_logo.svg",
+      "usedBy": ["EndfieldSplashScreen"],
+      "role": "splash-logo",
+      "shipped": true,
+      "format": "SVG",
+      "width": 214,
+      "height": 233,
+      "bytes": 5362,
+      "sha256": "297fe6f4bd4c0bfe942589eca68dde3bfad818ef611dbccdc7b0f192f9d8946e",
+      "copiedFrom": "endfield.hypergryph.com",
+      "sourceNote": "官网首页加载页里内联的游戏标志（简体中文站），存的是那个 svg 元素的 outerHTML，一个字节没改"
+    },
+    {
+      "path": "splash-screen/assets/splash_deco.svg",
+      "usedBy": ["EndfieldSplashScreen"],
+      "role": "splash-micro-decor",
+      "shipped": true,
+      "format": "SVG",
+      "width": 141,
+      "height": 64,
+      "bytes": 7845,
+      "sha256": "1c62cf003581db0e38604a778ef3f1e422c5e63c0a6693b18a5c7d38309eae6e",
+      "copiedFrom": "endfield.hypergryph.com",
+      "sourceUrl": "https://web.hycdn.cn/endfield/official-v4/_next/static/media/deco.dbe18bea.svg"
+    },
+    {
+      "path": "splash-screen/assets/splash_triangles.svg",
+      "usedBy": ["EndfieldSplashScreen"],
+      "role": "splash-triangle-mark",
+      "shipped": true,
+      "format": "SVG",
+      "width": 23,
+      "height": 21,
+      "bytes": 261,
+      "sha256": "c903dc264b1b0d17ea582b8e578e643818f4aa61126f12b95482a9b43b549e83",
+      "copiedFrom": "endfield.hypergryph.com",
+      "sourceUrl": "https://web.hycdn.cn/endfield/official-v4/_next/static/media/triangles.bcbd794a.svg"
     }
   ]
 }

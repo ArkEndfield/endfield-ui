@@ -6,6 +6,10 @@
  * 这样 `Field` 的上下文和主入口是同一份，主入口的产物也不因为多了这个入口而变。
  */
 export { useFieldContext, useFieldControl } from "../../components/field/Field";
+export {
+  SplashScreen,
+  type SplashScreenProps,
+} from "../../components/splash-screen/SplashScreen";
 export { useControllableState } from "../../hooks/useControllableState";
 export { usePortalScope } from "../../hooks/usePortalScope";
 export { useReducedMotion } from "../../hooks/useReducedMotion";

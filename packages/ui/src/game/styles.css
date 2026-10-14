@@ -22,3 +22,4 @@
 @import "./item-card/item-card.css" layer(components);
 @import "./item-tooltip-card/item-tooltip-card.css" layer(components);
 @import "./item-hover-card/item-hover-card.css" layer(components);
+@import "./splash-screen/splash-screen.css" layer(components);

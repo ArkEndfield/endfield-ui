@@ -1,0 +1,138 @@
+/*
+ * 官网开屏页的五张图。排法和动画都在主入口的 SplashScreen 里，这里只是把图放进它的插槽：
+ * 尺寸用它给的 --ef-splash-unit（官网的 1rem），横竖跟它一样看所在那一块的宽高比。
+ */
+.ef-splash {
+  /*
+   * 这几个是库里的出厂值（官方图片）。要换图请设不带 -default 的同名变量
+   * （--ef-game-splash-bg 等，写在 :root 上就行），不要改这几个。
+   */
+  --ef-game-splash-bg-default: url("./assets/splash_bg.jpg");
+  --ef-game-splash-bg-portrait-default: url("./assets/splash_bg_portrait.jpg");
+  --ef-game-splash-logo-default: url("./assets/splash_logo.svg");
+  --ef-game-splash-deco-default: url("./assets/splash_deco.svg");
+  --ef-game-splash-mark-default: url("./assets/splash_triangles.svg");
+}
+
+/* 底图：铺满，随进度从模糊变清晰（模糊是 SplashScreen 加在外面那一层上的） */
+.ef-splash-backdrop {
+  display: block;
+  background: var(--ef-game-splash-bg, var(--ef-game-splash-bg-default))
+    center / cover no-repeat;
+}
+
+/*
+ * 标志当遮罩用：图里只有形状，颜色跟着文字走。所以这个变量换的是形状——
+ * 要放一张自己的彩色标志，用 logo 属性
+ */
+.ef-splash-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: currentColor;
+  mask: var(--ef-game-splash-logo, var(--ef-game-splash-logo-default)) center /
+    contain no-repeat;
+}
+
+/* 微标：8.8125 × 4 个单位，比标语的左边往外探半个单位（官网实测） */
+.ef-splash-deco {
+  position: relative;
+  display: block;
+  width: calc(var(--ef-splash-unit) * 8.8125);
+  height: calc(var(--ef-splash-unit) * 4);
+  margin-left: calc(var(--ef-splash-unit) * -0.5);
+}
+
+.ef-splash-deco__text {
+  position: absolute;
+  inset: 0;
+  background: var(--ef-game-splash-deco, var(--ef-game-splash-deco-default))
+    center / 100% 100% no-repeat;
+}
+
+/* 三角标：在微标组左侧 3.375 个单位，比它的上边低 1.5 个单位 */
+.ef-splash-deco__mark {
+  position: absolute;
+  top: calc(var(--ef-splash-unit) * 1.5);
+  left: calc(var(--ef-splash-unit) * -2.875);
+  width: calc(var(--ef-splash-unit) * 1.4375);
+  height: calc(var(--ef-splash-unit) * 1.3125);
+  background: var(--ef-game-splash-mark, var(--ef-game-splash-mark-default))
+    center / 100% 100% no-repeat;
+}
+
+/* 竖排：底图换竖的那一张，没有三角标 */
+@container (orientation: portrait) {
+  .ef-splash-backdrop {
+    background-image: var(
+      --ef-game-splash-bg-portrait,
+      var(--ef-game-splash-bg-portrait-default)
+    );
+  }
+
+  .ef-splash-deco__mark {
+    display: none;
+  }
+}
+
+/* 高对比模式：底图和微标整层不显示（SplashScreen 管的）；标志的底色会被系统换掉，写明 */
+@media (forced-colors: active) {
+  .ef-splash-logo {
+    background-color: CanvasText;
+    forced-color-adjust: none;
+  }
+}
+
+/*
+ * 关掉官方图片：一张都不请求。底图和标志不画；微标退回代码画的样子——
+ * 两排方点，和一枚三个小三角拼成的三角标
+ */
+.ef-splash-backdrop:is(
+  [data-ef-game-images="off"],
+  [data-ef-game-images="off"] *
+) {
+  background-image: none;
+}
+
+.ef-splash-logo:is([data-ef-game-images="off"], [data-ef-game-images="off"] *) {
+  display: none;
+  /* 藏起来的元素样式里的地址也还在：一并去掉，别人查"还引用着图片吗"才是干净的 */
+  mask: none;
+}
+
+.ef-splash-deco__text:is(
+  [data-ef-game-images="off"],
+  [data-ef-game-images="off"] *
+) {
+  inset: auto auto 0 calc(var(--ef-splash-unit) * 0.5);
+  width: calc(var(--ef-splash-unit) * 3.875);
+  height: calc(var(--ef-splash-unit) * 1.125);
+  /* 一格 11 份宽、7 份是点：横着排六个，上下各一排 */
+  background:
+    linear-gradient(90deg, #626262 63.6%, transparent 0) left top / 17.742%
+      38.9% repeat-x,
+    linear-gradient(90deg, #626262 63.6%, transparent 0) left bottom / 17.742%
+      38.9% repeat-x;
+}
+
+.ef-splash-deco__mark:is(
+  [data-ef-game-images="off"],
+  [data-ef-game-images="off"] *
+) {
+  background: #fffa00;
+  clip-path: polygon(
+    0 0,
+    48.3% 0,
+    24.2% 47.6%,
+    0 0,
+    51.7% 0,
+    100% 0,
+    75.8% 47.6%,
+    51.7% 0,
+    25.8% 52.4%,
+    74.2% 52.4%,
+    50% 100%,
+    25.8% 52.4%,
+    0 0
+  );
+}

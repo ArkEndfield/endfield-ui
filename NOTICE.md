@@ -21,7 +21,7 @@
 
 ## Game 实机风格入口的官方图片
 
-组件库有一个单独的入口 `@endfield-ui/react/game`（源码在 `packages/ui/src/game`），收的是照游戏内界面复刻的一组控件。**它带着 25 张官方图片**，这是本仓库里唯一有官方素材的地方：
+组件库有一个单独的入口 `@endfield-ui/react/game`（源码在 `packages/ui/src/game`），收的是照游戏内界面复刻的一组控件，和一个官网的开屏页。**它带着 30 张官方图片**，这是本仓库里唯一有官方素材的地方：
 
 | 用在哪 | 张数 | 位置（相对 `packages/ui/src/game`） | 随 npm 包 |
 | --- | --- | --- | --- |
@@ -29,11 +29,12 @@
 | `BannerAlert`、`FullWidthAlert` 的横幅、底图与标志底图 | 4 | `banner-alert/assets/` | 是 |
 | `ItemCard` 的亮暗背景与稀有度底边 | 12 | `item-card/assets/` | 是 |
 | `ItemTooltipCard` 的标题纹理、详情入口图标、正文底图 | 3 | `item-tooltip-card/assets/` | 是 |
+| `EndfieldSplashScreen` 的底图（横、竖各一张）、游戏标志、微标与三角标 | 5 | `splash-screen/assets/` | 是 |
 | 预览站里物品示例用的图标 | 5 | `item-card/assets/` | 否 |
 
-- 这些图片取自游戏界面与物品图，经社区项目 [EndfieldMap](https://github.com/ArkEndfield/EndfieldMap) 和 EndfieldWiki 转来。**本仓库没有取得授权**，两个上游仓库也没有为它们标明许可。
+- 前四行和最后一行的 25 张取自游戏界面与物品图，经社区项目 [EndfieldMap](https://github.com/ArkEndfield/EndfieldMap) 和 EndfieldWiki 转来；`EndfieldSplashScreen` 的 5 张是 2026-10-14 直接从[官网](https://endfield.hypergryph.com/)首页的加载页取的，原样存。**本仓库没有取得授权**，两个上游仓库也没有为它们标明许可。
 - 它们的权利归鹰角网络及其权利人。**MIT 许可不覆盖这些图片**，本仓库不宣称对它们有任何权利，也给不了使用方使用它们的权利。
-- 其中 `banner-alert/assets/deco_common_logo_bg.png` 里是官方的「终末地 / ENDFIELD INDUSTRIES」标志；`AnimatedDialog` 的装饰条上有代码画的 `ARKNIGHTS:ENDFIELD`、`ENDFIELD` 字样。这两处涉及商标。
+- 其中 `splash-screen/assets/splash_logo.svg` 就是游戏的标志「明日方舟：终末地 / ARKNIGHTS ENDFIELD」；`banner-alert/assets/deco_common_logo_bg.png` 里是官方的「终末地 / ENDFIELD INDUSTRIES」标志；`AnimatedDialog` 的装饰条上有代码画的 `ARKNIGHTS:ENDFIELD`、`ENDFIELD` 字样；`EndfieldSplashScreen` 默认的标语是官网的 `OVER THE FRONTIER / INTO THE FRONT`。前三处涉及商标。
 - 逐张的路径、尺寸、字节数、SHA256 和来源登记在 [`packages/ui/src/game/resource-provenance.json`](packages/ui/src/game/resource-provenance.json)，随包在 `dist/game/resource-provenance.json`。发布的包里，这些图片只在 `dist/game/assets/` 一处。
 - 主入口（`@endfield-ui/react`）、主样式、令牌和母题工具类里没有它们。不引 `@endfield-ui/react/game` 和 `@endfield-ui/react/game.css`，就不会加载其中任何一张。
 - 使用方可以整类关掉这些图片（在 `<html>` 上写 `data-ef-game-images="off"`，控件退回代码画的样子），也可以经变量逐张换成自己的。
