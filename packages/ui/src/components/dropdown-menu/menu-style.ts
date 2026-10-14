@@ -16,6 +16,10 @@ export const MenuVariantContext = createContext<MenuVariant>("plain");
 /**
  * 面板：直角、1px 线、环境阴影；顶部一条半宽的行动色细条，展开时从 0 伸到一半宽。
  *
+ * 细条上挂一个朝下的小三角，和它是同一个伪元素裁出来的：条高 3px，三角露出 8×4px，
+ * 中心距条的左端 32px（实机风格弹窗分隔条的一半大）。它是条上的记号，不指向触发处——
+ * 面板翻到上面、在侧边时照旧在顶上、朝下。三角探进第一行 2px，所以压在各行的底色之上
+ *
  * 进场：淡入（200ms），同时从触发处那一侧挪过来 4px（300ms，和细条同一拍）。
  * 退场只淡出——位移只写在起点上。两个时长、两条缓动按属性一一对应
  */
@@ -24,7 +28,8 @@ export const menuPanel = [
   "origin-(--transform-origin) transition-[opacity,translate] duration-[var(--duration-fast),var(--duration-base)] ease-[var(--ease-standard),var(--ease-exit)]",
   "data-ending-style:opacity-0 data-starting-style:opacity-0",
   enterFromSide,
-  "before:pointer-events-none before:absolute before:-top-px before:-left-px before:h-[3px] before:w-1/2 before:origin-left before:bg-action before:content-['']",
+  "before:pointer-events-none before:absolute before:-top-px before:-left-px before:z-1 before:h-[7px] before:w-1/2 before:origin-left before:bg-action before:content-['']",
+  "before:[clip-path:polygon(0_0,100%_0,100%_3px,36px_3px,32px_100%,28px_3px,0_3px)]",
   "before:transition-transform before:duration-(--duration-base) before:ease-exit data-starting-style:before:scale-x-0",
   "forced-colors:before:hidden",
 ].join(" ");

@@ -1,4 +1,4 @@
-// 下拉菜单：键盘开合与移动、按字母跳转、指针高亮、单选组、贴边不出视口
+// 下拉菜单：键盘开合与移动、按字母跳转、指针高亮、单选组、贴边不出视口；面板顶上的强调条
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { useStorybook, type Page } from "./lib/harness.ts";
@@ -207,4 +207,95 @@ test("子菜单：指针停在这一行上就打开；右边放不下时翻到�
     ),
     "子菜单超出了视口",
   );
+});
+
+/** 这一点画出来是什么：一张 1×1 的截图。只拿来比一样不一样 */
+async function pixel(page: Page, x: number, y: number): Promise<string> {
+  const { data } = await page.send("Page.captureScreenshot", {
+    format: "png",
+    clip: { x, y, width: 1, height: 1, scale: 1 },
+  });
+  // 截图之后页面会被当成失去焦点，键盘事件慢一拍
+  await page.send("Page.bringToFront");
+  return data;
+}
+
+/**
+ * 开着的那块跟随主题的面板：左上角（边线的外沿）和右边。
+ * 带 `data-variant` 的不止面板（按钮也带），面板另外还带着基元给的 `data-side`
+ */
+const panelBox = (page: Page) =>
+  page.evaluate(() => {
+    const panel = [
+      ...document.querySelectorAll("[data-variant=plain][data-side]"),
+    ].find((element) => element.getBoundingClientRect().height > 0)!;
+    const rect = panel.getBoundingClientRect();
+    return { left: rect.left, top: rect.top, right: rect.right };
+  });
+
+test("菜单面板一族：顶上的强调条挂着一个朝下的小三角，压在第一行的底色之上", async () => {
+  const { page } = storybook;
+
+  /*
+   * 条从面板的左上角起，高 3px；三角接在它下面，露出 8×4，中心距左 32px。
+   * 取的点都是整个像素落在形状里面（或外面）的：斜边上的那几个像素是半透明的，不取
+   */
+  const look = async () => {
+    // 面板进场时挪 4px，条和三角从左伸出来：都走完了再量
+    await page.settled();
+    const { left, top, right } = await panelBox(page);
+    assert.ok(
+      Number.isInteger(left) && Number.isInteger(top),
+      `面板没有落在整像素上（${left}, ${top}），下面取的点对不上`,
+    );
+    return {
+      bar: await pixel(page, left + 10, top + 1),
+      // 右半边没有条：同一行上是面板的底
+      ground: await pixel(page, right - 10, top + 2),
+      // 三角里：条和第一行之间的那 2px，以及探进第一行的头一个像素
+      inGap: await pixel(page, left + 32, top + 4),
+      inRow: await pixel(page, left + 32, top + 5),
+      // 三角外：两边，和尖的下面
+      before: await pixel(page, left + 22, top + 4),
+      after: await pixel(page, left + 42, top + 4),
+      below: await pixel(page, left + 32, top + 8),
+      // 第一行里、离三角远一点的地方：这一行的底
+      row: await pixel(page, left + 60, top + 6),
+    };
+  };
+
+  // 下拉菜单把滚动写在面板自己身上：三角不能被它裁掉
+  await page.story("控件-dropdownmenu-下拉菜单--open");
+  await page.waitVisible(MENU);
+  const menu = await look();
+  assert.notEqual(menu.bar, menu.ground, "条应该是行动色，不是面板的底");
+  assert.equal(menu.inGap, menu.bar, "条的下面应该挂着三角");
+  assert.equal(menu.inRow, menu.bar, "三角应该有 4px 高");
+  assert.deepEqual(
+    [menu.before, menu.after, menu.below],
+    [menu.ground, menu.ground, menu.ground],
+    "三角只有 8px 宽、4px 高，旁边和尖的下面是面板的底",
+  );
+
+  // 下拉选择的第一行就是选项：指针停上去有悬停底，三角仍然在它上面
+  await page.story("控件-select-下拉选择--open");
+  await page.waitVisible("[role=listbox]");
+  const rest = await look();
+  assert.equal(rest.inGap, rest.bar, "下拉选择的面板也应该有三角");
+  assert.equal(rest.row, rest.ground, "第一行平时没有底色");
+
+  await page.moveTo("[role=option]");
+  await page.waitFor(
+    () =>
+      page.evaluate(() =>
+        document.querySelector("[role=option]")?.matches("[data-highlighted]"),
+      ),
+    "指针停在第一项上，它应该被高亮",
+  );
+  // "仍然是"这一类：等动效走完、再等一会儿，只问一次
+  await page.settled();
+  await page.pause(300);
+  const hovered = await look();
+  assert.notEqual(hovered.row, hovered.ground, "第一行应该有了悬停底");
+  assert.equal(hovered.inRow, hovered.bar, "三角被第一行的底色盖住了");
 });

@@ -68,6 +68,26 @@ describe("DropdownMenu", () => {
     expect(menu.className).not.toMatch(/data-ending-style:[^ ]*translate/);
   });
 
+  it("面板顶上的强调条挂着一个朝下的小三角：和条是同一个伪元素，高对比模式下一起隐藏", async () => {
+    const user = userEvent.setup();
+    render(<Basic />);
+    await user.click(screen.getByRole("button", { name: "更多" }));
+    const menu = await screen.findByRole("menu");
+    expect(menu).toHaveClass(
+      "before:w-1/2",
+      "before:bg-action",
+      // 条高 3px，三角再往下 4px：露出 8×4，中心距条的左端 32px
+      "before:h-[7px]",
+      "before:[clip-path:polygon(0_0,100%_0,100%_3px,36px_3px,32px_100%,28px_3px,0_3px)]",
+      // 三角探进第一行 2px，要压在那一行的底色上
+      "before:z-1",
+      // 进场时跟着条一起从左伸出来
+      "before:origin-left",
+      "data-starting-style:before:scale-x-0",
+      "forced-colors:before:hidden",
+    );
+  });
+
   it("点一项：执行并关掉菜单，焦点回到触发按钮", async () => {
     const user = userEvent.setup();
     const onRename = vi.fn();
