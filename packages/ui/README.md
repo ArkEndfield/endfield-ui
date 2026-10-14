@@ -8,7 +8,7 @@
 | --- | --- |
 | 基础 | Button / ButtonGroup、IconButton、Toolbar、Tag / TagPair、Badge、Kbd、SectionTitle、BracketTitle、Tabs、Panel |
 | 表单 | Field、Input、OtpInput、Textarea、Select、Combobox、TagInput、DatePicker / DateRangePicker / Calendar、FileUpload / FileItem、Checkbox、Radio / RadioGroup、SegmentedControl、Switch、Stepper、Slider、FilterChip |
-| 反馈 | Alert、Toast、Progress / ProgressRing、Spinner、Skeleton、EmptyState、Loader、CompletionBanner、RecIndicator |
+| 反馈 | Alert、Toast、Progress / ProgressRing、Spinner、Skeleton、EmptyState、Loader、SplashScreen、CompletionBanner、RecIndicator |
 | 浮层 | Tooltip、Popover、HoverCard、Dialog、Drawer、DropdownMenu、ContextMenu、FlyoutBar |
 | 展示 | Table（行能展开）、Stat、RollingNumber、Sparkline、DataRowList / DataRow、List / ListRow、Accordion、ScrollArea、MediaCard、PlayButton / PlayMark、Carousel、ImageViewer、ItemSlot / ItemGrid、Avatar、Timeline、Schedule、Term、ResourceChip、Countdown、Marquee、ScrollHint |
 | 导航 | SideRail（含二级）、TopBar、NavMenu、NavAction、PageHeader、Breadcrumb、Pagination、Navigator、AvatarSwitcher、DashIndicator、Steps、Toc、BackToTop |
@@ -320,6 +320,27 @@ import { Loader } from "@endfield-ui/react";
 ```
 
 不知道真实进度就不传 `value`。只想盖住页面的一块区域时加 `fullscreen={false}`，并让那块区域带 `relative` 与 `overflow-hidden`。
+
+### 开屏页
+
+`SplashScreen` 是官网首次载入的那一页：一根贴边的进度条，读数跟着它的末端走，画面偏右是标志和标语；就绪后黄色铺满整屏，再整层淡出。库里不带任何图，标志和底图放你自己的：
+
+```tsx
+import { SplashScreen } from "@endfield-ui/react";
+
+<SplashScreen
+  value={progress}
+  open={!ready}
+  logo={<img src="/brand/mark.svg" alt="第七勘探队" />}
+  tagline="SEVENTH SURVEY TEAM / FIELD ARCHIVE"
+  backdrop={<img src="/brand/scene.jpg" alt="" />}
+  onReveal={() => setEntered(true)}
+/>;
+```
+
+- 退场是照官网走的，从 `open` 变成 `false` 到卸载一共 2.4 秒；页面到开始淡出的那一刻（第 1.4 秒）才放开，`onReveal` 同时触发——页面自己的入场从这里起。只要一块简单的整页等待，用上面的 `Loader`。
+- 横排还是竖排，看的是它所在那一块自己的宽高比，尺寸跟着那一块的宽度等比缩放；放进插槽的东西可以用 `--ef-splash-unit`（横排是宽度的 1/160）跟着缩。
+- `caption` 是标语上方那组微标里的微文字；整组微标可以用 `decor` 换掉，传 `null` 是不要。读数下面的状态字用 `status` 换，默认是 `LOADING`。
 
 ### 浮层
 

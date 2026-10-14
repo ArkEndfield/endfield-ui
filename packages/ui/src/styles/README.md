@@ -67,7 +67,10 @@ Game 实机风格的样式不在这个目录里，也不在主样式里：源码
 
 这些类只画形状。什么东西可以切角、哪里能放斜纹，见 [docs/design/elements](../../../../docs/design/elements/corner-and-wedge.md) 各篇的"什么时候用"。预编译的 `styles.css` 里只有组件自己用到的那几个；不用 Tailwind 的项目用对应的装饰组件。
 
-文件末尾还有一个自定义变体 `choice-diamond:`，在祖先带 `data-choice="diamond"` 时生效，复选与单选靠它整体换成菱形符号。
+文件末尾还有两个自定义变体：
+
+- `choice-diamond:`，在祖先带 `data-choice="diamond"` 时生效，复选与单选靠它整体换成菱形符号。
+- `cq-portrait:`，在最近的尺寸容器（`container-type: size`）高大于宽时生效。开屏页靠它换成竖排——看的是它所在的那一块，不是视口。
 
 ## 注意
 

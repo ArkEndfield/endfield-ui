@@ -62,6 +62,7 @@
 | `skeleton/` | `Skeleton` | [反馈](../../../../docs/design/components/feedback.md) |
 | `empty-state/` | `EmptyState` | [反馈](../../../../docs/design/components/feedback.md) |
 | `loader/` | `Loader` | [反馈](../../../../docs/design/components/feedback.md) |
+| `splash-screen/` | `SplashScreen`（开屏页：照官网首次载入的那一页排的，标志和底图是插槽） | [反馈](../../../../docs/design/components/feedback.md#开屏页) |
 | `spinner/` | `Spinner` | [反馈](../../../../docs/design/components/feedback.md) |
 | `completion-banner/` | `CompletionBanner` | [反馈](../../../../docs/design/components/feedback.md) |
 | `tooltip/` | `Tooltip`、`TooltipProvider` | [浮层](../../../../docs/design/components/overlay.md) |
