@@ -176,6 +176,42 @@ test("气泡卡片：面板在视口里", async () => {
   assert.ok(await inside(page, "[role=dialog]"), "面板超出了视口");
 });
 
+// 参数表比手机的屏宽，外面原先没有东西兜着，把整页撑宽了——整页都能横着划。
+// `.storybook/preview.css` 里给它外面那层开了横向滚动
+test("手机上的文档页：参数表在自己的框里横着滚，不把整页撑宽", async () => {
+  const { page } = storybook;
+  await page.setSize(360, 800);
+  await page.docs("控件-accordion-折叠面板--docs");
+  await page.waitFor(
+    () =>
+      page.evaluate(
+        () => document.querySelector(".docblock-argstable tbody tr") !== null,
+      ),
+    "参数表没有出来",
+  );
+
+  // 不靠字宽（CI 上没有中文字体，表格有多宽说不准）：直接把它撑到比屏宽
+  await page.evaluate(() => {
+    document.querySelector<HTMLElement>(".docblock-argstable")!.style.minWidth =
+      "600px";
+  });
+  await page.waitEqual(
+    () =>
+      page.evaluate(() => {
+        const box = document.querySelector(
+          ".docblock-argstable",
+        )!.parentElement!;
+        const root = document.documentElement;
+        return {
+          page: root.scrollWidth - root.clientWidth,
+          box: box.scrollWidth > box.clientWidth,
+        };
+      }),
+    { page: 0, box: true },
+    "参数表应该在自己的框里滚，整页不横向滚动",
+  );
+});
+
 /*
  * 手机上看文档页。文档页自己的留白加上并排外壳的内边距要吃掉 130px：360px 的屏，
  * story 只剩 230px 上下，比 320px 的单页预览（272px）还窄。一行里的东西被挤折、挤出去，

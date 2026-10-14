@@ -15,3 +15,14 @@
 .docs-story div:has(> .innerZoomElementWrapper) {
   height: auto !important;
 }
+
+/*
+ * 文档页的参数表有五百多像素宽，外面没有东西兜着：手机上它把整页撑宽，整页都能横着划，
+ * 划过去右边是一片空白。窄的时候给它外面那层开横向滚动，表格在自己的框里滚。
+ * 宽屏上表格本来就放得下，不去动它
+ */
+@media (width < 40rem) {
+  .sbdocs-content div:has(> .docblock-argstable) {
+    overflow-x: auto;
+  }
+}
