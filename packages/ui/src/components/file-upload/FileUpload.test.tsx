@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { stubAnimations } from "../../test/animations";
 import { Field } from "../field/Field";
@@ -277,6 +277,29 @@ describe("FileUpload", () => {
 
     await finish();
     expect(document.querySelector("ul")).toBeNull();
+  });
+
+  it("移除赶在上一次渲染的副作用前面：焦点照样交得出去", () => {
+    // 不是点击引起的渲染（上一行收完卸载、使用方在推进度），副作用晚一拍才跑；这一拍里点了移除，
+    // React 先把那一份补跑——它看到的还是移除之前的页面。
+    // 在上一次提交收尾的地方点，把这个先后固定下来
+    function Racing({ remove }: { remove?: string }) {
+      useLayoutEffect(() => {
+        if (remove) {
+          screen.getByRole("button", { name: `移除${remove}` }).click();
+        }
+      }, [remove]);
+      return <Example multiple defaultValue={[pdf, png]} />;
+    }
+    const { rerender } = render(<Racing />);
+
+    rerender(<Racing remove="交接单.pdf" />);
+    expect(names()).toEqual(["现场.png"]);
+    expect(screen.getByRole("button", { name: "移除现场.png" })).toHaveFocus();
+
+    rerender(<Racing remove="现场.png" />);
+    expect(screen.queryByRole("list")).not.toBeInTheDocument();
+    expect(input()).toHaveFocus();
   });
 
   it("renderFile：正在收起的那一行不再为它调 renderFile，画的是最后一次的", async () => {
