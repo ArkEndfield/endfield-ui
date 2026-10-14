@@ -1,4 +1,5 @@
-// 320px 宽：页面不横向溢出，浮层整个在视口里；手机上看文档页：一行里的东西不被挤折、挤出去
+// 320px 宽：页面不横向溢出，浮层整个在视口里；手机上看文档页：演示区通栏；
+// 文档页压窄：一行里的东西不被挤折、挤出去
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { useStorybook, type Page } from "./lib/harness.ts";
@@ -176,6 +177,115 @@ test("气泡卡片：面板在视口里", async () => {
   assert.ok(await inside(page, "[role=dialog]"), "面板超出了视口");
 });
 
+/*
+ * 手机上看文档页。窄于 640px 时演示区通栏（`.storybook/preview.css` 和 `preview.tsx`）：
+ * 文档页自己的留白收到 16px，演示区左右贴到屏幕边，预览外壳的内边距也收到 16px——
+ * 360px 的屏，留给 story 的是 328px。通栏之前两边要吃掉 130px，只剩 230px
+ */
+
+/**
+ * 文档页里每个演示区去掉预览外壳的内边距之后，留给 story 的宽度。
+ * 量的是演示区自己：story 里放了更宽的东西时外壳会被撑大，在演示区里横着滚
+ */
+function room(page: Page) {
+  return page.evaluate(() =>
+    [...document.querySelectorAll(".docs-story")].map((story) => {
+      // 外壳是里面头一个带 text-ink 的（并排时是亮色那一半）
+      const style = getComputedStyle(story.querySelector(".text-ink")!);
+      return Math.round(
+        story.clientWidth -
+          parseFloat(style.paddingLeft) -
+          parseFloat(style.paddingRight),
+      );
+    }),
+  );
+}
+
+test("手机上的文档页：演示区左右贴到屏幕边，文字和 story 两边都只留 16px", async () => {
+  const { page } = storybook;
+  await page.setSize(360, 800);
+  // 这一页有好几个 story，各带一个小标题
+  await page.docs("控件-accordion-折叠面板--docs");
+
+  const gaps = await page.evaluate(() => {
+    const sides = (element: Element) => {
+      const rect = element.getBoundingClientRect();
+      const viewport = document.documentElement.clientWidth;
+      return [Math.round(rect.left), Math.round(viewport - rect.right)];
+    };
+    return {
+      text: sides(document.querySelector(".sbdocs-content")!),
+      stories: [...document.querySelectorAll(".docs-story")].map(sides),
+    };
+  });
+  assert.deepEqual(gaps.text, [16, 16], "文字两边应该各留 16px");
+  assert.ok(gaps.stories.length > 0, "文档页里没有 story");
+  assert.deepEqual(
+    gaps.stories,
+    gaps.stories.map(() => [0, 0]),
+    "演示区应该左右贴到屏幕边",
+  );
+  assert.deepEqual(
+    [...new Set(await room(page))],
+    [328],
+    "留给 story 的应该是屏宽减去两边各 16px",
+  );
+
+  // 演示区以外的东西都在留白以内。标题旁那个悬停才出现的"复制链接"原来挂在标题左边
+  // 36px 处，留白收窄之后会落到屏幕外面，窄的时候不要它
+  const outside = await page.evaluate(() => {
+    const viewport = document.documentElement.clientWidth;
+    const content = document.querySelector(".sbdocs-content")!;
+    const clipped = (element: Element) => {
+      for (
+        let parent = element.parentElement;
+        parent && parent !== content;
+        parent = parent.parentElement
+      ) {
+        if (getComputedStyle(parent).overflowX !== "visible") return true;
+      }
+      return false;
+    };
+    return [...content.querySelectorAll("*")]
+      .filter((element) => !element.closest(".docs-story"))
+      .filter((element) => {
+        const rect = element.getBoundingClientRect();
+        return (
+          rect.width > 0 && (rect.left < -0.5 || rect.right > viewport + 0.5)
+        );
+      })
+      .filter((element) => !clipped(element))
+      .slice(0, 3)
+      .map((element) => {
+        const name = element.getAttribute("aria-label") ?? element.textContent;
+        return `${element.tagName.toLowerCase()}「${(name ?? "").trim().slice(0, 16)}」`;
+      });
+  });
+  assert.deepEqual(outside, [], "演示区以外有东西伸到了屏幕外面");
+});
+
+test("文档页：640px 起演示区照旧是卡片，两边的留白不动", async () => {
+  const { page } = storybook;
+  // 样式表里的媒体查询和外壳上的 sm: 是同一条线，差一个像素就是两个样子
+  await page.setSize(640, 800);
+  await page.docs("示例-内容页--docs");
+
+  const card = await page.evaluate(() => {
+    const preview = document.querySelector(".sbdocs-preview")!;
+    return {
+      gutter: Math.round(preview.getBoundingClientRect().left),
+      border: getComputedStyle(preview).borderLeftWidth,
+    };
+  });
+  assert.deepEqual(card, { gutter: 40, border: "1px" });
+  // 留白 40、边框 1、外壳的内边距 24，两边各一份
+  assert.deepEqual([...new Set(await room(page))], [510]);
+
+  await page.setSize(639, 800);
+  await page.docs("示例-内容页--docs");
+  assert.deepEqual([...new Set(await room(page))], [607]);
+});
+
 // 参数表比手机的屏宽，外面原先没有东西兜着，把整页撑宽了——整页都能横着划。
 // `.storybook/preview.css` 里给它外面那层开了横向滚动
 test("手机上的文档页：参数表在自己的框里横着滚，不把整页撑宽", async () => {
@@ -213,10 +323,22 @@ test("手机上的文档页：参数表在自己的框里横着滚，不把整�
 });
 
 /*
- * 手机上看文档页。文档页自己的留白加上并排外壳的内边距要吃掉 130px：360px 的屏，
- * story 只剩 230px 上下，比 320px 的单页预览（272px）还窄。一行里的东西被挤折、挤出去，
- * 在上面那些"页面不横向溢出"的检查里看不出来——外面那一层照样不滚
+ * 文档页压窄。通栏之前，手机上的文档页里 360px 的屏 story 只剩 230px，320px 的屏只剩
+ * 190px，比 320px 的单页预览（272px）还窄。下面这几处就是在那个宽度上被挤折、挤出去的——
+ * 在上面那些"页面不横向溢出"的检查里看不出来，外面那一层照样不滚。
+ * 现在同样的屏宽得多了，这几条仍旧压到当时的宽度量：story 放进窄栏里是一样的处境
  */
+
+/** 打开文档页，把留给 story 的宽度压到 `width`：视口是它加上两边各 16px */
+async function squeezed(page: Page, id: string, width: number) {
+  await page.setSize(width + 32, 800);
+  await page.docs(id);
+  assert.deepEqual(
+    [...new Set(await room(page))],
+    [width],
+    "留给 story 的不是要量的那个宽度：文档页两边的留白变了",
+  );
+}
 
 /** 每个匹配到的元素里，字排成了几行。`text` 只留内容正好是它的那几个 */
 function lineCounts(page: Page, selector: string, text?: string) {
@@ -298,10 +420,9 @@ const widths = (page: Page, selector: string) =>
 
 const NAME = ".docs-story [role=radiogroup] + [aria-live] > :first-child";
 
-test("手机上的文档页：内容页的页码不折行，标题不被旁边的按钮挤折，没有东西伸出去", async () => {
+test("文档页压到 230px：内容页的页码不折行，标题不被旁边的按钮挤折，没有东西伸出去", async () => {
   const { page } = storybook;
-  await page.setSize(360, 800);
-  await page.docs("示例-内容页--docs");
+  await squeezed(page, "示例-内容页--docs", 230);
 
   // 并排的两份各有一个
   assert.deepEqual(
@@ -317,10 +438,9 @@ test("手机上的文档页：内容页的页码不折行，标题不被旁边�
   assert.deepEqual(await stickingOut(page, ".docs-story section"), []);
 });
 
-test("手机上的文档页：内容页的队员一节上下叠放，名字排在一行里", async () => {
+test("文档页压到 230px：内容页的队员一节上下叠放，名字排在一行里", async () => {
   const { page } = storybook;
-  await page.setSize(360, 800);
-  await page.docs("示例-内容页--docs");
+  await squeezed(page, "示例-内容页--docs", 230);
 
   assert.deepEqual(
     await page.evaluate(() =>
@@ -336,10 +456,9 @@ test("手机上的文档页：内容页的队员一节上下叠放，名字排�
   assert.deepEqual(await lineCounts(page, NAME), [1, 1], "名字应该排在一行里");
 });
 
-test("手机上的文档页：内容页的名字折行时，右括号跟着最后一个字", async () => {
+test("文档页压到 230px：内容页的名字折行时，右括号跟着最后一个字", async () => {
   const { page } = storybook;
-  await page.setSize(360, 800);
-  await page.docs("示例-内容页--docs");
+  await squeezed(page, "示例-内容页--docs", 230);
 
   const together = await page.evaluate(
     (css) =>
@@ -371,30 +490,27 @@ test("手机上的文档页：内容页的名字折行时，右括号跟着最�
   assert.deepEqual(together, [true, true], "右括号不应该自己落到下一行");
 });
 
-test("手机上的文档页：统计块旁边放图，数字不被挤折", async () => {
+test("文档页压到 230px：统计块旁边放图，数字不被挤折", async () => {
   const { page } = storybook;
-  await page.setSize(360, 800);
-  await page.docs("控件-sparkline-小型面积图--docs");
+  await squeezed(page, "控件-sparkline-小型面积图--docs", 230);
   const lines = await lineCounts(page, ".docs-story [data-size] span", "1,280");
   assert.ok(lines.length >= 2, "没有找到统计块的数字");
   assert.deepEqual([...new Set(lines)], [1], "数字应该排在一行里");
 });
 
-test("手机上的文档页：工具条上的字不被按钮挤折", async () => {
+test("文档页压到 190px：工具条上的字不被按钮挤折", async () => {
   const { page } = storybook;
   // 这一条要更窄才挤得到
-  await page.setSize(320, 800);
-  await page.docs("母题-hatch-斜纹--docs");
+  await squeezed(page, "母题-hatch-斜纹--docs", 190);
   const lines = await lineCounts(page, ".docs-story span", "已选 3 项");
   assert.ok(lines.length >= 2, "没有找到工具条上的字");
   assert.deepEqual([...new Set(lines)], [1], "“已选 3 项”应该排在一行里");
 });
 
-test("手机上的文档页：页内目录旁边的正文、侧轨旁边的页面不被挤成一条", async () => {
+test("文档页压到 230px：页内目录旁边的正文、侧轨旁边的页面不被挤成一条", async () => {
   const { page } = storybook;
-  await page.setSize(360, 800);
 
-  await page.docs("控件-toc-页内目录--docs");
+  await squeezed(page, "控件-toc-页内目录--docs", 230);
   const texts = await widths(
     page,
     ".docs-story [role=region][aria-label=正文]",
@@ -405,7 +521,7 @@ test("手机上的文档页：页内目录旁边的正文、侧轨旁边的页�
     `正文的滚动框太窄了：${texts.join("、")}`,
   );
 
-  await page.docs("控件-siderail-侧轨--docs");
+  await squeezed(page, "控件-siderail-侧轨--docs", 230);
   const mains = await widths(page, ".docs-story main");
   assert.ok(mains.length >= 2, "没有找到侧轨旁边的页面");
   assert.ok(

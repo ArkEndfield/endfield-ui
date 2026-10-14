@@ -27,6 +27,10 @@ function ThemeFrame({
     document.documentElement.dataset.theme = mode === "dark" ? "dark" : "light";
   }, [mode]);
 
+  // 文档页里窄于 640px 时内边距收到 16px：手机上演示区是通栏的（见 preview.css），
+  // 这样 story 和页面上的文字左边缘对齐。单独的画布不动
+  const padding = fill ? "p-6" : "p-4 sm:p-6";
+
   if (mode !== "both") {
     // 文字色显式写在外壳上，不只靠 body 继承：主题是挂载后才写到 <html> 上的，
     // 无头浏览器截图时继承来的颜色偶尔停在切换前。
@@ -34,7 +38,9 @@ function ThemeFrame({
     // 盖住了 body 的底色，只切暗色时就成了白底上的浅色字
     return (
       <div
-        className={bleed ? "bg-surface text-ink" : "bg-surface p-6 text-ink"}
+        className={
+          bleed ? "bg-surface text-ink" : `bg-surface ${padding} text-ink`
+        }
       >
         {children}
       </div>
@@ -48,7 +54,11 @@ function ThemeFrame({
       }
     >
       {(["light", "dark"] as const).map((theme) => (
-        <div key={theme} data-theme={theme} className="bg-surface p-6 text-ink">
+        <div
+          key={theme}
+          data-theme={theme}
+          className={`bg-surface ${padding} text-ink`}
+        >
           <p className="mb-4 font-tech text-xs text-ink-tertiary uppercase">
             {`// ${theme}`}
           </p>

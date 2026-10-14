@@ -17,6 +17,30 @@
 }
 
 /*
+ * 手机上看文档页太挤：Storybook 的文档页两边各留 40px，演示区是一张带边框的卡片，
+ * 里面预览外壳还有 24px 的内边距——360px 的屏，留给 story 的只有 230px。
+ * 窄的时候演示区通栏：留白收到 16px，卡片左右贴到屏幕边，两侧的边框和圆角去掉；
+ * 外壳的内边距在 preview.tsx 里同样收到 16px，文字和 story 的左边缘对在一条线上。
+ * 断点和外壳上的 sm: 是同一条。选择器写两个类，压过 Storybook 自己那个单类的规则
+ */
+@media (width < 40rem) {
+  .sbdocs.sbdocs-wrapper {
+    padding-inline: 1rem;
+  }
+
+  .sbdocs.sbdocs-preview {
+    margin-inline: -1rem;
+    border-inline-width: 0;
+    border-radius: 0;
+  }
+
+  /* 标题旁那个悬停才出现的"复制链接"挂在标题左边 36px 处，留白只有 16px 时落在屏幕外面 */
+  .sbdocs-content :is(h1, h2, h3, h4, h5, h6) a[href^="#"]:has(> svg) {
+    display: none;
+  }
+}
+
+/*
  * 文档页的参数表有五百多像素宽，外面没有东西兜着：手机上它把整页撑宽，整页都能横着划，
  * 划过去右边是一片空白。窄的时候给它外面那层开横向滚动，表格在自己的框里滚。
  * 宽屏上表格本来就放得下，不去动它
