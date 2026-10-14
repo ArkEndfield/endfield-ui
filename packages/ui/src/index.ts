@@ -63,6 +63,7 @@ export * from "./components/skeleton";
 export * from "./components/slider";
 export * from "./components/sparkline";
 export * from "./components/spinner";
+export * from "./components/splash-screen";
 export * from "./components/stat";
 export * from "./components/stepper";
 export * from "./components/steps";
