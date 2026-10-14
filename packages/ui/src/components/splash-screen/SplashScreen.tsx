@@ -248,13 +248,18 @@ export function SplashScreen({
           </div>
         )}
 
+        {/*
+         * 纵向位置和官网一样按宽度定（标志在上 27.625 个单位，微标组的分隔线在 63.375），
+         * 所以 16:9 以外的比例下这一列不在正中。官网在超宽的屏上会掉出底边：这里放不下时
+         * 往上收，标语的底边至少离底 4 个单位。竖排的标志同理，不低于高度的 41.667%
+         */}
         {logo !== undefined && (
-          <div className="absolute top-[calc(50%_-_var(--ef-splash-unit)*17.375)] left-[64.4531%] flex h-[calc(var(--ef-splash-unit)*16.75)] w-[calc(var(--ef-splash-unit)*16.5)] items-center justify-center cq-portrait:top-[41.667%] cq-portrait:left-1/2 cq-portrait:h-[calc(var(--ef-splash-unit)*20.9375)] cq-portrait:w-[calc(var(--ef-splash-unit)*19.3125)] cq-portrait:-translate-1/2 [&>:is(img,svg)]:size-full [&>img]:object-contain">
+          <div className="absolute top-[min(calc(var(--ef-splash-unit)*27.625),calc(100%_-_var(--ef-splash-unit)*44.25))] left-[64.4531%] flex h-[calc(var(--ef-splash-unit)*16.75)] w-[calc(var(--ef-splash-unit)*16.5)] items-center justify-center cq-portrait:top-[min(calc(var(--ef-splash-unit)*50),41.667%)] cq-portrait:left-1/2 cq-portrait:h-[calc(var(--ef-splash-unit)*20.9375)] cq-portrait:w-[calc(var(--ef-splash-unit)*19.3125)] cq-portrait:-translate-1/2 [&>:is(img,svg)]:size-full [&>img]:object-contain">
             {logo}
           </div>
         )}
 
-        <div className="absolute top-[calc(50%_+_var(--ef-splash-unit)*18.375)] right-[calc(var(--ef-splash-unit)*2)] left-[64.4531%] cq-portrait:top-auto cq-portrait:right-[calc(var(--ef-splash-unit)*4.625)] cq-portrait:bottom-[calc(var(--ef-splash-unit)*5.75)] cq-portrait:left-[calc(var(--ef-splash-unit)*4.625)]">
+        <div className="absolute top-[min(calc(var(--ef-splash-unit)*63.375),calc(100%_-_var(--ef-splash-unit)*8.5))] right-[calc(var(--ef-splash-unit)*2)] left-[64.4531%] cq-portrait:top-auto cq-portrait:right-[calc(var(--ef-splash-unit)*4.625)] cq-portrait:bottom-[calc(var(--ef-splash-unit)*5.75)] cq-portrait:left-[calc(var(--ef-splash-unit)*4.625)]">
           {decor === undefined && <Mark />}
           {decor !== null && (
             <div

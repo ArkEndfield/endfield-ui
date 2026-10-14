@@ -169,6 +169,23 @@ test("官网开屏页：底图、标志、微标、三角标四处都是图，�
   );
   assert.deepEqual(missing, [], "开屏页引用的图片取不到");
 
+  // 标志和官网一样按宽度放满那个盒子、高度跟着图走：比盒子略高，上下各探出一点
+  const logo = await page.evaluate((css) => {
+    const mark = document.querySelector(`${css} .ef-splash-logo`)!;
+    const rect = mark.getBoundingClientRect();
+    const box = mark.parentElement!.getBoundingClientRect();
+    return {
+      width: rect.width - box.width,
+      ratio: rect.height / rect.width,
+      taller: rect.height > box.height,
+      centre: rect.top + rect.height / 2 - (box.top + box.height / 2),
+    };
+  }, SPLASH);
+  assert.ok(Math.abs(logo.width) < 0.5, "标志应该和它的盒子一样宽");
+  assert.ok(Math.abs(logo.ratio - 233 / 214) < 0.01, "标志应该保持原图的比例");
+  assert.ok(logo.taller, "标志应该比盒子略高");
+  assert.ok(Math.abs(logo.centre) < 0.5, "标志应该竖直居中在盒子上");
+
   // 横竖看的是它所在的那个框：这个 story 的框是竖的
   await page.story(`${GROUP}-endfieldsplashscreen-官网开屏页--portrait`);
   const tall = await used();

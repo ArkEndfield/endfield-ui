@@ -158,8 +158,9 @@ test("竖排：条横在下面、从左往右长，读数在它的末端；标�
   );
   assert.ok(at.status.y >= at.bar.y, "状态字应该在条的下半边往下");
 
-  // 标志：水平居中
+  // 标志：水平居中，中心在上 50rem（官网实测）
   near(at.logo!.x + at.logo!.width / 2, 375 / 2, "标志的水平中心");
+  near(at.logo!.y + at.logo!.height / 2, 50 * unit, "标志的竖直中心");
   near(at.logo?.width, 19.3125 * unit, "标志的宽");
   // 微标组：左 4.625rem，标语的底边距底 5.75rem
   near(at.group?.x, 4.625 * unit, "微标组的左边");
@@ -213,14 +214,24 @@ test("尺寸跟着宽度等比缩放，状态字和标语有下限；标语放�
   assert.ok(at.tagline!.x + at.tagline!.width <= 640, "标语不该伸到开屏页外面");
 });
 
-test("别的宽高比：标志和微标组那一列整体竖直居中", async () => {
+test("别的宽高比：纵向位置和官网一样按宽度定；超宽放不下时往上收，不掉出底边", async () => {
   const { page } = storybook;
+  // 比 16:9 高（4:3）：和官网一样，从上往下 27.625rem 和 63.375rem，这一列偏在上半边
+  await open(page, PLAYGROUND, { width: 1280, height: 960 });
+  let at = await measure(page);
+  near(at.logo?.y, 27.625 * 8, "4:3 下标志的上边");
+  near(at.decor!.y + at.decor!.height, 63.375 * 8, "4:3 下微标的底边");
+
+  // 比 16:9 扁很多：照官网排，标语会贴到底边甚至掉出去。往上收，标语的底边离底 4 个单位
   await open(page, PLAYGROUND, { width: 1720, height: 720 });
-  const at = await measure(page);
+  at = await measure(page);
   const unit = 1720 / 160;
-  // 16:9 下它们在 27.625rem 和 63.375rem，中点比正中低 0.5rem：别的比例下保持这个关系
-  near(at.logo?.y, 360 - 17.375 * unit, "标志的上边");
-  near(at.decor!.y + at.decor!.height, 360 + 18.375 * unit, "微标的底边");
+  near(at.logo?.y, 720 - 44.25 * unit, "超宽时标志的上边");
+  near(at.decor!.y + at.decor!.height, 720 - 8.5 * unit, "超宽时微标的底边");
+  assert.ok(
+    at.tagline!.y + at.tagline!.height <= 720 - 3.5 * unit,
+    "超宽时标语不该贴到底边",
+  );
 });
 
 test("读数画的是进度取整，条和读数的位置是同一个进度；底图的模糊跟着进度", async () => {

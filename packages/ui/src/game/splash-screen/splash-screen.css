@@ -23,12 +23,16 @@
 
 /*
  * 标志当遮罩用：图里只有形状，颜色跟着文字走。所以这个变量换的是形状——
- * 要放一张自己的彩色标志，用 logo 属性
+ * 要放一张自己的彩色标志，用 logo 属性。
+ *
+ * 官网是按宽度放满那个盒子、高度跟着图走的：标志（214 × 233）比盒子略高，
+ * 上下各探出去一点，由盒子的居中摆在正中。照这个来，不缩进盒子里
  */
 .ef-splash-logo {
   display: block;
+  flex: none;
   width: 100%;
-  height: 100%;
+  aspect-ratio: 214 / 233;
   background-color: currentColor;
   mask: var(--ef-game-splash-logo, var(--ef-game-splash-logo-default)) center /
     contain no-repeat;
