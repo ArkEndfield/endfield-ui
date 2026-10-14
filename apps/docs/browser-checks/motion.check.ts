@@ -1582,6 +1582,186 @@ test("加载页：就绪后向上滑出（600ms），滑完才卸载；减少动
   await page.waitFor(gone, "减少动态效果下加载页也应该卸载", 10_000);
 });
 
+test("开屏页：进度补间 0.5s；就绪后走满、铺满（等 0.5s，走 0.6s）、淡出（等 1.4s，走 1s），开始淡出才放开页面，走完才卸载；减少动态效果下不等", async () => {
+  const { page } = storybook;
+  const SPLASH = "#storybook-root [data-state]";
+  const STORY = "控件-splashscreen-开屏页--fullscreen";
+  const gone = () =>
+    page.evaluate((css) => document.querySelector(css) === null, SPLASH);
+  const locked = () =>
+    page.evaluate(() => document.documentElement.style.overflow === "hidden");
+
+  type Snapshot = { locked: boolean; pointer: string; now: string | null };
+  type SplashLog = {
+    closing?: number;
+    atClosing?: Snapshot;
+    fade?: Record<string, [number, number]>;
+    flood?: { at: number; duration: number; delay: number; easing: string };
+    reveal?: number;
+    unlocked?: number;
+    afterReveal?: Snapshot;
+    gone?: number;
+  };
+  /**
+   * 退场的每一步都是浏览器自己报的：在页面里挂好监听，事后取。
+   * 时间只断言"不早于"——机器慢的时候只会更晚
+   */
+  const watch = () =>
+    page.evaluate((css) => {
+      const node = document.querySelector<HTMLElement>(css)!;
+      const bar = node.querySelector("[role=progressbar]")!;
+      const log: SplashLog = {};
+      Object.assign(window, { splashLog: log });
+      const html = document.documentElement;
+      const snapshot = (): Snapshot => ({
+        locked: html.style.overflow === "hidden",
+        pointer: getComputedStyle(node).pointerEvents,
+        now: bar.getAttribute("aria-valuenow"),
+      });
+      new MutationObserver(() => {
+        if (node.dataset.state === "closing" && log.closing === undefined) {
+          log.closing = performance.now();
+          log.atClosing = snapshot();
+          // 这一刻根上声明的过渡：属性 → [时长, 延迟]（秒）
+          const style = getComputedStyle(node);
+          const list = (value: string) =>
+            value.split(",").map((part) => Number.parseFloat(part));
+          const durations = list(style.transitionDuration);
+          const delays = list(style.transitionDelay);
+          log.fade = Object.fromEntries(
+            style.transitionProperty
+              .split(",")
+              .map((property, index) => [
+                property.trim(),
+                [
+                  durations[index % durations.length]!,
+                  delays[index % delays.length]!,
+                ],
+              ]),
+          );
+        }
+        if (!node.isConnected) log.gone ??= performance.now();
+      }).observe(document.querySelector("#storybook-root")!, {
+        subtree: true,
+        childList: true,
+        attributes: true,
+        attributeFilter: ["data-state"],
+      });
+      node.addEventListener("animationstart", (event) => {
+        if (event.animationName !== "ef-fill") return;
+        // 缓动读声明：动画对象上报的是整段的缓动（linear），曲线写在每一帧上
+        const style = getComputedStyle(event.target as Element);
+        log.flood = {
+          at: performance.now(),
+          duration: Number.parseFloat(style.animationDuration),
+          delay: Number.parseFloat(style.animationDelay),
+          easing: style.animationTimingFunction,
+        };
+      });
+      node.addEventListener("transitionstart", (event) => {
+        if (event.target !== node || event.propertyName !== "opacity") return;
+        log.reveal = performance.now();
+        // 放开是这之后的一次渲染里的事：逐帧等到它
+        const check = () => {
+          if (html.style.overflow === "hidden" && node.isConnected) {
+            requestAnimationFrame(check);
+            return;
+          }
+          log.unlocked = performance.now();
+          if (node.isConnected) log.afterReveal = snapshot();
+        };
+        check();
+      });
+    }, SPLASH);
+  const taken = () =>
+    page.evaluate(
+      () => (window as unknown as { splashLog: SplashLog }).splashLog,
+    );
+
+  await withMotion(page, async () => {
+    await page.story(STORY);
+    await page.click("text=打开");
+    await page.waitVisible(SPLASH);
+    assert.deepEqual(
+      await transitions(page, SPLASH),
+      { "--ef-splash-progress": 0.5, "--ef-splash-percent": 0.5 },
+      "打开着的时候只有进度的两个变量在过渡，0.5s",
+    );
+    await record(page, "#storybook-root", "[data-state]");
+    await watch();
+    await page.waitFor(gone, "进度到头之后开屏页应该退场并卸载", 20_000);
+
+    const seen = await recorded(page);
+    for (const property of [
+      "--ef-splash-progress",
+      "--ef-splash-percent",
+      "opacity",
+    ]) {
+      assert.ok(seen.includes(property), `${property} 应该过渡过`);
+    }
+
+    const log = await taken();
+    const since = (at: number | undefined) =>
+      Math.round((at ?? Number.NaN) - log.closing!);
+    // 开始退场的那一刻：状态先变（报的是 100），页面还锁着、还挡着点击
+    assert.deepEqual(log.atClosing, {
+      locked: true,
+      pointer: "auto",
+      now: "100",
+    });
+    assert.deepEqual(
+      log.fade,
+      {
+        "--ef-splash-progress": [0.5, 0],
+        "--ef-splash-percent": [0.5, 0],
+        opacity: [1, 1.4],
+      },
+      "退场时多一条整层的淡出：1s，等 1.4s",
+    );
+    // 铺满：等条走满的 0.5s，再走 0.6s，先慢后快
+    assert.deepEqual(
+      [log.flood?.duration, log.flood?.delay, log.flood?.easing],
+      [0.6, 0.5, "cubic-bezier(1, 0, 0.7, 1)"],
+    );
+    assert.ok(
+      since(log.flood?.at) >= 450,
+      `铺满应该等条走满再开始，实际是 ${since(log.flood?.at)}ms`,
+    );
+    // 开始淡出：页面这时候才露出来，才放开
+    assert.ok(
+      since(log.reveal) >= 1350,
+      `淡出应该排在铺满之后，实际是 ${since(log.reveal)}ms`,
+    );
+    assert.ok(
+      log.unlocked! >= log.reveal!,
+      "页面应该到开始淡出才放开，不能更早",
+    );
+    assert.deepEqual(
+      [log.afterReveal?.locked, log.afterReveal?.pointer],
+      [false, "none"],
+      "开始淡出之后放开页面，淡出中的那一层不挡点击",
+    );
+    assert.ok(
+      since(log.gone) >= 2350,
+      `应该等淡出走完再卸载，实际只等了 ${since(log.gone)}ms`,
+    );
+    assert.equal(await locked(), false);
+    await page.waitFocused("button:打开", "焦点应该回到打开它的按钮上");
+  });
+
+  // 减少动态效果：过渡压到了接近零，照样卸载、照样放开
+  await page.story(STORY);
+  await page.click("text=打开");
+  await page.waitVisible(SPLASH);
+  const durations = Object.values((await transitions(page, SPLASH))!);
+  assert.ok(
+    durations.every((seconds) => seconds < 0.001),
+    `过渡时长应该接近零，实际是 ${durations.join("、")}s`,
+  );
+  await page.waitFor(gone, "减少动态效果下开屏页也应该卸载", 20_000);
+  assert.equal(await locked(), false, "卸载之后应该放开页面");
+});
+
 test("页签面板：切过来的那一块淡入（200ms），不位移；一开始选中的不动", async () => {
   const { page } = storybook;
   const PANEL = "#storybook-root [role=tabpanel]:not([hidden])";
