@@ -1,0 +1,28 @@
+.ef-item-hover-trigger {
+  display: inline-block;
+  vertical-align: top;
+  max-width: 100%;
+}
+
+.ef-item-hover-positioner {
+  z-index: var(--z-overlay, 300);
+  max-width: calc(100vw - 16px);
+}
+
+.ef-item-hover-panel {
+  width: 100%;
+  max-height: calc(100dvh - 16px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  background: transparent;
+  text-align: left;
+}
+
+.ef-item-hover-panel:focus-visible {
+  outline: 2px solid var(--ef-accent-ink, #fffa00);
+  outline-offset: 2px;
+}

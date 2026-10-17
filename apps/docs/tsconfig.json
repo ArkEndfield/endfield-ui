@@ -5,7 +5,8 @@
     // browser-checks 由 Node 直接运行，导入要写出 .ts 后缀
     "allowImportingTsExtensions": true,
     "paths": {
-      "@endfield-ui/react": ["../../packages/ui/src/index.ts"]
+      "@endfield-ui/react": ["../../packages/ui/src/index.ts"],
+      "@endfield-ui/react/game": ["../../packages/ui/src/game/index.ts"]
     }
   },
   "include": [".storybook", "stories", "browser-checks"]

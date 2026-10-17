@@ -1,6 +1,7 @@
 import {
   useEffect,
   useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -203,9 +204,11 @@ export function TagInput({
     return () => clearTimeout(timer);
   }, [flash]);
 
-  // 删掉一个之后焦点落到哪：等这一次渲染完，旁边那个小块才是"旁边那个"
+  // 删掉一个之后焦点落到哪：等这一次渲染落到页面上，旁边那个小块才是"旁边那个"，当场交出去。
+  // 不用 useEffect：它晚一拍，上一次渲染留下的那一份可能在这次删除之后才补跑——
+  // 看到的还是删之前的那一排，焦点留在马上要走的那一块上，随后掉到 body
   const pendingFocus = useRef<number | "input" | null>(null);
-  useEffect(() => {
+  useLayoutEffect(() => {
     const target = pendingFocus.current;
     if (target === null) return;
     pendingFocus.current = null;

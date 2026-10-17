@@ -22,6 +22,26 @@ const config: StorybookConfig = {
               new URL("../../../packages/ui/src/index.ts", import.meta.url),
             ),
           },
+          {
+            // Game 实机风格是独立入口，同样指向源码。它的样式在包的 exports 里
+            // 指的是构建产物，这里也换成源码那一份（纯 CSS，图片按相对路径跟着走）
+            find: /^@endfield-ui\/react\/game$/,
+            replacement: fileURLToPath(
+              new URL(
+                "../../../packages/ui/src/game/index.ts",
+                import.meta.url,
+              ),
+            ),
+          },
+          {
+            find: /^@endfield-ui\/react\/game\.css$/,
+            replacement: fileURLToPath(
+              new URL(
+                "../../../packages/ui/src/game/styles.css",
+                import.meta.url,
+              ),
+            ),
+          },
         ],
       },
     }),

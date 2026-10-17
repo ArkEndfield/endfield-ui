@@ -4,17 +4,49 @@
 
 ## 未发布
 
-外观与动效的两处修正。属性、导出和令牌都没有变，升级不用改代码。
+### 新增
 
-### 动效
+- `SplashScreen`（开屏页）：照官网首次载入的那一页排的。一根贴边的黄色进度条，读数跟着条的末端走，画面偏右是标志、一组微标和一行标语；就绪后黄色从左往右铺满整屏，再整层淡出，一共 2.4 秒。不带任何图——标志和底图是插槽。横竖看它所在那一块自己的宽高比，尺寸跟着那一块的宽度等比缩放。页面到开始淡出的那一刻才放开，同时触发 `onReveal`。`Loader` 没有变：只要一块简单的整页等待，照旧用它。
+- `EndfieldSplashScreen`（Game 入口，`@endfield-ui/react/game`）：上面那个开屏页填上官方的标志、底图和微标，就是官网首次载入的样子。**它带 5 张直接从官网取的图，其中一张是游戏的标志**；`dist/game/assets` 因此从 20 张变成 25 张，包大了约 500 KB。和这个入口别的图一样没有取得授权、可以用 `data-ef-game-images="off"` 整类关掉；标志用 `logo` 属性换。用之前请读[风险与处理](docs/design/game/README.md#风险与处理)。
+- 令牌与工具类：`animate-indeterminate-y`（竖着的轨道上的不确定进度）、变体 `cq-portrait:`（最近的尺寸容器高大于宽时生效）。主样式里多注册了两个变量 `--ef-splash-progress`、`--ef-splash-percent`，只有开屏页在用。
 
-- 输入框、多行文本、验证码输入、分段选择、下拉选择、日期选择、组合框、标签输入：聚焦时那条墨线不再是把底边线换个颜色，而是从左往右擦出来（`--duration-base`、`ease-exit`），失焦时缩回去（`--duration-fast`）。`sunken` 变体擦的是压在底边线上的一条线，`outline` 变体擦的是整圈（用裁切，四条边不会被压扁）。打开的下拉面板算作聚焦，线留着；错误、禁用、只读时不画。
-- 验证码输入：每一格外面多包了一层同宽的盒子，聚焦的墨线画在它上面（`<input>` 是替换元素，自己画不了伪元素）。尺寸、间距和 `className` 的位置都不变。
+### 变化
+
+- 菜单面板一族顶上那条半宽的强调条，下沿多了一个朝下的小三角（露出 8 × 4px，中心距条的左端 32px）：`Select`、`Combobox`、`DropdownMenu` 和它的子菜单、`ContextMenu`、`DatePicker` / `DateRangePicker`、`Popover`、`HoverCard`、`SideRail` 收起时的二级。只是画法上多了这一笔，属性、导出和令牌都没有变；高对比模式下它和条一起隐藏。
+- 聚焦的那条墨线：输入框、多行文本、验证码输入、分段选择、下拉选择、日期选择、组合框、标签输入，聚焦时不再是把底边线换个颜色，而是另画一条墨线从左往右擦出来（`--duration-base`、`ease-exit`），失焦时缩回去（`--duration-fast`）。`sunken` 变体擦的是压在底边线上的一条线，`outline` 变体擦的是整圈（用裁切，四条边不会被压扁）。打开的下拉面板算作聚焦，线留着；错误、禁用、只读时不画。
 
 ### 修复
 
-- `Alert` 去掉了整圈的外边框，只留左缘 4px 的语义色条和 `surface-raised` 的底。围一圈线是"卡片"的画法，页面内的一条消息不该看起来像一个盒子。
-- `Toast` 去掉了 1px 的外边框，暗色页面上改用零偏移的环境阴影（`shadow-sm`）和页面分开。
+- `FileUpload`、`TagInput`：连着移除两项，后一下正好落在前一项退场走完、卸载的那一刻时，焦点会丢到页面上（`<body>`）——现在照旧落到旁边那一项，一个不剩就回到投放区 / 输入框。使用方正在频繁重画控件（比如推上传进度）时点移除，原来也会碰上。
+- `Alert` 去掉了整圈的外边框，只留左缘 4px 的语义色条和 `surface-raised` 的底；`Toast` 同样去掉了 1px 的外边框，暗色页面上改用零偏移的环境阴影（`shadow-sm`）和页面分开。层次靠底色差和边线交代，不再用一圈线把块包起来。
+
+### 内部
+
+- 验证码输入的每一格改成和 `Input` 同构：外层盒子承担外框、状态和聚焦环，输入框只负责字，删掉了它自己那份重复的边框状态类名表。尺寸、间距和 `className` 的位置都不变。
+
+## 1.1.0 — 2026-10-13
+
+新增一个独立入口：Game 实机风格。主入口的属性、导出、令牌和样式都没有变，升级不用改代码。
+
+### 新增：Game 实机风格（独立入口）
+
+照游戏内界面复刻的一组控件，迁自社区项目 EndfieldMap 与 EndfieldWiki（[#1](https://github.com/icaruszezen/endfield-ui/pull/1)）。它是单独的一类，不从主入口导出：
+
+```tsx
+import "@endfield-ui/react/game.css";
+import { AnimatedDialog, RoundedButton } from "@endfield-ui/react/game";
+```
+
+- `AnimatedDialog`：分段入场的装饰弹窗，关闭可以异步否决。
+- 三个弹窗控件（`AnimatedDialog`、`BannerAlert`、`FullWidthAlert`）都收 `container` 和 `modal`：挂进指定的元素、不做成模态，可以嵌在页面的一块区域里展示。
+- `RoundedSelect`、`RoundedButton` / `RoundedIconButton`、`RoundedToggle`、`RoundedSwitch`：圆角的下拉、按钮、分段选择和 ON / OFF 文字开关。
+- `BannerAlert`、`FullWidthAlert`：紧凑卡片与通栏面板两种确认提示。
+- `ItemCard`、`ItemIcon`：带稀有度、库存的物品卡片与分层图标。
+- `ItemTooltipCard`、`ItemHoverCard`、`ItemHoverCardLayer`：物品详情卡，单个控件或整片网格的悬浮预览。
+
+**这个入口带着官方图片**（20 张随包发在 `dist/game/assets`），没有取得授权，MIT 许可不覆盖它们；权利人提出异议时会撤下并发补丁版本，这些图片不在语义化版本的承诺之内。在 `<html>` 上写 `data-ef-game-images="off"` 可以整类关掉，每张图也能经 `--ef-game-*` 变量换成自己的。用之前请读[风险与处理](docs/design/game/README.md#风险与处理)。
+
+主入口没有变：`@endfield-ui/react` 的导出和预编译的 `styles.css` 与 1.0.1 的相同，里面没有这一类的任何东西；`tailwind.css` 只多了一句把 game 目录排除在类名扫描之外的声明。不引 `/game` 的项目升级后产物不变。
 
 ## 1.0.1 — 2026-10-12
 

@@ -42,6 +42,7 @@ const groupMeta: Record<string, { key: string; latin: string }> = {
   母题: { key: "elements", latin: "ELEMENTS" },
   载体: { key: "surfaces", latin: "SURFACES" },
   组件: { key: "components", latin: "COMPONENTS" },
+  "Game 实机风格": { key: "game", latin: "GAME" },
   依据: { key: "references", latin: "REFERENCES" },
 };
 

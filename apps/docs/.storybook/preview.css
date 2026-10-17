@@ -3,3 +3,67 @@
 /* stories 与预览外壳里用到的工具类 */
 @source "../stories";
 @source "./";
+
+/*
+ * 文档页里每个 story 外面，Storybook 套了一层给"缩放"用的外壳：它量里面的高度，
+ * 抄成自己的像素高度——晚一帧。story 里的东西一变高（折叠面板展开、表格的明细行），
+ * 这一帧里内容比外壳高，再外面那层 overflow: auto 的容器就闪出一条竖向滚动条，
+ * 把 story 挤窄 15px，高度停下来又弹回去：看着是控件在抖。
+ * 所以这个容器竖向不出滚动条：外壳没跟上的那一帧，多出来的一截先裁着，下一帧就撑开了。
+ *
+ * 外壳的高度本身不能动（以前这里是把它改回 auto）：每页第一个演示上面那条工具栏里有
+ * Storybook 自带的缩放按钮，外壳是整个缩放的，占多大地方全靠那个写死的高度跟着变——
+ * 改回 auto，缩小之后下面留一截空白，放大之后内容比容器高。
+ * 竖向本来也没有要滚的东西：外壳的高度就是内容画出来的高度。放大时竖向多出来的那一截
+ * 是空的（被放大的外壳自己的框），右边才真的有内容，横向照旧能滚。
+ * 选择器写两个类，压过 Storybook 自己那个单类的 overflow: auto
+ */
+.sbdocs-preview .docs-story {
+  overflow-y: hidden;
+}
+
+/*
+ * 缩放按钮按下去，Storybook 当场量一次内容"画出来有多高"，记成外壳的高度。
+ * 主题样式里"减少动态效果"那条规则给所有元素的过渡都留了 0.01ms，外壳的缩放也成了过渡：
+ * 量的那一刻它还停在起点，量到的是缩放之前的高度——每按一下，高度都是上一步的
+ * （缩小了留空白，再复位反而比内容矮）。外壳不过渡，量到的就是对的。
+ * 上面那条让竖向不能滚，这里要是错了，放大之后下面那一截就够不着：两条一起留着
+ */
+.docs-story div:has(> .innerZoomElementWrapper) {
+  transition-property: none;
+}
+
+/*
+ * 手机上看文档页太挤：Storybook 的文档页两边各留 40px，演示区是一张带边框的卡片，
+ * 里面预览外壳还有 24px 的内边距——360px 的屏，留给 story 的只有 230px。
+ * 窄的时候演示区通栏：留白收到 16px，卡片左右贴到屏幕边，两侧的边框和圆角去掉；
+ * 外壳的内边距在 preview.tsx 里同样收到 16px，文字和 story 的左边缘对在一条线上。
+ * 断点和外壳上的 sm: 是同一条。选择器写两个类，压过 Storybook 自己那个单类的规则
+ */
+@media (width < 40rem) {
+  .sbdocs.sbdocs-wrapper {
+    padding-inline: 1rem;
+  }
+
+  .sbdocs.sbdocs-preview {
+    margin-inline: -1rem;
+    border-inline-width: 0;
+    border-radius: 0;
+  }
+
+  /* 标题旁那个悬停才出现的"复制链接"挂在标题左边 36px 处，留白只有 16px 时落在屏幕外面 */
+  .sbdocs-content :is(h1, h2, h3, h4, h5, h6) a[href^="#"]:has(> svg) {
+    display: none;
+  }
+}
+
+/*
+ * 文档页的参数表有五百多像素宽，外面没有东西兜着：手机上它把整页撑宽，整页都能横着划，
+ * 划过去右边是一片空白。窄的时候给它外面那层开横向滚动，表格在自己的框里滚。
+ * 宽屏上表格本来就放得下，不去动它
+ */
+@media (width < 40rem) {
+  .sbdocs-content div:has(> .docblock-argstable) {
+    overflow-x: auto;
+  }
+}

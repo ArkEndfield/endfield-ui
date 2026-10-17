@@ -6,21 +6,17 @@
 | [utilities.css](utilities.css) | `@utility`：母题工具类（斜纹、切角、斜楔、角括号、镂空字、警示条纹、竖条变箭头），以及菱形表单符号的开关 |
 | [index.css](index.css) | 入口：`tailwindcss` → `theme.css` → `utilities.css` → 基础样式 → `@source` |
 
-圆形图标按钮的本地纹理由 `scripts/copy-assets.mjs` 在 `build:css` 后复制到 `dist/assets`，对应预编译 CSS 中的相对地址。源码样式保留组件目录内的同一张图片；两种入口都不需要外部资源地址。
-
-确认提示的四张图片也由同一脚本复制。`banner-alert.css` 在共享弹层上声明图片变量，紧凑与通栏样式共同使用；因此源码与预编译 CSS 都从各自的 `assets` 路径读取，不需要为通栏面板配置另一套资源地址。
-
-物品卡片的六张背景、六张稀有度底边及五张示例图片保存在 `item-card/assets`，同样复制到 `dist/assets`。这些文件实际编码为 WebP，迁入时保留原字节；主题变量选择亮暗背景，使用方也可在容器上覆盖背景变量。
-
-物品详情的 `header.webp`、`link.webp` 和 `detail.png` 保存在 `item-tooltip-card/assets`。源码和预编译 CSS 使用相对路径，构建脚本复制原字节到 `dist/assets`；悬浮卡复用同一份样式和图片。
-
-对外的三个入口（见包的 `exports`）：
+对外的入口（见包的 `exports`）：
 
 | 引入路径 | 对应 | 给谁用 |
 | --- | --- | --- |
 | `@endfield-ui/react/tailwind.css` | `index.css` | 用 Tailwind v4 的项目，代替 `@import "tailwindcss"` |
 | `@endfield-ui/react/styles.css` | `dist/styles.css` | 不用 Tailwind 的项目，预编译产物 |
 | `@endfield-ui/react/theme.css` | `theme.css` | 只要令牌、不要组件 |
+| `@endfield-ui/react/utilities.css` | `utilities.css` | 只要母题工具类 |
+| `@endfield-ui/react/game.css` | `dist/game/styles.css` | 用了 [Game 实机风格](../game/README.md)那一类控件的项目；纯 CSS，和上面的主样式一起引 |
+
+Game 实机风格的样式不在这个目录里，也不在主样式里：源码是 [`../game/styles.css`](../game/styles.css) 汇总的每个控件一份纯 CSS，`index.css` 用 `@source not` 把那个目录排除在扫描之外。
 
 ## theme.css 的结构
 
@@ -71,7 +67,10 @@
 
 这些类只画形状。什么东西可以切角、哪里能放斜纹，见 [docs/design/elements](../../../../docs/design/elements/corner-and-wedge.md) 各篇的"什么时候用"。预编译的 `styles.css` 里只有组件自己用到的那几个；不用 Tailwind 的项目用对应的装饰组件。
 
-文件末尾还有一个自定义变体 `choice-diamond:`，在祖先带 `data-choice="diamond"` 时生效，复选与单选靠它整体换成菱形符号。
+文件末尾还有两个自定义变体：
+
+- `choice-diamond:`，在祖先带 `data-choice="diamond"` 时生效，复选与单选靠它整体换成菱形符号。
+- `cq-portrait:`，在最近的尺寸容器（`container-type: size`）高大于宽时生效。开屏页靠它换成竖排——看的是它所在的那一块，不是视口。
 
 ## 注意
 

@@ -53,7 +53,8 @@
   <text x="56" y="281" font-size="13" font-weight="700" fill="#191919">选项一</text>
   <text x="56" y="311" font-size="13" fill="#191919">选项二</text>
   <text x="56" y="341" font-size="13" fill="#191919">选项三</text>
-  <text x="40" y="372" font-size="12" fill="#626262">下拉面板顶部一条半宽的强调条</text>
+  <polygon points="68,261 76,261 72,265" fill="#fffa00"/>
+  <text x="40" y="372" font-size="12" fill="#626262">下拉面板顶部一条半宽的强调条，条上挂一个朝下的小三角</text>
 
   <!-- 复选 / 单选：方案 A -->
   <text x="300" y="222" font-size="12" font-weight="700" fill="#191919">方案 A · 方形（默认）</text>

@@ -21,5 +21,6 @@
 15. 控件之外的：~~发布到 npm~~、~~ESLint~~（改用 oxlint）、~~高对比模式的实测~~、截图比对、触屏的实测
 16. ~~动效补全：状态记号的过渡、浮层进出的方向、只播一次的入场、展开与增删、选中指示的滑动、内容切换与补位，外加滚动数字~~（[逐步的记录](docs/motion-plan.md)）
 17. ~~高对比模式（`forced-colors`）：只靠底色或阴影成形的地方——"选中 / 当前"、进度与滑块、按钮一类的外形、禁用的字色——另写一份用系统色的画法~~（[约定](docs/design/foundations/color.md#高对比模式)）；在真的 Windows 对比度主题下核对还没做，现在是在 Chromium 的模拟下看的
+18. ~~Game 实机风格：照游戏内界面复刻的一组控件（动画弹窗、圆角的下拉 / 按钮 / 分段选择 / 开关、两种确认提示、物品卡片与悬浮卡），社区贡献，迁自 EndfieldMap 与 EndfieldWiki~~——单独成一类、单独一个入口（`@endfield-ui/react/game`），带官方图片（[是什么、有什么风险](docs/design/game/README.md)）
 
-各期的组件清单见 [组件规范](docs/design/components/README.md)。规范之外补的控件（第 11 到 14 项），每一个都是先在规范里写了规格再做的。
+各期的组件清单见 [组件规范](docs/design/components/README.md)。规范之外补的控件（第 11 到 14 项），每一个都是先在规范里写了规格再做的。第 18 项不属于这份规范：它复刻的是游戏里的样子，文档在 [docs/design/game](docs/design/game/README.md)。

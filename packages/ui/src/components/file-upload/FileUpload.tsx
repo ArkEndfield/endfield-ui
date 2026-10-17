@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type ChangeEvent,
@@ -235,9 +236,11 @@ export function FileUpload({
     }
   }, [files, revision]);
 
-  // 移除之后焦点落到哪：等这一次渲染完
+  // 移除之后焦点落到哪：等这一次渲染落到页面上，当场交出去。
+  // 不用 useEffect：它晚一拍，上一次渲染留下的那一份可能在这次移除之后才补跑——
+  // 看到的还是移除之前的页面，焦点留在马上要收起的那一行上，随后掉到 body
   const pendingFocus = useRef<number | null>(null);
-  useEffect(() => {
+  useLayoutEffect(() => {
     const index = pendingFocus.current;
     if (index === null) return;
     pendingFocus.current = null;

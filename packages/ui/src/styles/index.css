@@ -10,23 +10,17 @@
 @import "tailwindcss";
 @import "./theme.css";
 @import "./utilities.css";
-@import "../components/animated-dialog/animated-dialog.css";
-@import "../components/rounded-select/rounded-select.css";
-@import "../components/rounded-button/rounded-button.css";
-@import "../components/rounded-toggle/rounded-toggle.css";
-@import "../components/rounded-switch/rounded-switch.css";
-@import "../components/banner-alert/banner-alert.css";
-@import "../components/full-width-alert/full-width-alert.css";
-@import "../components/item-icon/item-icon.css";
-@import "../components/item-card/item-card.css";
-@import "../components/item-tooltip-card/item-tooltip-card.css";
-@import "../components/item-hover-card/item-hover-card.css";
 
 /*
  * 让 Tailwind 扫到本包用到的类名。要扫整个 src，不能只扫 components：
  * 焦点环这类共用的类名写在 lib 里。
  */
 @source "../";
+/*
+ * game 目录不扫：那一类是独立入口（`@endfield-ui/react/game`），样式自己一份纯 CSS，
+ * 不用工具类。扫了它，源码里碰巧和工具类同名的词会混进这份产物。
+ */
+@source not "../game";
 
 @layer base {
   body {

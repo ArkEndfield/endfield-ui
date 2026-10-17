@@ -1051,6 +1051,37 @@ test("进度条：轨道是一圈线，填充是实心的「选中」色；分�
   );
 });
 
+test("开屏页：贴边的那根条，走过的一段是「选中」色，没到的是空心的一圈线", async () => {
+  const { page } = storybook;
+  // 进度 51%，条竖着贴在框的左缘：上半截走过了，下半截还没到
+  await open(page, "控件-splashscreen-开屏页--playground");
+  const bar = `${ROOT} [role=progressbar]`;
+  await shows(
+    page,
+    await at(page, bar, "center", 20),
+    "Highlight",
+    "走过的一段应该是「选中」色",
+  );
+  await differs(
+    page,
+    await at(page, bar, "center", -20),
+    "Highlight",
+    "没到的那一段不该是「选中」色",
+  );
+  await differs(
+    page,
+    await at(page, bar, "center", -20),
+    "CanvasText",
+    "没到的那一段应该是空心的",
+  );
+  await shows(
+    page,
+    await at(page, bar, 0, -20),
+    "CanvasText",
+    "轨道的左沿应该有一条线",
+  );
+});
+
 test("进度环：轨道是一圈细线，弧是「选中」色", async () => {
   const { page } = storybook;
   // 第一行四个 48px 的环：0、25、64、100。弧从 12 点方向顺时针走

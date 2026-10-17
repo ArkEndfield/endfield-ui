@@ -79,6 +79,40 @@ test("键盘删：空着按 Backspace 删最后一个；← 走到小块上，De
   );
 });
 
+test("键盘连着删：前一块淡出完卸载的那一刻再删一块，焦点照样落到旁边那个", async () => {
+  const { page } = storybook;
+  await page.story("控件-taginput-标签输入--narrow");
+  const all = await tags(page);
+  assert.equal(all.length, 4);
+  // 小块卸载的那一次渲染不是按键引起的，它的副作用晚一拍才跑。下一次删落在这一拍里时，
+  // 挪焦点的那一步曾经被上一次渲染补跑的副作用抢先用掉——它看到的还是删之前的那一排，
+  // 焦点留在马上要走的那一块上，随后掉到 body。
+  // 不赌时机：在页面里盯着第一块被拿掉，当场删现在的第一块
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve, reject) => {
+        const buttons = () =>
+          document.querySelectorAll<HTMLElement>(
+            "#storybook-root [data-tag] button",
+          );
+        const first = buttons()[0]!;
+        const row = first.closest("[data-tag]")!.parentElement!;
+        new MutationObserver((records, observer) => {
+          if (!records.some((record) => record.removedNodes.length > 0)) return;
+          observer.disconnect();
+          buttons()[0]!.click();
+          resolve();
+        }).observe(row, { childList: true });
+        setTimeout(() => reject(new Error("第一块一直没有卸载")), 5000);
+        first.focus();
+        // 脚本里的 click() 和回车、空格一样（detail 是 0）：焦点留在小块这一排
+        first.click();
+      }),
+  );
+  await waitTags(page, all.slice(2), "应该删掉了前两个");
+  await page.waitFocused(`button:移除${all[2]}`, "焦点应该落到原来的下一个上");
+});
+
 test("小块上的焦点环看得见", async () => {
   const { page } = storybook;
   await page.story("控件-taginput-标签输入--playground");

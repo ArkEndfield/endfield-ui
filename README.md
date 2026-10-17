@@ -2,7 +2,7 @@
 
 《明日方舟：终末地》设计风格指导文档，以及按这套文档实现的 React + Tailwind CSS v4 组件库。
 
-> 非官方的爱好者项目，与鹰角网络（Hypergryph）无关。社区控件引用的图片单独记录来源与素材归属，详见 [NOTICE](NOTICE.md)。
+> 非官方的爱好者项目，与鹰角网络（Hypergryph）无关。除了单独的 [Game 实机风格](#game-实机风格独立入口)入口，本仓库不包含任何官方素材。详见 [NOTICE](NOTICE.md)。
 
 [设计文档站](https://icaruszezen.github.io/endfield-ui/design/) · [组件预览](https://icaruszezen.github.io/endfield-ui/) · [组件库用法](packages/ui/README.md) · [npm](https://www.npmjs.com/package/@endfield-ui/react) · [更新记录](CHANGELOG.md) · [路线](ROADMAP.md)
 
@@ -33,7 +33,7 @@
 
 ## 组件库展示
 
-在线预览：<https://icaruszezen.github.io/endfield-ui/>。侧栏分三组——**示例**、**控件**、**母题**；工具栏上的主题开关默认把同一个控件的亮暗两套并排摆出来。
+在线预览：<https://icaruszezen.github.io/endfield-ui/>。侧栏分四组——**示例**、**控件**、**母题**，和单独成一类的 **Game 实机风格**；工具栏上的主题开关默认把同一个控件的亮暗两套并排摆出来。
 
 ### 示例页
 
@@ -49,17 +49,17 @@
 | [![设置页的亮色截图](docs/screenshots/settings-light.png)](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-设置页--page&globals=theme:light) | [![列表页的暗色截图](docs/screenshots/list-dark.png)](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-列表页--page&globals=theme:dark) |
 | 表单与反馈：页头、步骤条、字段与校验、下拉选择与组合框、标签输入、文件上传、验证码输入、分段选择、滑块、折叠面板，带一次完整的"提交 → 报错 → 改正 → 保存" | 页头，检索、排序、筛选，网格与列表两种视图，分页；侧栏里是胶囊导航器、进度环、步进器和一条限高、在滚动区里滚的时间线 |
 
-"示例"组里还有两个小的：[主题色接管](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-主题色接管--takeover)（下面有图）和[主题切换](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-主题切换--switch)（切亮暗时整页交叉淡化一次）。演示内容都是原创的占位图和虚构文案。
+"示例"组里还有两个小的：[主题色接管](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-主题色接管--takeover)（下面有图）和[主题切换](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-主题切换--switch)（切亮暗时整页交叉淡化一次）。除了最后一页“实机风格”，演示内容都是原创的占位图和虚构文案；那一页是 [Game 实机风格](#game-实机风格独立入口)的控件搭的，带官方图片，三个弹窗除了能点开，还直接摆在页面上。
 
 ### 控件一览
 
 | 类别 | 控件 |
 | --- | --- |
-| 基础 | Button / ButtonGroup / RoundedButton、IconButton / RoundedIconButton、RoundedToggle、Toolbar、Tag / TagPair、Badge、Kbd、SectionTitle、BracketTitle、Tabs、Panel |
-| 表单 | Field、Input、OtpInput、Textarea、Select / RoundedSelect、Combobox、TagInput、DatePicker / DateRangePicker / Calendar、FileUpload / FileItem、Checkbox、Radio / RadioGroup、SegmentedControl、Switch / RoundedSwitch、Stepper、Slider、FilterChip |
-| 反馈 | Alert / BannerAlert / FullWidthAlert、Toast、Progress / ProgressRing、Spinner、Skeleton、EmptyState、Loader、CompletionBanner、RecIndicator |
-| 浮层 | Tooltip、Popover、HoverCard、Dialog / AnimatedDialog、Drawer、DropdownMenu、ContextMenu、FlyoutBar |
-| 展示 | Table（行能展开）、Stat、RollingNumber、Sparkline、DataRowList / DataRow、List / ListRow、Accordion、ScrollArea、MediaCard、PlayButton / PlayMark、Carousel、ImageViewer、ItemSlot / ItemGrid、ItemCard / ItemIcon、Avatar、Timeline、Schedule、Term、ResourceChip、Countdown、Marquee、ScrollHint |
+| 基础 | Button / ButtonGroup、IconButton、Toolbar、Tag / TagPair、Badge、Kbd、SectionTitle、BracketTitle、Tabs、Panel |
+| 表单 | Field、Input、OtpInput、Textarea、Select、Combobox、TagInput、DatePicker / DateRangePicker / Calendar、FileUpload / FileItem、Checkbox、Radio / RadioGroup、SegmentedControl、Switch、Stepper、Slider、FilterChip |
+| 反馈 | Alert、Toast、Progress / ProgressRing、Spinner、Skeleton、EmptyState、Loader、SplashScreen、CompletionBanner、RecIndicator |
+| 浮层 | Tooltip、Popover、HoverCard、Dialog、Drawer、DropdownMenu、ContextMenu、FlyoutBar |
+| 展示 | Table（行能展开）、Stat、RollingNumber、Sparkline、DataRowList / DataRow、List / ListRow、Accordion、ScrollArea、MediaCard、PlayButton / PlayMark、Carousel、ImageViewer、ItemSlot / ItemGrid、Avatar、Timeline、Schedule、Term、ResourceChip、Countdown、Marquee、ScrollHint |
 | 导航 | SideRail（含二级）、TopBar、NavMenu、NavAction、PageHeader、Breadcrumb、Pagination、Navigator、AvatarSwitcher、DashIndicator、Steps、Toc、BackToTop |
 | 母题 | CornerBrackets、Viewfinder、GhostText、Hatch、Texture、RegistrationStrip、TickRing、HazardStripe |
 
@@ -71,17 +71,28 @@
 - **行为交给 Base UI。** 浮层和几个行为复杂的控件（组合框、滑块、工具栏、验证码输入…）的焦点、键盘、定位建立在 [Base UI](https://base-ui.com) 上，其余控件用的是原生元素。
 - **链接接得上路由。** 能当链接用的控件除了 `href` 还收一个 `render`，用来接路由库的链接组件。
 
-`AnimatedDialog` 和 `RoundedSelect` 是来自 EndfieldMap 的两种独立外观：前者保留分段入场的黄色装饰弹窗，后者保留圆角触发器和灰色下拉面板。它们使用固定配色，不随主题反转；原有 `Dialog`、`Select` 继续按本库的主题令牌绘制。用法与尺寸见[社区变体](docs/design/components/community-variants.md)。
-
-`RoundedButton`、`RoundedIconButton`、`RoundedToggle`、`RoundedSwitch` 保留同一来源的圆角外观，全部不带声音。圆形图标按钮的一张纹理随包提供，使用时不请求外链；用法与图片来源见[圆角控件](docs/design/components/rounded-controls.md)。
-
-确认提示使用 `BannerAlert` 或 `FullWidthAlert`：前者是紧凑卡片，后者横贯视口。它们复用无音效圆角按钮，四张装饰图片随包提供；原有 `Alert` 继续作为页面内提示条。用法与资源清单见[确认提示](docs/design/components/confirmation-alerts.md)。
-
-`ItemCard` 和 `ItemIcon` 来自 EndfieldWiki，提供六档稀有度、物品 / 武器 / 敌人背景、库存数量和分层图标。亮暗背景、稀有度底边及示例图片均保存在本地；用法与来源见[物品卡片](docs/design/components/item-cards.md)。
-
-`ItemTooltipCard` 展示物品详情，`ItemHoverCard` 和 `ItemHoverCardLayer` 为单个控件或整片网格提供悬浮预览。详情卡使用固定灰色皮肤和六档稀有度标题，三张装饰图片本地打包；数据、富文本和路由由使用方接入，见[物品悬浮卡](docs/design/components/item-hover-cards.md)。
-
 [![同一组控件在亮暗两个主题下的截图，上半是默认的信号黄，下半把强调色换成了青色](docs/screenshots/takeover.png)](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-主题色接管--takeover)
+
+### Game 实机风格（独立入口）
+
+预览站侧栏的第四组，“示例”组的最后还有一页[实机风格](https://icaruszezen.github.io/endfield-ui/?path=/story/示例-实机风格--page)。照游戏内界面复刻的一组控件，迁自社区项目 EndfieldMap 与 EndfieldWiki：固定的灰与黄，不随主题变；和上面那张表里的控件是两套东西，所以不在表里，也不从主入口导出。
+
+| 控件 | |
+| --- | --- |
+| AnimatedDialog | 分段入场的装饰弹窗 |
+| RoundedSelect | 圆角触发器、灰色面板的下拉 |
+| RoundedButton / RoundedIconButton、RoundedToggle、RoundedSwitch | 圆角的按钮、分段选择和 ON / OFF 文字开关 |
+| BannerAlert、FullWidthAlert | 紧凑卡片与通栏面板两种确认提示 |
+| ItemCard / ItemIcon | 带稀有度、库存的物品卡片与分层图标 |
+| ItemTooltipCard、ItemHoverCard / ItemHoverCardLayer | 物品详情卡与悬浮预览 |
+| EndfieldSplashScreen | 官网首次载入的开屏页：主入口的 SplashScreen 填上官方的标志、底图和微标 |
+
+```tsx
+import "@endfield-ui/react/game.css";
+import { AnimatedDialog, RoundedButton } from "@endfield-ui/react/game";
+```
+
+> **这个入口带着 30 张官方图片**（界面纹理、卡片背景、开屏页的底图，和两张官方标志——其中一张是游戏的标志本身），没有取得授权，MIT 许可不覆盖它们；权利人提出异议时会撤下。不引它，主入口和主样式里就没有其中任何一张。在 `<html>` 上写 `data-ef-game-images="off"` 可以整类关掉。用之前请读[风险与处理](docs/design/game/README.md#风险与处理)。
 
 ### 在本地看
 
@@ -108,6 +119,7 @@ endfield-ui/
 │   │   ├── elements/          母题：切角、括号、斜纹、分节标题、镂空字、底纹、测绘叠层
 │   │   ├── surfaces/          载体：官网、游戏界面、宣传物料
 │   │   ├── components/        组件：按钮、导航、卡片、表单、反馈、浮层、数据展示
+│   │   ├── game/              Game 实机风格：总览与风险说明，六篇控件文档
 │   │   ├── references/        依据：官网实测数据、官方来源、开源项目调研
 │   │   └── assets/            原创 SVG 图解
 │   ├── motion-plan.md         动效是怎么一步步补上的（已做完，留作记录）
@@ -116,13 +128,14 @@ endfield-ui/
 │   └── ui/                    组件库 @endfield-ui/react
 │       └── src/
 │           ├── components/    一组件一目录
+│           ├── game/          Game 实机风格：独立入口，带官方图片
 │           ├── styles/        令牌、母题工具类、样式入口
 │           ├── hooks/         通用 hooks
 │           ├── lib/           工具函数
 │           └── icons/         原创图标
 ├── apps/
 │   ├── docs/                  Storybook 预览站
-│   │   ├── stories/           每个组件一个文件，外加几个示例页
+│   │   ├── stories/           每个组件一个文件，外加几个示例页；game/ 下是 Game 实机风格的
 │   │   └── browser-checks/    在真的浏览器里做的检查（键盘、焦点、布局）
 │   └── site/                  设计文档站：把 docs/design 渲染成站点
 │       ├── scripts/           读文档、核对、构建
@@ -203,8 +216,8 @@ import { Button, Field, Input, Tag } from "@endfield-ui/react";
 - 官网改版后的重新测量；
 - 文档中标为"推断"的数值的更好依据。
 
-请只提交原创内容，不要提交官方截图、立绘、Logo、图标或字体文件。
+请只提交原创内容，不要提交官方截图、立绘、Logo、图标或字体文件。[Game 实机风格](docs/design/game/README.md)是唯一的例外：给它加图片，要放在 `packages/ui/src/game` 下并登记进那里的来源清单。
 
 ## 许可
 
-仓库内的原创内容以 [MIT License](LICENSE) 发布。《明日方舟：终末地》及其全部官方素材的权利归鹰角网络所有，不在本许可范围内，详见 [NOTICE](NOTICE.md)。
+仓库内的原创内容以 [MIT License](LICENSE) 发布。《明日方舟：终末地》及其全部官方素材的权利归鹰角网络所有，不在本许可范围内——包括 Game 实机风格入口带的那些图片，详见 [NOTICE](NOTICE.md)。

@@ -23,6 +23,7 @@ import {
   ElementsIcon,
   ExternalIcon,
   FoundationsIcon,
+  GameIcon,
   HomeIcon,
   OverviewIcon,
   ReferencesIcon,
@@ -39,6 +40,7 @@ const groupIcons: Record<string, ReactNode> = {
   elements: <ElementsIcon />,
   surfaces: <SurfacesIcon />,
   components: <ComponentsIcon />,
+  game: <GameIcon />,
   references: <ReferencesIcon />,
 };
 

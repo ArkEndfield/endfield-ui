@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { FLIP_LIMIT } from "../../hooks/useFlip";
 import { stubAnimations } from "../../test/animations";
@@ -359,6 +359,26 @@ describe("TagInput", () => {
     await finish();
     expect(screen.queryByText("管廊")).not.toBeInTheDocument();
     expect(tags()).toEqual(["北岭", "泵站"]);
+  });
+
+  it("删赶在上一次渲染的副作用前面：焦点照样落到旁边那个", () => {
+    // 不是按键引起的渲染（前一块淡出完卸载、使用方重画），副作用晚一拍才跑；这一拍里又删了一块，
+    // React 先把那一份补跑——它看到的还是删之前的那一排。
+    // 在上一次提交收尾的地方删，把这个先后固定下来
+    function Racing({ remove }: { remove?: string }) {
+      useLayoutEffect(() => {
+        // 脚本里的 click() 和回车、空格一样（detail 是 0）：焦点留在小块这一排
+        if (remove) {
+          screen.getByRole("button", { name: `移除${remove}` }).click();
+        }
+      }, [remove]);
+      return <Example defaultValue={["北岭", "管廊", "二号线"]} />;
+    }
+    const { rerender } = render(<Racing />);
+
+    rerender(<Racing remove="北岭" />);
+    expect(tags()).toEqual(["管廊", "二号线"]);
+    expect(screen.getByRole("button", { name: "移除管廊" })).toHaveFocus();
   });
 
   it("删了马上又加回来：还是一个标签，不会被当成走着的拿掉", async () => {

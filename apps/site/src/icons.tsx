@@ -43,6 +43,15 @@ export const ComponentsIcon = createIcon(
   </>,
 );
 
+/** Game 实机风格：一颗圆角的钮，里面一个圆片 */
+export const GameIcon = createIcon(
+  "GameIcon",
+  <>
+    <rect x="3" y="7" width="18" height="10" rx="5" />
+    <circle cx="16" cy="12" r="2.5" />
+  </>,
+);
+
 /** 依据：一把尺 */
 export const ReferencesIcon = createIcon(
   "ReferencesIcon",

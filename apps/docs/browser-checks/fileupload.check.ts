@@ -258,6 +258,37 @@ test("移除之后焦点有去处：下一行的移除钮，一个不剩回到�
   );
 });
 
+test("上一行收完卸载的那一刻又移除一行：焦点照样有去处，不掉到页面上", async () => {
+  const { page } = storybook;
+  await page.story("控件-fileupload-文件上传--with-files");
+  // 行卸载的那一次渲染不是点击引起的，它的副作用晚一拍才跑。第二下移除落在这一拍里时，
+  // 挪焦点的那一步曾经被上一次渲染补跑的副作用抢先用掉——它看到的还是移除之前的页面，
+  // 焦点留在马上要收起的那一行上，随后掉到 body（放慢跑上面那一条时偶发过）。
+  // 不赌时机：在页面里盯着第一行被拿掉，当场点第二行
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve, reject) => {
+        const list = document.querySelector("#storybook-root ul[aria-label]")!;
+        const [first, second] =
+          list.querySelectorAll<HTMLElement>("[data-file-remove]");
+        new MutationObserver((records, observer) => {
+          if (!records.some((record) => record.removedNodes.length > 0)) return;
+          observer.disconnect();
+          second!.click();
+          resolve();
+        }).observe(list, { childList: true });
+        setTimeout(() => reject(new Error("第一行一直没有卸载")), 5000);
+        first!.focus();
+        first!.click();
+      }),
+  );
+  await page.waitFocused("input:交接附件", "一个不剩时焦点应该回到投放区");
+  await page.waitFor(
+    async () => (await names(page)).length === 0,
+    "移除的那一行收完之后，列表里应该一行都不剩",
+  );
+});
+
 test("只收一个：再放一个替掉原来的", async () => {
   const { page } = storybook;
   await page.story("控件-fileupload-文件上传--single");

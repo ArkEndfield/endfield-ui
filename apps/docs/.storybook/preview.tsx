@@ -1,6 +1,8 @@
 import type { Decorator, Preview } from "@storybook/react-vite";
 import { useEffect, type ReactNode } from "react";
 import "./preview.css";
+// Game 实机风格的样式是单独的一份，和使用方一样排在主样式后面引
+import "@endfield-ui/react/game.css";
 
 type ThemeMode = "light" | "dark" | "both";
 
@@ -25,11 +27,23 @@ function ThemeFrame({
     document.documentElement.dataset.theme = mode === "dark" ? "dark" : "light";
   }, [mode]);
 
+  // 文档页里窄于 640px 时内边距收到 16px：手机上演示区是通栏的（见 preview.css），
+  // 这样 story 和页面上的文字左边缘对齐。单独的画布不动
+  const padding = fill ? "p-6" : "p-4 sm:p-6";
+
   if (mode !== "both") {
     // 文字色显式写在外壳上，不只靠 body 继承：主题是挂载后才写到 <html> 上的，
-    // 无头浏览器截图时继承来的颜色偶尔停在切换前
+    // 无头浏览器截图时继承来的颜色偶尔停在切换前。
+    // 底色也写在外壳上：文档页里 story 外面套着 Storybook 自己的白底容器，
+    // 盖住了 body 的底色，只切暗色时就成了白底上的浅色字
     return (
-      <div className={bleed ? "text-ink" : "p-6 text-ink"}>{children}</div>
+      <div
+        className={
+          bleed ? "bg-surface text-ink" : `bg-surface ${padding} text-ink`
+        }
+      >
+        {children}
+      </div>
     );
   }
 
@@ -40,7 +54,11 @@ function ThemeFrame({
       }
     >
       {(["light", "dark"] as const).map((theme) => (
-        <div key={theme} data-theme={theme} className="bg-surface p-6 text-ink">
+        <div
+          key={theme}
+          data-theme={theme}
+          className={`bg-surface ${padding} text-ink`}
+        >
           <p className="mb-4 font-tech text-xs text-ink-tertiary uppercase">
             {`// ${theme}`}
           </p>
@@ -98,7 +116,18 @@ const preview: Preview = {
     layout: "fullscreen",
     controls: { expanded: true },
     options: {
-      storySort: { order: ["示例", "控件", "母题"] },
+      // Game 实机风格排在最后：它是独立入口的一类，自己的示例收在自己下面。
+      // 顶上“示例”里另有一页“实机风格”，排在那一组的末尾
+      storySort: {
+        order: [
+          "示例",
+          ["*", "实机风格"],
+          "控件",
+          "母题",
+          "Game 实机风格",
+          ["示例", "*"],
+        ],
+      },
     },
   },
   tags: ["autodocs"],

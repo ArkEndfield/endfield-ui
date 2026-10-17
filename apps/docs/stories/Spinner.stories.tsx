@@ -52,12 +52,13 @@ export const InRows: Story = {
   ),
 };
 
+/* 外层是 div 不是 p：进度环的根元素是 div，放进 p 里是不合法的嵌套 */
 export const Ring: Story = {
   name: "圆环形的",
   render: () => (
-    <p className="flex items-center gap-2 text-sm text-ink-secondary">
+    <div className="flex items-center gap-2 text-sm text-ink-secondary">
       <ProgressRing size={16} aria-label="加载中" />
       圆环形的行内加载用 16px 的进度环
-    </p>
+    </div>
   ),
 };

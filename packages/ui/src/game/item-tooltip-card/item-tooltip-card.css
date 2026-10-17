@@ -1,0 +1,404 @@
+/* 物品提示固定使用游戏灰色与稀有度配色，不随站点主题翻转。 */
+.ef-item-tooltip-card {
+  --ef-game-item-tooltip-rarity: #9b9b9b;
+  container-type: inline-size;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 2px;
+  background: #cdcdcb;
+  color: #555651;
+  font-family: "HarmonyOS Sans SC", "HarmonyOS Sans", sans-serif;
+  font-weight: 500;
+  font-synthesis: none;
+  text-align: left;
+  color-scheme: light;
+  box-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 10%),
+    0 8px 10px -6px rgb(0 0 0 / 10%);
+}
+
+.ef-item-tooltip-card[data-rarity="2"] {
+  --ef-game-item-tooltip-rarity: #abce42;
+}
+
+.ef-item-tooltip-card[data-rarity="3"] {
+  --ef-game-item-tooltip-rarity: #26bbfd;
+}
+
+.ef-item-tooltip-card[data-rarity="4"] {
+  --ef-game-item-tooltip-rarity: #9452fa;
+}
+
+.ef-item-tooltip-card[data-rarity="5"] {
+  --ef-game-item-tooltip-rarity: #ffbb03;
+}
+
+.ef-item-tooltip-card[data-rarity="6"] {
+  --ef-game-item-tooltip-rarity: #ff7100;
+}
+
+.ef-item-tooltip-card *,
+.ef-item-tooltip-card *::before,
+.ef-item-tooltip-card *::after {
+  box-sizing: border-box;
+}
+
+.ef-item-tooltip-card p,
+.ef-item-tooltip-card h2,
+.ef-item-tooltip-card h3 {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.ef-item-tooltip-card a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ef-item-tooltip-card__header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  overflow: hidden;
+  padding: 8px 20px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--ef-game-item-tooltip-rarity) 78%, #303234) 0%,
+    color-mix(in srgb, var(--ef-game-item-tooltip-rarity) 78%, #4b415a) 45%,
+    color-mix(in srgb, var(--ef-game-item-tooltip-rarity) 78%, #8e8b85) 100%
+  );
+  color: #fff;
+}
+
+.ef-item-tooltip-card__header h2 {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.ef-item-tooltip-card__header-texture {
+  position: absolute;
+  inset: 0;
+  background: var(--ef-game-item-tooltip-header, url("./assets/header.webp"))
+    center / 100% 100% no-repeat;
+  opacity: 0.78;
+  pointer-events: none;
+}
+
+.ef-item-tooltip-card__detail-link {
+  position: relative;
+  flex-shrink: 0;
+  border-radius: 2px;
+  transition: opacity 150ms;
+}
+
+.ef-item-tooltip-card__detail-link-icon {
+  display: block;
+  width: 32px;
+  height: 32px;
+  background: var(--ef-game-item-tooltip-link-icon, url("./assets/link.webp"))
+    center / contain no-repeat;
+  pointer-events: none;
+}
+
+.ef-item-tooltip-card__detail-link:hover {
+  opacity: 0.75;
+}
+
+.ef-item-tooltip-card__detail-link:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.ef-item-tooltip-card__body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 256px;
+  background: #2e3234;
+}
+
+.ef-item-tooltip-card__detail-texture {
+  position: absolute;
+  inset: 60px 0 0;
+  border: solid transparent;
+  border-width: 126px 5px 0;
+  border-image-source: var(
+    --ef-game-item-tooltip-detail,
+    url("./assets/detail.png")
+  );
+  border-image-slice: 222 8 14 8 fill;
+  border-image-repeat: stretch;
+  filter: brightness(1.1);
+  pointer-events: none;
+}
+
+.ef-item-tooltip-card__hero {
+  position: relative;
+  min-height: 160px;
+  padding: 8px 20px 0;
+}
+
+.ef-item-tooltip-card__category {
+  position: relative;
+  z-index: 1;
+  max-width: 58%;
+  color: #aeb1aa;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.ef-item-tooltip-card__marker {
+  display: block;
+  width: 80px;
+  height: 40px;
+  margin-top: 12px;
+  border-left: 2px solid #72756e;
+  opacity: 0.35;
+}
+
+.ef-item-tooltip-card__barcode {
+  display: block;
+  width: 96px;
+  height: 6px;
+  margin-top: 4px;
+  background: repeating-linear-gradient(
+    90deg,
+    #aeb1aa 0 5px,
+    transparent 5px 7px
+  );
+  opacity: 0.35;
+}
+
+.ef-item-tooltip-card .ef-item-tooltip-card__icon {
+  position: absolute;
+  top: -36px;
+  right: 8px;
+  width: 176px;
+  height: 176px;
+  filter: drop-shadow(0 4px 4px rgb(0 0 0 / 15%));
+  pointer-events: none;
+}
+
+.ef-item-tooltip-card__icon img {
+  pointer-events: none;
+}
+
+.ef-item-tooltip-card__color-strip {
+  position: absolute;
+  top: 8px;
+  right: 0;
+  width: 4px;
+  height: 48px;
+  background: linear-gradient(
+    180deg,
+    #00ffa2 0 33.333%,
+    #ff00f0 33.333% 66.667%,
+    #fffa00 66.667% 100%
+  );
+  pointer-events: none;
+}
+
+.ef-item-tooltip-card__text {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 20px 12px;
+  font-size: 14px;
+  line-height: 1.375;
+  white-space: pre-wrap;
+}
+
+.ef-item-tooltip-card__description {
+  color: #70716d;
+}
+
+.ef-item-tooltip-card__obtain-title {
+  padding: 6px 20px;
+  border-top: 2px solid #a4a5a1;
+  background: #bdbebb;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.ef-item-tooltip-card__obtain-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ef-item-tooltip-card__obtain-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 8px 20px;
+  border-top: 1px solid #a4a5a1;
+  background: #f6f5f3;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+a.ef-item-tooltip-card__obtain-row {
+  transition: background-color 150ms;
+}
+
+a.ef-item-tooltip-card__obtain-row:hover {
+  background: #e3e4df;
+}
+
+a.ef-item-tooltip-card__obtain-row:focus-visible {
+  outline: 2px solid #525350;
+  outline-offset: -2px;
+}
+
+.ef-item-tooltip-card__obtain-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.ef-item-tooltip-card__obtain-icon img {
+  filter: brightness(0);
+  opacity: 0.65;
+}
+
+.ef-item-tooltip-card__obtain-icon svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.ef-item-tooltip-card__obtain-name {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.ef-item-tooltip-card__chevrons {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: #a1a39d;
+}
+
+.ef-item-tooltip-card__obtain-hint {
+  padding: 8px 20px;
+  border-top: 1px solid #a4a5a1;
+  font-size: 14px;
+}
+
+@container (max-width: 319px) {
+  .ef-item-tooltip-card .ef-item-tooltip-card__icon {
+    width: min(176px, 55cqw);
+    height: min(176px, 55cqw);
+  }
+
+  .ef-item-tooltip-card__category {
+    max-width: max(48px, calc(100cqw - min(176px, 55cqw) - 28px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ef-item-tooltip-card a {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .ef-item-tooltip-card {
+    border: 1px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+    box-shadow: none;
+  }
+
+  .ef-item-tooltip-card__header,
+  .ef-item-tooltip-card__body,
+  .ef-item-tooltip-card__obtain-title,
+  .ef-item-tooltip-card__obtain-row {
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .ef-item-tooltip-card__header-texture,
+  .ef-item-tooltip-card__detail-texture,
+  .ef-item-tooltip-card__marker,
+  .ef-item-tooltip-card__barcode,
+  .ef-item-tooltip-card__color-strip {
+    display: none;
+  }
+
+  .ef-item-tooltip-card__category,
+  .ef-item-tooltip-card__description,
+  .ef-item-tooltip-card__chevrons {
+    color: CanvasText;
+  }
+
+  .ef-item-tooltip-card__detail-link-icon {
+    background: ButtonText;
+    mask: var(--ef-game-item-tooltip-link-icon, url("./assets/link.webp"))
+      center / contain no-repeat;
+  }
+}
+
+/*
+ * 关掉官方图片：标题纹理不画；正文底图换成代码画的渐变（上面透明、往下变成浅灰，
+ * 文字压在浅灰上）；详情入口换成代码画的一个箭头。
+ */
+.ef-item-tooltip-card__header-texture:is(
+  [data-ef-game-images="off"],
+  [data-ef-game-images="off"] *
+) {
+  display: none;
+  background: none;
+}
+.ef-item-tooltip-card__detail-texture:is(
+  [data-ef-game-images="off"],
+  [data-ef-game-images="off"] *
+) {
+  border: 0;
+  border-image: none;
+  border-radius: 0 0 4px 4px;
+  background: linear-gradient(to bottom, transparent, #cdcdcb 126px);
+}
+.ef-item-tooltip-card__detail-link-icon:is(
+  [data-ef-game-images="off"],
+  [data-ef-game-images="off"] *
+) {
+  background: none;
+  border: 2px solid currentColor;
+  border-radius: 2px;
+}
+.ef-item-tooltip-card__detail-link-icon:is(
+    [data-ef-game-images="off"],
+    [data-ef-game-images="off"] *
+  )::before {
+  display: block;
+  width: 10px;
+  height: 10px;
+  margin: 9px 0 0 6px;
+  border: solid currentColor;
+  border-width: 2px 2px 0 0;
+  transform: rotate(45deg);
+  content: "";
+}
+@media (forced-colors: active) {
+  .ef-item-tooltip-card__detail-link-icon:is(
+    [data-ef-game-images="off"],
+    [data-ef-game-images="off"] *
+  ) {
+    background: none;
+    mask: none;
+  }
+}

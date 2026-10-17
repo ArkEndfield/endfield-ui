@@ -1,0 +1,463 @@
+.ef-animated-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay, 300);
+  background: rgb(0 0 0 / 20%);
+}
+
+.ef-animated-dialog-viewport {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay, 300);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.ef-animated-dialog {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 768px;
+  max-width: 100%;
+  max-height: 100%;
+  min-width: 0;
+  min-height: 0;
+  outline: none;
+  color: #191919;
+  font-family: var(--font-sans, inherit);
+  isolation: isolate;
+}
+
+.ef-animated-dialog[hidden],
+.ef-animated-dialog-viewport[hidden],
+.ef-animated-dialog-backdrop[hidden] {
+  display: none;
+}
+
+.ef-animated-dialog__header {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.ef-animated-dialog__top-strip {
+  display: flex;
+  align-items: stretch;
+  width: 348px;
+  max-width: 100%;
+  height: 15px;
+  transform-origin: left;
+}
+
+.ef-animated-dialog__yellow-block {
+  flex: 0 0 51px;
+  background: #ffff21;
+}
+
+.ef-animated-dialog__top-deco {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 0;
+  padding-inline: 4px;
+  background: #999;
+  color: #363636;
+}
+
+.ef-animated-dialog__top-deco > svg {
+  width: auto;
+  height: 10px;
+  fill: currentColor;
+  font-family: "Outfit";
+  font-weight: 700;
+}
+
+.ef-animated-dialog__top-deco > .ef-animated-dialog__plus {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  fill: none;
+}
+
+.ef-animated-dialog__title-band {
+  position: relative;
+  display: flex;
+  gap: 24px;
+  height: 63px;
+  overflow: hidden;
+  background: #363636;
+}
+
+.ef-animated-dialog__icon-slot {
+  display: flex;
+  flex: 0 0 79px;
+  justify-content: center;
+  align-items: center;
+  background: #484848;
+  color: #d3d3d3;
+  font-size: 24px;
+}
+
+.ef-animated-dialog__icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ef-animated-dialog__title {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+  margin: 0;
+  padding-right: 40px;
+  overflow: hidden;
+  color: #fff;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.ef-animated-dialog__title-deco {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgb(255 255 255 / 5%);
+  font-family: "Outfit";
+  font-size: 144px;
+  font-weight: 700;
+  letter-spacing: -14px;
+  pointer-events: none;
+}
+
+.ef-animated-dialog__title > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ef-animated-dialog__close-motion {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+}
+
+.ef-animated-dialog__close {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: #ffff21;
+  color: #363636;
+  cursor: pointer;
+}
+
+.ef-animated-dialog__close > svg {
+  width: 24px;
+  height: 24px;
+}
+
+.ef-animated-dialog__close:hover {
+  background: #eeea00;
+}
+
+.ef-animated-dialog__close:active {
+  background: #e6de01;
+}
+
+.ef-animated-dialog__close[aria-disabled="true"] {
+  cursor: progress;
+}
+
+/*
+ * 焦点环画两圈：里圈墨色贴着黄钮，外圈白色。按钮探出面板的右上角，环的上、右两边
+ * 压在遮罩上，另外两边压在深灰的标题带上——页面是暗色时这两处都是深的，只有墨色
+ * 那一圈就看不见。高对比模式下阴影不画，剩外圈，颜色由系统换。
+ */
+.ef-animated-dialog__close:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 3px #191919;
+}
+
+.ef-animated-dialog__separator {
+  position: relative;
+  z-index: 1;
+  height: 6px;
+  transform-origin: left;
+  background: linear-gradient(90deg, #ffff1b 50%, #d3d3d3 50%);
+  filter: drop-shadow(0 0 3px rgb(0 0 0 / 50%));
+}
+
+.ef-animated-dialog__separator::after {
+  position: absolute;
+  bottom: -8px;
+  left: 52px;
+  display: block;
+  box-sizing: content-box;
+  border-top: 12px solid #ffff1b;
+  border-inline: 12px solid transparent;
+  content: "";
+}
+
+.ef-animated-dialog__content {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  background-color: #fff;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 2px,
+    #ccc2 2px,
+    #ccc2 3px
+  );
+}
+
+.ef-animated-dialog__body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.ef-animated-dialog__description {
+  margin: 24px 24px 16px;
+  color: #626262;
+}
+
+.ef-animated-dialog__registration {
+  position: absolute;
+  bottom: 0;
+  right: 20.4px;
+  width: min(240px, calc(100% - 40.8px));
+  height: 4px;
+  transform-origin: right;
+  background: linear-gradient(
+    90deg,
+    #00ffa2 42.5%,
+    #ffff21 42.5%,
+    #ffff21 79.2%,
+    #ff00f0 79.2%
+  );
+}
+
+.ef-animated-dialog__footer {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 15px;
+  margin-right: 36px;
+  padding-inline: 16px;
+  transform-origin: left;
+  background: #ababab;
+}
+
+.ef-animated-dialog__footer-square {
+  width: 8px;
+  height: 8px;
+  background: #838383;
+}
+
+.ef-animated-dialog__footer-outline {
+  width: 8px;
+  height: 8px;
+  margin-left: 2px;
+  border: 1px solid #838383;
+  mask-image: linear-gradient(
+    #fff 2px,
+    transparent 2px,
+    transparent 6px,
+    #fff 6px
+  );
+}
+
+.ef-animated-dialog__footer-hatch {
+  width: 48px;
+  height: 8px;
+  margin-left: 4px;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 1px,
+    #838383 1px,
+    #838383 2px
+  );
+}
+
+.ef-animated-dialog[data-open] {
+  animation: ef-animated-dialog-enter 150ms ease-out both;
+}
+
+.ef-animated-dialog[data-open] .ef-animated-dialog__top-strip {
+  animation: ef-animated-dialog-strip-enter 120ms ease-out both;
+}
+
+.ef-animated-dialog[data-open] .ef-animated-dialog__footer {
+  animation: ef-animated-dialog-strip-enter 120ms ease-out 50ms both;
+}
+
+.ef-animated-dialog[data-open] .ef-animated-dialog__icon {
+  animation: ef-animated-dialog-scale-enter 200ms
+    cubic-bezier(0.33, 1.53, 0.69, 0.99) 100ms both;
+}
+
+.ef-animated-dialog[data-open] .ef-animated-dialog__close-motion {
+  animation: ef-animated-dialog-scale-enter 200ms
+    cubic-bezier(0.33, 1.53, 0.69, 0.99) 200ms both;
+}
+
+.ef-animated-dialog[data-open] .ef-animated-dialog__registration {
+  animation: ef-animated-dialog-strip-enter 150ms ease-out 100ms both;
+}
+
+.ef-animated-dialog[data-open] .ef-animated-dialog__separator {
+  animation: ef-animated-dialog-strip-enter 120ms ease-out 200ms both;
+}
+
+.ef-animated-dialog[data-ending-style] {
+  animation: ef-animated-dialog-exit 100ms ease-out 200ms both;
+}
+
+.ef-animated-dialog[data-ending-style] .ef-animated-dialog__top-strip {
+  animation: ef-animated-dialog-strip-exit 100ms ease-in 150ms both;
+}
+
+.ef-animated-dialog[data-ending-style] .ef-animated-dialog__footer {
+  animation: ef-animated-dialog-strip-exit 100ms ease-in 50ms both;
+}
+
+.ef-animated-dialog[data-ending-style] .ef-animated-dialog__icon {
+  animation: ef-animated-dialog-scale-exit 100ms ease-in both;
+}
+
+.ef-animated-dialog[data-ending-style] .ef-animated-dialog__close-motion {
+  animation: ef-animated-dialog-scale-exit 150ms ease-in both;
+}
+
+.ef-animated-dialog[data-ending-style] .ef-animated-dialog__registration {
+  animation: ef-animated-dialog-strip-exit 80ms ease-in both;
+}
+
+.ef-animated-dialog[data-ending-style] .ef-animated-dialog__separator {
+  animation: ef-animated-dialog-strip-exit 100ms ease-in 100ms both;
+}
+
+@keyframes ef-animated-dialog-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes ef-animated-dialog-exit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+@keyframes ef-animated-dialog-strip-enter {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes ef-animated-dialog-strip-exit {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes ef-animated-dialog-scale-enter {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes ef-animated-dialog-scale-exit {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ef-animated-dialog,
+  .ef-animated-dialog
+    :is(
+      .ef-animated-dialog__top-strip,
+      .ef-animated-dialog__footer,
+      .ef-animated-dialog__icon,
+      .ef-animated-dialog__close-motion,
+      .ef-animated-dialog__registration,
+      .ef-animated-dialog__separator
+    ) {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  /* 遮罩和各层底色都被系统换成页面色：面板要靠一圈线才和页面分得开 */
+  .ef-animated-dialog {
+    border: 1px solid CanvasText;
+    background: Canvas;
+  }
+  /*
+   * 装饰都拿掉。镂空的大字平时是 5% 的白，系统会把它换成实心的字色，压在标题上；
+   * 分隔条的小箭头、页脚的小方框是用边线画的，底色没了之后只剩几个孤零零的白块。
+   */
+  .ef-animated-dialog__top-strip,
+  .ef-animated-dialog__title-deco,
+  .ef-animated-dialog__separator,
+  .ef-animated-dialog__registration,
+  .ef-animated-dialog__footer {
+    display: none;
+  }
+  .ef-animated-dialog__content {
+    background: Canvas;
+    color: CanvasText;
+  }
+  .ef-animated-dialog__title-band {
+    background: Canvas;
+    border: 1px solid CanvasText;
+  }
+  .ef-animated-dialog__title {
+    color: CanvasText;
+  }
+  .ef-animated-dialog__close {
+    background: ButtonFace;
+    color: ButtonText;
+    border: 1px solid ButtonText;
+  }
+}

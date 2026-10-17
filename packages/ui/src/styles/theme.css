@@ -374,6 +374,7 @@
   --animate-turn-in: ef-turn-in 300ms ease-out both;
   --animate-fade-in: ef-fade-in 300ms ease-out both;
   --animate-indeterminate: ef-indeterminate 1.2s linear infinite alternate;
+  --animate-indeterminate-y: ef-indeterminate-y 1.2s linear infinite alternate;
   --animate-pulse: ef-pulse 2s ease-in-out infinite;
   --animate-bracket-in: ef-bracket-in 200ms ease-out both;
   --animate-shift-in: ef-shift-in 300ms ease-out both;
@@ -507,6 +508,16 @@
     }
   }
 
+  /* 同上，竖着的轨道：开屏页贴左缘的那根条 */
+  @keyframes ef-indeterminate-y {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(150%);
+    }
+  }
+
   /* 骨架：很轻的明度往返，不是扫光 */
   @keyframes ef-pulse {
     0%,
@@ -608,6 +619,28 @@
   --color-success: var(--ef-success);
   --color-warning: var(--ef-warning);
   --color-info: var(--ef-info);
+}
+
+/* ------------------------------------------------------------------ */
+/* 开屏页的进度                                                         */
+/* ------------------------------------------------------------------ */
+
+/*
+ * SplashScreen 把进度写成根上的这两个变量，注册成数值之后才能过渡：条长、读数的位置、
+ * 底图的模糊都由第一个算，读数的数字是第二个（整数，经计数器显示）。两个一起过渡，
+ * 所以这四样天然同拍，半路改值也是从当前的位置折过去。
+ * 不认 @property 的浏览器里它们只是普通变量：值照样对，只是不补间、直接到位。
+ */
+@property --ef-splash-progress {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --ef-splash-percent {
+  syntax: "<integer>";
+  inherits: true;
+  initial-value: 0;
 }
 
 /* ------------------------------------------------------------------ */
