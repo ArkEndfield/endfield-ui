@@ -180,6 +180,8 @@ function ToastHost({ placement, label, closeLabel, children }: ToastHostProps) {
                   "pointer-events-auto absolute left-1/2 w-max max-w-full",
                   // 暗色页面上黑底和页面只差一档，靠环境阴影分开
                   "bg-black/80 shadow-sm text-base leading-[1.4] text-white",
+                  // 高对比模式下系统把阴影关掉、底色换成页面色，提示就没有边界了：补一圈线
+                  "forced-colors:border forced-colors:border-[CanvasText]",
                   // 三样各走各的：淡入淡出 200ms；进场的位移 300ms；没划够就松手，滑回原位 200ms。
                   // 拖动中基元把过渡整个关掉，位置贴着手指
                   "transition-[opacity,translate,transform] duration-[var(--duration-fast),var(--duration-base),var(--duration-fast)] ease-[var(--ease-standard),var(--ease-exit),var(--ease-standard)]",

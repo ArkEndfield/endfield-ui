@@ -2046,3 +2046,41 @@ test("分页条：条有一圈线，两端的方钮各有一圈；到头而禁�
     "翻到第二页：上一页的线应该变回来",
   );
 });
+
+test("轻提示：没有阴影、底色也换成了页面色，要有一圈 CanvasText 的线才看得出边界", async () => {
+  const { page } = storybook;
+  await open(page, "控件-toast-轻提示--open-action");
+  const TOAST = "[role=region] :is([role=dialog], [role=alertdialog])";
+  await page.waitVisible(TOAST);
+  await page.settled();
+
+  // 四边都是 1px。声明写的是系统色关键字（作者写的普通颜色在计算样式里原样，和探针对不上）
+  const widths = await page.evaluate((css) => {
+    const style = getComputedStyle(document.querySelector(css)!);
+    return [
+      style.borderTopWidth,
+      style.borderRightWidth,
+      style.borderBottomWidth,
+      style.borderLeftWidth,
+    ];
+  }, TOAST);
+  assert.deepEqual(widths, ["1px", "1px", "1px", "1px"], "四边都该有 1px 的线");
+  await declares(page, TOAST, "borderLeftColor", "CanvasText");
+
+  // 画出来的：提示水平居中、位置带小数，左边线会被抗锯齿抹在相邻两列上，取不到一个整色。
+  // 外面和里面都是页面色（底色被系统换掉了），所以左缘前后几列里只要有一列不是页面色，
+  // 就是画了线；没有线就一列也不会不同
+  const canvas = await painted(page, "Canvas");
+  const left = await page.evaluate((css) => {
+    const rect = document.querySelector(css)!.getBoundingClientRect();
+    return { x: rect.left + scrollX, y: rect.top + rect.height / 2 + scrollY };
+  }, TOAST);
+  await page.waitFor(async () => {
+    for (const dx of [-1, 0, 1, 2]) {
+      if ((await pixel(page, { x: left.x + dx, y: left.y })) !== canvas) {
+        return true;
+      }
+    }
+    return false;
+  }, "提示的左缘应该画着一条线，不是页面色");
+});

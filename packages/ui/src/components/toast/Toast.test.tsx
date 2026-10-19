@@ -49,6 +49,11 @@ describe("Toast", () => {
     // 黑底白字不随主题变
     expect(root).toHaveAttribute("data-theme", "dark");
     expect(root).toHaveClass("bg-black/80", "text-white");
+    // 高对比模式下阴影不画、底色换成页面色：靠一圈系统字色的线才有边界
+    expect(root).toHaveClass(
+      "forced-colors:border",
+      "forced-colors:border-[CanvasText]",
+    );
   });
 
   it("位置和划走的位移写在 transform 上：拖动时基元用内联的 transform 接管的就是它", async () => {
