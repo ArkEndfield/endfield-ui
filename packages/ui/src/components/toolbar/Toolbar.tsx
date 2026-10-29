@@ -45,7 +45,8 @@ export type ToolbarProps = Omit<
 /* 带子的总高和输入框同档：2px 的内边距（描边时是 1px 的边 + 1px）加里面的钮 */
 const barVariant: Record<ToolbarVariant, string> = {
   sunken: "bg-surface-sunken p-0.5",
-  outline: "border border-line-strong bg-surface p-px",
+  // 描边款只留线、不带底：实体底和整圈边框不能同时在（2026-10-29 整改口径）
+  outline: "border border-line-strong bg-transparent p-px",
 };
 
 /*

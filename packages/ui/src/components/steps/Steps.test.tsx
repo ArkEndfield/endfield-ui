@@ -57,7 +57,9 @@ describe("Steps", () => {
     );
     expect(node(done!).querySelector("svg")).not.toBeNull();
 
-    expect(node(current!)).toHaveClass("bg-action", "border-ink");
+    // 实体色块不描边：当前节点只有黄块和序号，没有墨圈
+    expect(node(current!)).toHaveClass("bg-action");
+    expect(node(current!)).not.toHaveClass("border-ink");
     expect(node(current!)).toHaveTextContent("02");
 
     expect(node(upcoming!)).toHaveClass("border-line-strong");

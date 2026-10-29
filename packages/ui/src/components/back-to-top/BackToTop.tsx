@@ -110,11 +110,17 @@ export function BackToTop({
         "inline-flex shrink-0 items-center justify-center shadow-md",
         // 反转填充：浮在任意内容上，两个主题下都和页面拉得开
         "bg-surface-inverse text-ink-inverse hover:bg-action hover:text-on-action active:bg-action-pressed active:text-on-action",
-        "transition-[opacity,visibility,background-color,color] duration-(--duration-fast) ease-standard",
+        // 动效：原来只有透明度/可见性，现加 8px 纵向位移（--motion-shift-lg，
+        // 贴视口边缘的大面积浮层档），从下方滑入、只淡出方向不回滑。
+        // 进出不对称：出现（data-visible）300ms，消失 200ms；
+        // transform/opacity 均为合成器友好属性，不触发布局。
+        "transition-[opacity,visibility,transform,background-color,color] duration-(--duration-fast) data-visible:duration-(--duration-base) ease-standard motion-reduce:transition-none",
         focusRing,
         sizeClass[size],
         // 没出现时 visibility 是 hidden：Tab 到不了，读屏也读不到
-        visible ? "visible opacity-100" : "invisible opacity-0",
+        visible
+          ? "visible translate-y-0 opacity-100"
+          : "invisible translate-y-2 opacity-0",
         className,
       )}
     >

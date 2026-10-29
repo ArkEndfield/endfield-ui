@@ -173,10 +173,11 @@ const nodeSize: Record<StepsSize, string> = {
 const nodeClass: Record<StepStatus, string> = {
   // 墨底黄勾：和选中的复选框是同一个逻辑
   done: "bg-surface-inverse text-accent-ink-inverse forced-colors:bg-[CanvasText] forced-colors:text-[Canvas]",
-  // 描一圈最细的线：黄色对白底立不住。颜色跟着文字走，暗色下是近白。
+  // 实体色块不描边：黄块加序号已经立得住，再围一圈墨线只会显脏（2026-10-29 整改口径，
+  // 和时间线的当前节点一致）。
   // 序号是字，压在"选中"色上要关掉系统的接管（不然字后面会垫一块页面色），边线跟着自己写
   current:
-    "border border-ink bg-action font-bold text-on-action forced-colors:forced-color-adjust-none forced-colors:border-[Highlight] forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]",
+    "bg-action font-bold text-on-action forced-colors:forced-color-adjust-none forced-colors:border-[Highlight] forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]",
   upcoming: "border border-line-strong text-ink-secondary",
 };
 

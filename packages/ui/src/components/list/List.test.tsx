@@ -31,7 +31,9 @@ describe("List variant=band", () => {
     expect(list).not.toHaveClass("divide-y");
     for (const row of screen.getAllByRole("listitem")) {
       expect(row).toHaveAttribute("data-theme", "dark");
-      expect(row.firstElementChild).toHaveClass("bg-surface", "border-line");
+      // 行带不围边框：靠底色和行间的缝分开
+      expect(row.firstElementChild).toHaveClass("bg-surface");
+      expect(row.firstElementChild).not.toHaveClass("border-line");
     }
   });
 

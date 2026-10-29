@@ -63,6 +63,24 @@ describe("Timeline", () => {
     expect(past!.axis).toHaveClass("forced-colors:bg-[CanvasText]");
   });
 
+  it("线条流动：已过那一段的轴充满墨色，当前和未到的不充；当前节点是无边框的黄块", () => {
+    renderTimeline();
+    const [past, current, upcoming] = screen
+      .getAllByRole("listitem")
+      .map((item) => {
+        const rail = item.firstElementChild!;
+        return {
+          node: rail.firstElementChild!.firstElementChild!,
+          axis: rail.lastElementChild!,
+        };
+      });
+    expect(past!.axis).toHaveClass("before:scale-y-100");
+    expect(current!.axis).toHaveClass("before:scale-y-0");
+    expect(upcoming!.axis).toHaveClass("before:scale-y-0");
+    expect(current!.node).toHaveClass("bg-action");
+    expect(current!.node).not.toHaveClass("border-ink");
+  });
+
   it("节点与轴线是装饰，对读屏隐藏", () => {
     renderTimeline();
     const first = screen.getAllByRole("listitem")[0]!;

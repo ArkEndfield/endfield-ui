@@ -103,7 +103,8 @@ describe("Input", () => {
     rerender(<Input aria-label="代号" variant="outline" />);
     box = screen.getByRole("textbox").parentElement;
     expect(box).toHaveAttribute("data-variant", "outline");
-    expect(box).toHaveClass("border", "bg-surface");
+    // outline 只留描边、透明底：实体底和整圈边框不能同时在
+    expect(box).toHaveClass("border", "bg-transparent");
     expect(box).not.toHaveClass("border-b-2", "bg-surface-sunken");
   });
 

@@ -61,7 +61,8 @@ export type SegmentedControlProps = Omit<
 
 const track: Record<SegmentedControlVariant, string> = {
   sunken: "border-b-2 bg-surface-sunken",
-  outline: "border bg-surface",
+  // 描边款只留线、不带底：实体底和整圈边框不能同时在（2026-10-29 整改口径）
+  outline: "border bg-transparent",
 };
 
 /**

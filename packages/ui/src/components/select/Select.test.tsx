@@ -149,7 +149,7 @@ describe("Select", () => {
     rerender(
       <Select items={regions} aria-label="地区" size="sm" variant="outline" />,
     );
-    expect(box()).toHaveClass("h-8", "border", "bg-surface");
+    expect(box()).toHaveClass("h-8", "border", "bg-transparent");
   });
 
   it("自定义面板内容：分组与分隔线", async () => {

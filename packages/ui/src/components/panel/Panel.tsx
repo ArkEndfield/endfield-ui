@@ -2,12 +2,15 @@ import type { ComponentProps, ElementType, ReactNode } from "react";
 import { cn } from "../../lib/cn";
 
 export type PanelProps = ComponentProps<"div"> & {
-  /** 1px 描边，默认有。关掉后只靠底色差分层 */
+  /**
+   * 1px 描边，默认没有：实体底和整圈边框不能同时在（2026-10-29 整改口径），
+   * 默认只靠底色差分层；需要描边的场景显式打开。
+   */
   bordered?: boolean;
 };
 
 /** 围住一组信息的容器：直角、底色只比页面差一档、没有阴影。不要面板套面板。 */
-export function Panel({ bordered = true, className, ...props }: PanelProps) {
+export function Panel({ bordered = false, className, ...props }: PanelProps) {
   return (
     <div
       {...props}

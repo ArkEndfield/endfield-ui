@@ -26,7 +26,7 @@ export function MenuCheck({ checked, disabled = false }: MenuCheckProps) {
           "flex size-4 items-center justify-center border-2 transition-colors duration-(--duration-fast) ease-standard choice-diamond:size-3 choice-diamond:rotate-45",
           disabled
             ? [
-                "border-ink-disabled bg-surface-sunken text-ink-disabled",
+                "border-ink-disabled bg-transparent text-ink-disabled",
                 // 菱形方案里"已选"只靠实心表达，禁用了也要保持实心
                 checked &&
                   "choice-diamond:bg-ink-disabled forced-colors:choice-diamond:bg-[GrayText]",
@@ -34,7 +34,8 @@ export function MenuCheck({ checked, disabled = false }: MenuCheckProps) {
             : checked
               ? // 高对比模式下反转块没了：和复选框一样改用系统的"选中"色
                 "border-surface-inverse bg-surface-inverse text-accent-ink-inverse forced-colors:border-[Highlight] forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]"
-              : "border-line-strong bg-surface-sunken",
+              : // 未选只留描边、不带底：实体底和整圈边框不能同时在（2026-10-29 整改口径）
+                "border-line-strong bg-transparent",
         )}
       >
         {checked && (

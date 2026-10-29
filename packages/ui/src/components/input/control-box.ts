@@ -4,7 +4,8 @@ import { focusRingWithin } from "../../lib/focus-ring";
 /*
  * 输入框与多行文本共用的外框，直角，两种画法：
  * - `sunken` 凹陷的底 + 一条 2px 的底边线，默认；
- * - `outline` 四边 1px 的描边 + 页面底色，放在凹陷底色的区域里时用。
+ * - `outline` 四边 1px 的描边、透明底（不带实体底，见 2026-10-29 整改口径），
+ *   放在凹陷底色的区域里时用。
  * 状态靠边线说：默认灰 → 悬停深一档 → 错误红；聚焦另画一条墨线。
  */
 
@@ -38,7 +39,8 @@ const frame: Record<ControlVariant, string> = {
 
 const fill: Record<ControlVariant, string> = {
   sunken: "bg-surface-sunken",
-  outline: "bg-surface",
+  // 描边款只留线、不带底：实体底和整圈边框不能同时在（2026-10-29 整改口径）
+  outline: "bg-transparent",
 };
 
 /* 画在 `::before` 上：分段选择的 `::after` 是选中的那块底 */

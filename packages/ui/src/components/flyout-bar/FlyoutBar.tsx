@@ -64,7 +64,8 @@ export function FlyoutBar({
             // 固定的深色：里面的图标和焦点环都按深色底取值
             data-theme="dark"
             className={cn(
-              "flex h-(--anchor-height) min-h-10 items-stretch border border-line bg-surface-raised text-ink-secondary shadow-sm outline-none",
+              // 实体底不带整圈边框（2026-10-29 整改口径）：靠底色和阴影分层
+              "flex h-(--anchor-height) min-h-10 items-stretch bg-surface-raised text-ink-secondary shadow-sm outline-none",
               // 黄色竖条始终贴着触发按钮：翻到另一侧时跟着换边
               "data-[side=left]:border-r-4 data-[side=left]:border-r-action data-[side=right]:border-l-4 data-[side=right]:border-l-action",
               // 从触发按钮一侧拉开。用裁切而不是缩放——缩放会把图标压扁。

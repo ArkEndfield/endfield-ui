@@ -60,7 +60,8 @@ describe("FileUpload", () => {
     expect(screen.getByText("PDF 或图片，单个不超过 10 MB")).toHaveClass(
       "text-ink-secondary",
     );
-    expect(zone()).toHaveClass("border-dashed", "bg-surface-sunken");
+    // 投放区只留虚线框、透明底：实体底和整圈边框不能同时在
+    expect(zone()).toHaveClass("border-dashed", "bg-transparent");
   });
 
   it("选文件：列出来，每个文件一行，带扩展名和大小", async () => {

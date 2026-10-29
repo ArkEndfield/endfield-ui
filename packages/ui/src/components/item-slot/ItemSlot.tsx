@@ -123,9 +123,10 @@ export function ItemSlot({
 
   const faceClass = cn(
     // 卡面自己裁切：渐变、遮罩、角标都不许越界。焦点环画在它外面，不受影响
-    "absolute inset-0 block overflow-clip border border-line bg-surface-raised text-left text-ink",
+    // 实体底不带整圈边框（2026-10-29 整改口径）：卡面靠底色分层，选中另有角括号
+    "absolute inset-0 block overflow-clip bg-surface-raised text-left text-ink",
     interactive && [
-      "transition-colors duration-(--duration-fast) ease-standard hover:border-line-strong",
+      "transition-colors duration-(--duration-fast) ease-standard",
       focusRing,
       // 选中时让到角括号之外，两圈不重叠
       selected && "focus-visible:outline-offset-[6px]",

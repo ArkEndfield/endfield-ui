@@ -260,11 +260,12 @@ describe("OtpInput", () => {
     expect(group).toHaveAttribute("data-size", "lg");
     expect(group).toHaveAttribute("data-variant", "outline");
     expect(group).toHaveClass("justify-center");
+    // outline 外框和输入框族一致：只留描边、透明底
     expect(slots()[0]!.parentElement).toHaveClass(
       "h-14",
       "w-14",
       "border",
-      "bg-surface",
+      "bg-transparent",
     );
     expect(slots()[0]).toHaveClass("text-2xl");
   });

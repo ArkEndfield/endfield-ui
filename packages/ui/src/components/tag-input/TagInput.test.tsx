@@ -612,7 +612,7 @@ describe("TagInput", () => {
     expect(ref.current).toBe(input());
     expect(box()).toHaveClass("max-w-sm", "bg-surface-sunken", "min-h-10");
     rerender(<Example variant="outline" size="sm" />);
-    expect(box()).toHaveClass("border", "bg-surface", "min-h-8");
+    expect(box()).toHaveClass("border", "bg-transparent", "min-h-8");
     rerender(<Example size="lg" />);
     expect(box()).toHaveClass("min-h-14");
   });

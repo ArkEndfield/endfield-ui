@@ -14,7 +14,7 @@ export type MenuVariant = "plain" | "strong";
 export const MenuVariantContext = createContext<MenuVariant>("plain");
 
 /**
- * 面板：直角、1px 线、环境阴影；顶部一条半宽的行动色细条，展开时从 0 伸到一半宽。
+ * 面板：直角、无描边、环境阴影；顶部一条半宽的行动色细条，展开时从 0 伸到一半宽。
  *
  * 细条上挂一个朝下的小三角，和它是同一个伪元素裁出来的：条高 3px，三角露出 8×4px，
  * 中心距条的左端 32px（实机风格弹窗分隔条的一半大）。它是条上的记号，不指向触发处——
@@ -24,11 +24,12 @@ export const MenuVariantContext = createContext<MenuVariant>("plain");
  * 退场只淡出——位移只写在起点上。两个时长、两条缓动按属性一一对应
  */
 export const menuPanel = [
-  "relative min-w-40 border border-line bg-surface-raised py-1 text-ink shadow-sm outline-none",
+  // 实体底不带整圈边框（2026-10-29 整改口径）：靠底色和阴影和页面分开
+  "relative min-w-40 bg-surface-raised py-1 text-ink shadow-sm outline-none",
   "origin-(--transform-origin) transition-[opacity,translate] duration-[var(--duration-fast),var(--duration-base)] ease-[var(--ease-standard),var(--ease-exit)]",
   "data-ending-style:opacity-0 data-starting-style:opacity-0",
   enterFromSide,
-  "before:pointer-events-none before:absolute before:-top-px before:-left-px before:z-1 before:h-[7px] before:w-1/2 before:origin-left before:bg-action before:content-['']",
+  "before:pointer-events-none before:absolute before:top-0 before:left-0 before:z-1 before:h-[7px] before:w-1/2 before:origin-left before:bg-action before:content-['']",
   "before:[clip-path:polygon(0_0,100%_0,100%_3px,36px_3px,32px_100%,28px_3px,0_3px)]",
   "before:transition-transform before:duration-(--duration-base) before:ease-exit data-starting-style:before:scale-x-0",
   "forced-colors:before:hidden",

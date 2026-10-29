@@ -12,7 +12,8 @@ export const bandCanvas = "bg-surface-sunken p-3";
 export const bandGap = "gap-1.5";
 
 /**
- * 一条行带。带一圈 1px 的线：亮色页面上看不出来；
- * 暗色页面上画布是纯黑、行带是 #141414，靠它分开。
+ * 一条行带。不带边框（2026-10-29 整改口径）：行与行之间有 6px 的缝、画布从缝里
+ * 露出来；暗色页面上画布是纯黑、行带是 #141414，靠这点明度差和四周 12px 的
+ * 画布留白分开，不再围一圈线。
  */
-export const bandRow = "border border-line bg-surface text-ink";
+export const bandRow = "bg-surface text-ink";

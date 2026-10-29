@@ -112,8 +112,14 @@ export function Navigator({
               key={position}
               data-current={position === current ? "" : undefined}
               className={cn(
-                "col-start-1 row-start-1 truncate text-center",
-                position !== current && "invisible",
+                // 动效：切换条目时新名称 200ms 淡入（opacity，过渡只影响
+                // 透明度与可见性，不动布局）；旧名称仍用 invisible 立即隐藏，
+                // 避免新旧两行在 200ms 内重叠——这不是完整交叉淡入，是
+                // 有意取舍：淡入新项、立即隐藏旧项。
+                "col-start-1 row-start-1 truncate text-center transition-[opacity,visibility] duration-(--duration-fast) ease-standard motion-reduce:transition-none",
+                position === current
+                  ? "visible opacity-100"
+                  : "invisible opacity-0",
               )}
             >
               {item}

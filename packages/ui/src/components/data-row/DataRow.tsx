@@ -189,7 +189,13 @@ export function DataRow({
 }: DataRowProps) {
   const layout = useContext(LayoutContext);
   const hasFavorite = favorite !== undefined || onFavoriteChange !== undefined;
-  const dotClass = cn(favoriteDot, favorite ? favoriteOn : favoriteOff);
+  // 动效：收藏切换时圆点换色 200ms 淡过去；实心/空心环的边框粗细
+  // 仍瞬时切换（不对布局属性做动画），形状本身已区分收藏与否。
+  const dotClass = cn(
+    favoriteDot,
+    "transition-colors duration-(--duration-fast) ease-standard motion-reduce:transition-none",
+    favorite ? favoriteOn : favoriteOff,
+  );
 
   return (
     <div
@@ -260,7 +266,9 @@ export function DataRow({
       <div
         role="cell"
         className={cn(
-          "text-right font-tech font-bold whitespace-nowrap tabular-nums",
+          // 动效：tone 变化（中性/产出/关注/异常）时数值换色 200ms，
+          // 正负号本身已区分含义，不只靠颜色。
+          "text-right font-tech font-bold whitespace-nowrap tabular-nums transition-colors duration-(--duration-fast) ease-standard motion-reduce:transition-none",
           toneClass[tone],
         )}
       >

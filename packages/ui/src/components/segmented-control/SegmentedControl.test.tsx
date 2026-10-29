@@ -276,7 +276,7 @@ describe("SegmentedControl", () => {
         <Segment value="a">网格</Segment>
       </SegmentedControl>,
     );
-    expect(group()).toHaveClass("h-14", "border", "bg-surface");
+    expect(group()).toHaveClass("h-14", "border", "bg-transparent");
     expect(group()).not.toHaveClass("border-b-2");
   });
 

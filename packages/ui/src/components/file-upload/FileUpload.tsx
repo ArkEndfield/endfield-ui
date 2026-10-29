@@ -342,7 +342,8 @@ export function FileUpload({
         onDragOver={handleDragOver}
         onDrop={handleDrop}
         className={cn(
-          "relative flex items-center border bg-surface-sunken",
+          // 投放区只留虚线框、不带底：实体底和整圈边框不能同时在（2026-10-29 整改口径）
+          "relative flex items-center border bg-transparent",
           "transition-colors duration-(--duration-fast) ease-standard",
           focusRingWithin,
           zoneSize[size],

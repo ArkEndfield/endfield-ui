@@ -78,7 +78,7 @@ describe("Textarea", () => {
     render(<Textarea aria-label="备注" variant="outline" />);
     const box = screen.getByRole("textbox").parentElement;
     expect(box).toHaveAttribute("data-variant", "outline");
-    expect(box).toHaveClass("border", "bg-surface");
+    expect(box).toHaveClass("border", "bg-transparent");
     expect(box).not.toHaveClass("border-b-2");
   });
 });

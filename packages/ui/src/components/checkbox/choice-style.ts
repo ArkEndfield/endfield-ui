@@ -11,7 +11,8 @@ export const choiceControl = "flex h-[1lh] shrink-0 items-center";
 
 /*
  * 复选框与单选框的方格 / 圆：
- * 未选是凹陷底 + 2px 描边；已选是反转块，上面压 accent-ink-inverse 的记号——
+ * 未选是透明底 + 2px 描边（实体底和整圈边框不能同时在，2026-10-29 整改口径）；
+ * 已选是反转块，上面压 accent-ink-inverse 的记号——
  * 亮色下是墨底黄记号，暗色下反转块是近白，记号换成深色档。
  *
  * 祖先上有 data-choice="diamond" 时换成菱形（方案 B）：方格缩到 14px 并转 45°，
@@ -22,7 +23,7 @@ export const choiceControl = "flex h-[1lh] shrink-0 items-center";
  * 记号用它上面的字色；禁用的用灰字色（菱形仍然是实心的）。
  */
 export const choiceBox = [
-  "peer size-5 shrink-0 appearance-none border-2 choice-diamond:size-3.5 choice-diamond:rotate-45 choice-diamond:checked:disabled:bg-ink-disabled border-line-strong bg-surface-sunken transition-colors duration-(--duration-fast) ease-standard group-hover:border-ink-secondary checked:border-surface-inverse checked:bg-surface-inverse aria-invalid:border-danger disabled:cursor-not-allowed disabled:border-ink-disabled disabled:bg-surface-sunken",
+  "peer size-5 shrink-0 appearance-none border-2 choice-diamond:size-3.5 choice-diamond:rotate-45 choice-diamond:checked:disabled:bg-ink-disabled border-line-strong bg-transparent transition-colors duration-(--duration-fast) ease-standard group-hover:border-ink-secondary checked:border-surface-inverse checked:bg-surface-inverse aria-invalid:border-danger disabled:cursor-not-allowed disabled:border-ink-disabled",
   "forced-colors:checked:border-[Highlight] forced-colors:checked:bg-[Highlight] forced-colors:disabled:border-[GrayText] forced-colors:disabled:bg-[Canvas] forced-colors:choice-diamond:checked:disabled:bg-[GrayText]",
 ].join(" ");
 
